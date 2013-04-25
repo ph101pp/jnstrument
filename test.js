@@ -42,10 +42,7 @@ function onEvent(tabId, method, data) {
 }
 /////////////////////////////////////////////////////////////
 function eventPaused(data){
-	console.log("eventPaused ---------------------------");
-
-	
-		chrome.debugger.sendCommand(debuggee, "Debugger.resume");
+	chrome.debugger.sendCommand(debuggee, "Debugger.resume");
 }
 
 function eventscriptParsed(data){
