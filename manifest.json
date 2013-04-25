@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+
+  "name": "First debugger Test",
+  "description": "This Extension tests the Debug API of chrome.",
+  "version": "0.1",
+   "background": {
+     "persistent": false,
+     "scripts": [
+        "jsBeautifier.js",
+        "instrumentCode.js"
+      ]
+  },
+  "permissions": [
+    "tabs",
+    "file://*/*",   
+    "http://*/*",
+    "https://*/*",
+    "debugger"
+  ],
+  "browser_action": {
+    "default_icon": "icon.png"
+    // ,
+    // "default_popup": "test.html"
+  }
+}
