@@ -12,8 +12,8 @@
   Private Properties
 /*//////////////////////////////////////////////////////////////////////////////
       var objIndex = 0;
-      var maxDepth = 0;
-      var dontInstrument = [/*document,*/ window.location, window.localStorage,window.sessionStorage, window.console.debug, "__pca__", "__pca__objInfo", window.chrome, null];
+      var maxDepth = 3;
+      var dontInstrument = [/*document,*/ window.location, window.localStorage,window.sessionStorage, window.console.debug, "__pca__", "__pca__objInfo", window.chrome, null, "prototype"];
 
       var structure = {};
 /*//////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@
                           tempArguments = Array.prototype.slice.call(arguments);
                           Array.prototype.unshift.call(tempArguments, null);
                           result = new (Function.prototype.bind.apply(method, tempArguments)); 
-                          result = __pca__.doInstrument.indexOf(result) >=0 ?
+                          result = __pca__.doInstrument.indexOf(typeof(result)) >=0 ?
                           	__pca__.wrapper(result):
                           	result;
                           instrumentation(result, arguments);
@@ -81,7 +81,7 @@
                       else { // if normal function call
                           if(getObjId(this) < 0) __pca__.wrapper(this); // if function call on existing object but not [new]
                           result = method.apply(this, arguments);
-                          result = __pca__.doInstrument.indexOf(result) >=0 ?
+                          result = __pca__.doInstrument.indexOf(typeof(result)) >=0 ?
                           	__pca__.wrapper(result):
                           	result;
                           instrumentation(this, arguments);
@@ -91,9 +91,9 @@
                   return method.toString() == wrapper.toString() ?
                       method:
                       wrapper;
-              break;            
+                          
               case "object":
-                  if(dontInstrument.indexOf(method) >= 0 || depth > maxDepth || (getObjId(method) >= 0 && depth != undefined)) return method;
+                  if(dontInstrument.indexOf(method) >= 0 || depth <= 0 || (getObjId(method) >= 0 && depth != undefined)) return method;
                   
                   method.__pca__objInfo = {
                       oid:objIndex++, 
@@ -102,14 +102,14 @@
                   }; 
 
                   for(var m in method){
-                      if(dontInstrument.indexOf(m) < 0 && dontInstrument.indexOf(method[m]) <0 && this.doInstrument.indexOf(method[m]) >=0) {
-                        method[m]=this.wrapper(method[m], depth+1 || 0, method, m);
+                      if(dontInstrument.indexOf(m) < 0 && dontInstrument.indexOf(method[m]) <0 && this.doInstrument.indexOf(typeof(method[m])) >=0) {
+                        method[m]=this.wrapper(method[m], (depth >=0 ? depth-1 : maxDepth) , method, m);
                       }
                   }
                   return method;
               break;
               default:
-                  return false;   
+                  return method;   
               break;   
           }
       }
