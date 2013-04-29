@@ -4,12 +4,19 @@
   "name": "First debugger Test",
   "description": "This Extension tests the Debug API of chrome.",
   "version": "0.1",
-   "background": {
+  "background": {
      "persistent": false,
      "scripts": [
         "launcher.js"
       ]
   },
+  // "content_scripts" : [
+  //   {
+  //     "js": ["pca__Instrument.js"],
+  //     "run_at" : "document_start",
+  //     "matches" : ["http://*/*", "file://*/*"]
+  //   }
+  // ],
   "permissions": [
     "tabs",
     "file://*/*",   
