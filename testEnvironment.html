@@ -2,41 +2,21 @@
 
 <html>
 <head>
-
+	<script src="__pca__Instrument.js?sd"></script>
 	<script>
-		(function(){
-			myClass = function(value){
-				var priv = {};
-				var publ = this;
+		console.debug(window);
 
-				priv.status = "uninitialized";
-				priv.value = undefined;
-				publ.getStatus = function() { console.log(priv.status);}; publ.doSomething = function() { console.log("this is my value: "+priv.value);priv.status = "done";};
-				
-				
-				if(this == window) console.log("Static MyClass '"+priv.value+"'");
 
-				priv.status="initialized";
-				priv.value=value;
 
-			}
 
-			myClass("test");
-			var clss = new myClass("test");
-			clss.getStatus();
-			clss.doSomething();
-			clss.getStatus();
-			console.log("fertig");
 
-			console.log(window);
-		})();	
-</script>
 
+	</script>
 </head>
 
 <body>
 <div id="container">
- <h1 onClick="javascript:myClass('tadaa');">Test JS environment</h1>
+ <h1>Test JS environment</h1>
 </div>
 </body>
 </html>
