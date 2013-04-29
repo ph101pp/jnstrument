@@ -2,12 +2,13 @@
 
 <html>
 <head>
-	<script src="__pca__Instrument.js?sdd"></script>
+		<script src ="@@pca__Instrument.js"></script>
 	<script>
 		function myClass() {
-					var __pca__liner = __pca__.liner(this, arguments);
-					if(__pca__liner) return __pca__liner;
-
+				if(__pca__) {
+	        var __pca__liner = __pca__.liner(this, arguments);
+	        if(__pca__liner) return __pca__liner;
+	 		  };
 
 		    console.log("ClassCall");
 		    
