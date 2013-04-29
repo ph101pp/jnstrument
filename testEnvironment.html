@@ -2,15 +2,31 @@
 
 <html>
 <head>
-	<script src="__pca__Instrument.js?sd"></script>
+	<script src="__pca__Instrument.js?sdd"></script>
 	<script>
-		console.debug(window);
+		function myClass() {
+					var __pca__liner = __pca__.liner(this, arguments);
+					if(__pca__liner) return __pca__liner;
 
 
+		    console.log("ClassCall");
+		    
+		    this.hello = "hallo";
+		    var hallo = "hello";
+		    
+		    this.method = function () {
 
+						console.log("MethodCall");
+		        
+		        this.childHello = "hallo";
+		        
+		        this.childMethod = function(){
+					
 
-
-
+		            console.log("ChildMethodCall");
+		        }
+		    }
+		}
 	</script>
 </head>
 
