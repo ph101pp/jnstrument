@@ -13,7 +13,7 @@
 /*//////////////////////////////////////////////////////////////////////////////
       var objIndex = 0;
       var maxDepth = 2;
-      var dontInstrument = [document, window.location, window.localStorage,window.sessionStorage, window.console.debug, "__pca__", "__pca__objInfo", window.chrome, null, "status", "statusText","prototype"];
+      var dontInstrument = [document, window.location, window.XMLHttpRequest,"XMLHttpRequest", window.localStorage,window.sessionStorage, window.console.debug, "__pca__", this.wrapper, this.liner, "__pca__objInfo", window.chrome, null, /*"status", "statusText",*/"prototype"];
 
       var structure = {};
 /*//////////////////////////////////////////////////////////////////////////////
@@ -23,6 +23,10 @@
 /*//////////////////////////////////////////////////////////////////////////////
   Private Methods
 /*//////////////////////////////////////////////////////////////////////////////
+      var sendData = function (data) {
+        //console.debug(data);
+      }
+///////////////////////////////////////////////////////////////////////////////
       var getPropertyType = function(property){
           return property!=null && typeof(property.__pca__objInfo) == "object"?
               property.__pca__objInfo.oid:
@@ -73,18 +77,21 @@
             } 
             else { // if normal function call
                 if(getObjId(this) < 0) __pca__.wrapper(this); // if function call on existing object but not [new]
-                result = method.apply(this, arguments);
-                result = __pca__.doInstrument.indexOf(typeof(result)) >=0 ?
-                	__pca__.wrapper(result):
-                	result;
                 instrumentation(this, arguments);
+                
+                try{
+                  result = method.apply(this, arguments);
+                } catch(e){console.debug(e)}
+                  result = __pca__.doInstrument.indexOf(typeof(result)) >=0 ?
+                    __pca__.wrapper(result):
+                    result;
             }
             return result;
         };
 				if(method.toString() == wrapper.toString()) return method;
 			//	else return wrapper;
 
-    		method = (wrapObject.bind(this))(method,depth, parent, name);
+    		method = (wrapObject.bind(this))(method, depth, parent, name);
     		for(var m in method)
     			if(this.doInstrument.indexOf(typeof(method[m])) >=0) wrapper[m] = method[m]; 
 
@@ -94,27 +101,31 @@
       }
 ///////////////////////////////////////////////////////////////////////////////
 			var wrapObject = function (method,depth, parent, name){
-				if(dontInstrument.indexOf(method) >= 0 || depth <= 0 || (getObjId(method) >= 0 && depth != undefined)) return method;
-	        
+				var doIt=false;
 
-	        if(!method.__pca__objInfo) Object.defineProperty(method,"__pca__objInfo", { writable:true,value:{
+        if(method != null) name = method.constructor && method.constructor.name != "" ? method.constructor.name : name;
+				if(dontInstrument.indexOf(method) >= 0 || dontInstrument.indexOf(name) >= 0 || depth <= 0 || (getObjId(method) >= 0 && depth != undefined)) return method;
+          
+  
+        if(!method.__pca__objInfo) Object.defineProperty(method,"__pca__objInfo", { 
+            writable:true,
+            value:{
 	        		oid:objIndex++, 
-	            name: (method.constructor && method.constructor.name != "" ? method.constructor.name : name), 
+	            name: name, 
 	            obj: method
-	        }}); 
+  	        }
+          }); 
 
 	        for(var m in method){
-            if(dontInstrument.indexOf(m) < 0 && dontInstrument.indexOf(method[m]) <0 && this.doInstrument.indexOf(typeof(method[m])) >=0) {
-              method[m]=this.wrapper(method[m], (depth >=0 ? depth-1 : maxDepth) , method, m);
-            }
+	        	try{
+            	doIt = dontInstrument.indexOf(m) < 0 && dontInstrument.indexOf(method[m]) <0 && this.doInstrument.indexOf(typeof(method[m])) >=0 ?
+            		true:false;
+            } catch(e){ doIt=false; console.debug(e);};
+            if(doIt) method[m]=this.wrapper(method[m], (depth >=0 ? depth-1 : maxDepth) , method, m);
 	        }
 	        return method;
 
 			}
-///////////////////////////////////////////////////////////////////////////////
-      var sendData = function (data) {
-        console.debug(data);
-      }
 /*//////////////////////////////////////////////////////////////////////////////
   Public Methods
 /*//////////////////////////////////////////////////////////////////////////////
