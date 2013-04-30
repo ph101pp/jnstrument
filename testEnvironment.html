@@ -2,33 +2,79 @@
 
 <html>
 <head>
+	<script src ="reflect.js"></script>
 <!--		// <script src ="@@pca__Instrument.js"></script>-->
 
 	<script>
-		function myClass() {
-						// if(__pca__) {
-	   //      var __pca__liner = __pca__.liner(this, arguments);
-	   //      if(__pca__liner) return __pca__liner;
-	 		//   };
 
-		    console.log("ClassCall");
-		    
-		    this.hello = "hallo";
-		    var hallo = "hello";
-		    
-		    this.method = function () {
+function wrapper(obj) {
+    return Proxy(obj, {
+        get: function(obj, name) {
+        		if(name == "__pca__objInfo") return this.__pca__objInfo;
+        		if(name == "__pca__Proxied") return true;
 
-						console.log("MethodCall");
-		        
-		        this.childHello = "hallo";
-		        
-		        this.childMethod = function(){
-					
+        		console.log("get",obj, name, "proxied");
+            return Reflect.get(obj, name);
+        },
+        set: function(obj, name, value) {
+        		if(name === "__pca__objInfo") {
+        			this.__pca__objInfo=value;
+        			return;
+        		}
 
-		            console.log("ChildMethodCall");
-		        }
-		    }
-		}
+            console.log("set",obj, name, "proxied");
+            return Reflect.set(obj, name, value);
+        }, 
+        apply: function(method, _this, arguments) {
+            console.log("apply",method, _this,arguments,"proxied");
+            return Reflect.apply(method, _this, arguments);
+        },
+        construct: function(method, arguments) {
+            console.log("construct",method,arguments,"proxied");
+            return Reflect.construct(method, arguments);
+        }
+
+    });
+}
+myClass =function () {
+    console.log("ClassCall");
+    
+    this.hello = "hallo";
+    var hallo = "hello";
+    
+    this.method = function () {
+        
+        console.log("MethodCall");
+        
+        this.childHello = "hallo";
+        
+        this.childMethod = function(){
+            
+            
+            console.log("ChildMethodCall");
+        }
+    }
+}
+myClass=wrapper(myClass);
+
+myClass.__pca__objInfo={
+	jawohl:"yess"
+};
+
+console.debug(myClass.__pca__objInfo);
+
+
+myObject = {
+	bla: "blub"
+};
+myObject=wrapper(myObject);
+myObject.__pca__objInfo={
+	tscuah:"no"
+};
+console.debug(myObject.__pca__objInfo);
+console.debug(myClass.__pca__objInfo);
+console.debug(myObject);
+
 	</script>
 </head>
 
