@@ -1712,6 +1712,18 @@ var Reflect = global.Reflect = {
       return handler.construct(handler.target, args);
     }
     
+/*//////////////////////////////////////////////////////////////////////////////
+  PCA
+/*//////////////////////////////////////////////////////////////////////////////
+
+  var tempArguments = Array.prototype.slice.call(args);
+  Array.prototype.unshift.call(tempArguments, null);
+  return new (Function.prototype.bind.apply(target, tempArguments)); 
+
+/*//////////////////////////////////////////////////////////////////////////////
+  /PCA
+/*//////////////////////////////////////////////////////////////////////////////
+
     var proto = target.prototype;
     var instance = (Object(proto) === proto) ? Object.create(proto) : {};
     var result = Function.prototype.apply.call(target, instance, args);
