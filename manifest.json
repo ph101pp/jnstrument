@@ -12,7 +12,7 @@
   },
   // "content_scripts" : [
   //   {
-  //     "js": ["pca__Instrument.js"],
+  //     "js": ["inject.js"],
   //     "run_at" : "document_start",
   //     "matches" : ["http://*/*", "file://*/*"]
   //   }
@@ -21,8 +21,11 @@
     "tabs",
     "file://*/*",   
     "http://*/*",
-    "https://*/*",
-    "debugger"
+    "https://*/*"
+  ],
+  "web_accessible_resources" : [
+    "reflect.js", 
+    "pca__ProxyInstrument.js"
   ],
   "browser_action": {
     "default_icon": "icon.png"

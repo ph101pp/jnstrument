@@ -7,25 +7,25 @@
 
 	<script>
 myClass =function () {
-    console.log("ClassCall");
+    console.log("ClassCall",this);
     
     this.hello = "hallo";
     var hallo = "hello";
     
     this.method = function () {
         
-        console.log("MethodCall");
+        console.log("method Call",this instanceof myClass);
         
         this.childHello = "hallo";
         
         this.childMethod = function(){
             
             
-            console.log("ChildMethodCall");
+            console.log("ChildMethodCall",this);
         }
     }
 }
-
+testClass = new myClass();
 	</script>
 </head>
 

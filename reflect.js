@@ -71,8 +71,7 @@
  // Direct proxies can be created via Proxy(target, handler)
 
  // ----------------------------------------------------------------------------
-
-(function(global, nonstrictDelete){ // function-as-module pattern
+if(!window.Reflect) (function(global, nonstrictDelete){ // function-as-module pattern
 "use strict";
 
 // === Direct Proxies: Invariant Enforcement ===
