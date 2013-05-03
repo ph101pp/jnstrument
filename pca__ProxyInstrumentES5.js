@@ -1,87 +1,3 @@
-var Forwarder = function(){
-  var _slice  = Array.prototype.slice,
-      _bind   = Function.prototype.bind,
-      _apply  = Function.prototype.apply,
-      _hasOwn = Object.prototype.hasOwnProperty;
-
-  function Forwarder(target){
-    this.target = target;
-  }
-
-  Forwarder.prototype = {
-    getOwnPropertyNames: function(){
-      return Object.getOwnPropertyNames(this.target);
-    },
-    keys: function(){
-      return Object.keys(this.target);
-    },
-    enumerate: function(){
-      var i=0, keys=[];
-      for (keys[i++] in this.target);
-      return keys;
-    },
-    getPropertyDescriptor: function(key){
-      var o = this.target;
-      while (o) {
-        var desc = Object.getOwnPropertyDescriptor(o, key);
-        if (desc) {
-          desc.configurable = true;
-          return desc;
-        }
-        o = Object.getPrototypeOf(o);
-      }
-    },
-    getOwnPropertyDescriptor: function x(key){
-      var desc = Object.getOwnPropertyDescriptor(this.target, key);
-      if (desc) {
-        desc.configurable = true;
-        return desc;
-      }
-      return desc;
-    },
-    defineProperty: function(key, desc){
-      return Object.defineProperty(this.target, key, desc);
-    },
-    get: function get(receiver, key){
-      return this.target[key];
-    },
-    set: function set(receiver, key, value){
-      this.target[key] = value;
-      return true;
-    },
-    has: function has(key){
-      return key in this.target;
-    },
-    hasOwn: function(key){
-      return _hasOwn.call(this.target, key);
-    },
-    delete: function(key){
-      delete this.target[key];
-      return true;
-    },
-    apply: function(receiver, args){
-      return _apply.call(this.target, receiver, args);
-    },
-    construct: function(args){
-      return new (_bind.apply(this.target, [null].concat(args)));
-    }
-  };
-
-  // function forward(target, overrides){
-  //   var handler = new Forwarder(target);
-  //   for (var k in Object(overrides)) {
-  //     handler[k] = overrides[k];
-  //   }
-  //   return typeof target === 'function'
-  //     ? Proxy.createFunction(handler,
-  //         function(){ return handler.apply(this, _slice.call(arguments)) },
-  //         function(){ return handler.construct(_slice.call(arguments)) })
-  //     : Proxy.create(handler, Object.getPrototypeOf(Object(target)));
-  // }
-
-  return Forwarder;
-}();
-
 (function(window, document, undefined){
 	function __pca__Instrument() {
 			if (this == window) return new __pca__Instrument(); // has to be called as Constructor
@@ -96,8 +12,11 @@ var Forwarder = function(){
 /*//////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*//////////////////////////////////////////////////////////////////////////////
-			var sendData = function (data) {
-				//console.debug(data);
+			var sendData = function (event, proxy, method, args, _this) {
+				console.debug(event, proxy.__pca__objIndex, args);
+
+
+				
 			}
 ///////////////////////////////////////////////////////////////////////////////
 			var testObject = function(obj, name, parent) {
@@ -146,10 +65,85 @@ var Forwarder = function(){
 				if(!constructedFrom(obj,window.constructor)) return obj;
 				Object.defineProperty(obj,"__pca__Proxied", {
 					writable:true,
-					value: function(){return true},
+					value: true,
 				});
 				return obj;
 			}
+///////////////////////////////////////////////////////////////////////////////
+		  var Reflect = function(target){
+		    this.target = target;
+		  }
+
+		  Reflect.prototype = {
+		    getOwnPropertyNames: function(){
+		      return Object.getOwnPropertyNames(this.target);
+		    },
+		    keys: function(){
+		      return Object.keys(this.target);
+		    },
+		    enumerate: function(){
+		      var i=0, keys=[];
+		      for (keys[i++] in this.target);
+		      return keys;
+		    },
+		    getPropertyDescriptor: function(key){
+		      var o = this.target;
+		      while (o) {
+		        var desc = Object.getOwnPropertyDescriptor(o, key);
+		        if (desc) {
+		          desc.configurable = true;
+		          return desc;
+		        }
+		        o = Object.getPrototypeOf(o);
+		      }
+		    },
+		    getOwnPropertyDescriptor: function x(key){
+		      var desc = Object.getOwnPropertyDescriptor(this.target, key);
+		      if (desc) {
+		        desc.configurable = true;
+		        return desc;
+		      }
+		      return desc;
+		    },
+		    defineProperty: function(key, desc){
+		      return Object.defineProperty(this.target, key, desc);
+		    },
+		    get: function get(receiver, key){
+		      return this.target[key];
+		    },
+		    set: function set(receiver, key, value){
+		      this.target[key] = value;
+		      return true;
+		    },
+		    has: function has(key){
+		      return key in this.target;
+		    },
+		    hasOwn: function(key){
+		      return Object.prototype.hasOwnProperty.call(this.target, key);
+		    },
+		    delete: function(key){
+		      delete this.target[key];
+		      return true;
+		    },
+		    apply: function(receiver, args){
+		      return Function.prototype.apply.call(this.target, receiver, args);
+		    },
+		    construct: function(args){
+		      return new (Function.prototype.bind.apply(this.target, [null].concat(args)));
+		    }
+		  };
+///////////////////////////////////////////////////////////////////////////////
+		  var _Proxy = function(target, overrides){
+		    var handler = new Reflect(target);
+		    for (var k in Object(overrides)) {
+		      handler[k] = overrides[k];
+		    }
+		    return typeof target === 'function'
+		      ? Proxy.createFunction(handler,
+		          function(){ return handler.apply(this, arguments) },
+		          function(){ return handler.construct(arguments) })
+		      : Proxy.create(handler, Object.getPrototypeOf(Object(target)));
+		  }
 /*//////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*//////////////////////////////////////////////////////////////////////////////
@@ -157,34 +151,36 @@ var Forwarder = function(){
 				if(!parent && !testObject(obj,name, parent)) return obj;
 
 				if((depth = depth || maxDepth) > 1) 
-					for(var p in obj) {
-						var test = testObject(obj[p],p,obj);
-						if(test) obj[p] = this.wrapper(obj[p], depth-1 , obj, p);
-					}
-
+					for(var p in obj)
+						if(testObject(obj[p],p,obj)) 
+							obj[p] = this.wrapper(obj[p], depth-1 , obj, p);
 				 
-				if(typeof(obj) != "function" || obj.__pca__Proxied) return obj;
+				if(typeof(obj) !== "function" || obj.__pca__Proxied) return obj;
 
-				Object.defineProperty(obj,"__pca__Proxied", {
-					value: true,
-				});
-				Object.defineProperty(obj,"__pca__objIndex", {
-					value: objIndex++,
-				});
+				return windowObjectProxy( _Proxy(obj, {
+					get : function get(receiver, key){
+						if(key == "__pca__Proxied") return true;
+						if(key == "__pca__objInfo") return this.__pca__objInfo;
+						if(key == "__pca__objIndex") return this.__pca__objIndex;
 
-				return Proxy.createFunction(new Forwarder(obj), function(){
-						console.log("Call", arguments, obj.__pca__objIndex);
-						return obj.apply(this, arguments);
+						return this.target[key];
 					},
-					function(){
-						console.log("Construct", arguments, obj.__pca__objIndex);
-						
-						Array.prototype.unshift.call(arguments, null);
-						return __pca__.wrapper(new (Function.prototype.bind.apply(obj, arguments))); 
-						
-					});
-
-
+			    set: function set(receiver, key, value){
+			    	if(key == "__pca__objInfo") this[key] = value;
+			      else this.target[key] = value;
+			      return true;
+			    },
+					apply : function(_this, args){
+						sendData("Apply", this, this.target, args, _this);
+						return Function.prototype.apply.call(this.target, _this, args);
+					},
+					construct : function(args){
+						sendData("Construct", this, this.target, args);
+						Array.prototype.unshift.call(args, null);
+						return __pca__.wrapper(new (Function.prototype.bind.apply(this.target, args))); 	
+					},
+					__pca__objIndex:objIndex++
+				}));
 			}
 ///////////////////////////////////////////////////////////////////////////////
 	}
