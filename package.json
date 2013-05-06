@@ -1,0 +1,18 @@
+{
+  "name": "BA Thesis",
+  "version": "0.1.0",
+  "author": "Philipp Adrian <hello@philippadrian.com>",
+  "description": "Bachelor Thesis",
+  "main": "./index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greenish/BA-Thesis.git"
+  },
+  "dependencies" : {
+    "http-proxy"   :  "0.10.x",
+    "socket.io" :  "0.9.x"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
