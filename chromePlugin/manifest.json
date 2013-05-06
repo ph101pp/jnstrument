@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "First debugger Test",
-  "description": "This Extension tests the Debug API of chrome.",
+  "name": "PCA Instrumentation Inject",
+  "description": "Injects my instrumentation script.",
   "version": "0.1",
   "background": {
      "persistent": false,

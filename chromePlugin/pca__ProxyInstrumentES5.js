@@ -30,7 +30,7 @@
 			var testObject = function(obj, name, parent) {
 				try{
 					var nameIsNot = ["Proxy", "Reflect", "io", "__pca__", "toString", "__pca__Proxied", "prototype"];
-					var objIsNot = [document, setTimeout, window.WebSocket.prototype.send, clearTimeout, getComputedStyle, null, console];
+					var objIsNot = [document, window.WebSocket.prototype.send, setTimeout, clearTimeout, getComputedStyle, null, console];
 					var isNotInstancesOf = [console.constructor, window.location.constructor];
 					var typeIs = ["object", "function"];
 
