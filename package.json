@@ -4,7 +4,7 @@
   "author": "Philipp Adrian <hello@philippadrian.com>",
   "description": "Bachelor Thesis",
   "scripts": {
-    "start": "./index.js"
+    "start": "./nodeServer/proxyServer2.js"
   },
   "repository": {
     "type": "git",
