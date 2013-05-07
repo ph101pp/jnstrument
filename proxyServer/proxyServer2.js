@@ -7,8 +7,6 @@ httpProxy.createServer(function(req, res, proxy) {
   req.headers.host  = urlObj.host;
   req.url           = urlObj.path;
 
-  console.log(urlObj.host);
-
   proxy.proxyRequest(req, res, {
     host    : urlObj.host,
     port    : 80,
