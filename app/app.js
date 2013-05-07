@@ -1,6 +1,9 @@
 var express = require('express'),
 	stylus = require('stylus');
+	proxy = require("./proxyServer/proxyServer2.js");
 var app = express();
+
+proxy(9000);
 
 app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
@@ -18,4 +21,4 @@ app.get('/', function (req, res) {
   	title : 'Home' 
   });
 })
-app.listen(3000);
+app.listen(8000);
