@@ -2,11 +2,11 @@
 var url       = require('url');
 var httpProxy = require('http-proxy');
 
-var proxy = new httpProxy.RoutingProxy();
-
 var proxyRequest = function(req, res, next) {
 	var urlObj = url.parse(req.url);
 	if(!urlObj.host) next();
+
+	var proxy = new httpProxy.RoutingProxy();
 
 	req.headers.host  = urlObj.host;
 	req.url           = urlObj.path;
