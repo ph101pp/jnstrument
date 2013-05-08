@@ -1,34 +1,20 @@
 
-var httpProxy = require('http-proxy');
 var url       = require('url');
+var httpProxy = require('http-proxy');
 
-var proxyServer = function(port){
-	if(this === global) return new proxyServer(port); // has to be instanciated with new.
+var proxy = new httpProxy.RoutingProxy();
 
-	this.port = port;
+var proxyRequest = function(req, res, next) {
+	var urlObj = url.parse(req.url);
+	if(!urlObj.host) next();
 
-	httpProxy.createServer(function(req, res, proxy) {
-		var urlObj = url.parse(req.url);
-		// var urlObj = url.parse("http://www.posterkoenig.ch");
-
-		req.headers.host  = urlObj.host;
-		req.url           = urlObj.path;
-
-		if(urlObj.host) 
-			proxy.proxyRequest(req, res, {
-				host    : urlObj.hostname,
-				port    : urlObj.port || 80,
-				enable  : { xforward: true }
-			});		
-		else
-			proxy.proxyRequest(req, res, {
-				host    : "www.google.ch",
-				port    : 80,
-				enable  : { xforward: true }
-			});
-	}).listen(port, function () {
-		console.log("Proxy waiting for requests at port "+port);
+	req.headers.host  = urlObj.host;
+	req.url           = urlObj.path;
+	
+	proxy.proxyRequest(req, res, {
+		host    : urlObj.hostname,
+		port    : urlObj.port || 80,
+		enable  : { xforward: true }
 	});
-	return this;
 }
-module.exports = proxyServer;
+module.exports = proxyRequest;
