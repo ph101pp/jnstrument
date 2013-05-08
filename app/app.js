@@ -1,6 +1,6 @@
 var express = require('express');
 var stylus = require('stylus');
-var proxyRequest = require("./proxyServer.js");
+var proxyRequest = require("./proxyRequest.js");
 
 
 var app = express();
