@@ -8,7 +8,7 @@ function proxyInject(_tabId){
 
 	var injectScripts = function (tabId) {
 	 	chrome.tabs.executeScript(tabId, { 
-		  	code: "document.body.appendChild(document.createElement('script')).src='" + chrome.extension.getURL("pca__ProxyInstrumentES5.js") +"?"+new Date().getTime()+"';",
+		  	code: "document.body.appendChild(document.createElement('script')).src='http://greenish.eu01.aws.af.cm/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime()+"';",
 				allFrames: true
 		}, null);
 	};
