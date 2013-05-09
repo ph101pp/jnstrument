@@ -1,10 +1,10 @@
 extend layout
 block content
-  form(method = "GET", action= "http://localhost:8000/proxy") 
-    span http
-    input(type="text", name="url")
+	form(method = "GET", action= "http://localhost:8000/proxy") 
+		span http
+		input(type="text", name="url")
 block sidebar
-  .widget
-    h1 Widget
-    p
-      | Type in the website's url you want to get visualized
+	.widget
+		h1 Bookmarklet
+		p
+			a(href = "javascript:(function(window, document, undefined){document.body.appendChild(document.createElement('script')).src='http://localhost:8000/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime()+"';})(window,document)") jnstrument

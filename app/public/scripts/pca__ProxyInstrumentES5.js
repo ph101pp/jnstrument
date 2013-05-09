@@ -21,7 +21,7 @@ window.WEB_SOCKET_SWF_LOCATION = "http://greenish.eu01.aws.af.cm/socket.io/WebSo
 		var sendData = function (event, proxy, method, args, _this) {
 			//console.debug(event, proxy.__pca__objIndex, args, method);
 			
-			if(connection) connection.emit('__pca__', {
+			if(connection) connection.emit('__pca__Event', {
 				index:proxy.__pca__objIndex,
 				event: event
 			});
@@ -178,9 +178,11 @@ window.WEB_SOCKET_SWF_LOCATION = "http://greenish.eu01.aws.af.cm/socket.io/WebSo
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.setupConnection = function(){
-			connection = io.connect('http://greenish.eu01.aws.af.cm/');
-			// connection = io.connect('http://localhost:8000');
-			connection.emit("__pca__","hello");
+			//connection = io.connect('http://greenish.eu01.aws.af.cm/');
+			connection = io.connect('http://localhost:8000');
+			connection.emit("__pca__Connect_Sender",{}, function(data){
+				alert("Link to Visualization: "+data);
+			});
 		}		
 ///////////////////////////////////////////////////////////////////////////////
 	}
