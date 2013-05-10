@@ -2,7 +2,7 @@
 var http = require("http");
 var client = require("./expressClient.js")();
 var server = http.createServer(client);
-var eventHandler = require("./eventHandler.js")(server);
+var eventHandler = require("./serverEventHandler.js")(server);
 
 
 server.listen(process.env.VCAP_APP_PORT || 8000, function () {
