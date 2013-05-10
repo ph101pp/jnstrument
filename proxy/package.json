@@ -1,0 +1,20 @@
+{
+  "name": "PCA-BA-Thesis Proxy",
+  "version": "0.1.0",
+  "author": "Philipp Adrian <hello@philippadrian.com>",
+  "description": "Bachelor Thesis",
+  "scripts": {
+    "start": "./server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greenish/BA-Thesis.git"
+  },
+  "dependencies": {
+    "http-proxy": "0.10.x",
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "0.8.x"
+  }
+}
