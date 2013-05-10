@@ -17,17 +17,18 @@
 /*//////////////////////////////////////////////////////////////////////////////
 		var sendData = function (event, proxy, method, args, _this) {
 			//console.debug(event, proxy.__pca__objIndex, args, method);
-			console.log(__pca__.guid);
 			if(connection) connection.emit('__pca__Event', {
-				index:proxy.__pca__objIndex,
 				event: event,
-				guid:__pca__.guid
+				args:args.toString(),
+				id : proxy.__pca__objIndex
+			}, function(data){
+				console.log(data);
 			});
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var testObject = function(obj, name, parent) {
 			try{
-				var nameIsNot = ["Proxy", "Reflect", "io", "__pca__", "toString", "__pca__Proxied", "prototype"];
+				var nameIsNot = ["Proxy",  "__pca__", "toString", "__pca__Proxied", "prototype"];
 				var objIsNot = [document, window.WebSocket.prototype.send, setTimeout, clearTimeout, getComputedStyle, null, console];
 				var isNotInstancesOf = [console.constructor, window.location.constructor];
 				var typeIs = ["object", "function"];
@@ -199,10 +200,10 @@
 			
 			__pca__.guid = getCookie("__pca__Uuid");
 			
-			connection.emit("__pca__Connect_Sender",{guid:__pca__.guid}, function(data){
+			connection.emit("__pca__Connect_Sender",{guid:__pca__.guid, source: window.location.href}, function(data){
 				setCookie("__pca__Uuid", data.guid, 1);
 				__pca__.guid = data.guid;
-				alert("Link to Visualization: "+data.guid);
+				alert("Link to Visualization:\n "+data.url+data.guid);
 			});
 		}		
 ///////////////////////////////////////////////////////////////////////////////
