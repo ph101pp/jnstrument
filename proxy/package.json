@@ -1,5 +1,5 @@
 {
-  "name": "PCA-BA-Thesis Proxy",
+  "name": "jnstrument-Proxy",
   "version": "0.1.0",
   "author": "Philipp Adrian <hello@philippadrian.com>",
   "description": "Bachelor Thesis",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "http-proxy": "0.10.x",
+    "express": "3.2.x"
   },
   "devDependencies": {},
   "engines": {

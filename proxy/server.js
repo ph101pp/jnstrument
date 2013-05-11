@@ -1,6 +1,14 @@
 var http = require("http");
 var proxy = require("./proxyRequest.js");
+var express = require('express')
+var app = express();
 
-var server = http.createServer(function(req, res){
+app.use(express.logger('dev'))
+
+app.get("/|/*", /*proxy.middleware,*/ function (req, res) {
 	proxy.go(req, res);
-}).listen(8000);
+
+})
+
+
+var server = http.createServer(app).listen(80);
