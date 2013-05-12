@@ -1,6 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 (function(window, document, undefined){
-	window.WEB_SOCKET_SWF_LOCATION = "http://greenish.eu01.aws.af.cm/socket.io/WebSocketMain.swf";
 	var __pca__Instrument = function() {
 		if (this == window) return new __pca__Instrument(); // has to be called as Constructor
 /*//////////////////////////////////////////////////////////////////////////////
@@ -9,6 +8,9 @@
 		var objIndex = 0;
 		var maxDepth=3;
 		var connection;
+		var guid;
+		var io = require("socket.io-client");
+		var enabled=false;
 /*//////////////////////////////////////////////////////////////////////////////
 	Public Properties
 /*//////////////////////////////////////////////////////////////////////////////
@@ -17,7 +19,7 @@
 /*//////////////////////////////////////////////////////////////////////////////
 		var sendData = function (event, proxy, method, args, _this) {
 			//console.debug(event, proxy.__pca__objIndex, args, method);
-			if(connection) connection.emit('__pca__Event', {
+			if(connection && enabled) connection.emit('__pca__Event', {
 				event: event,
 				args:args.toString(),
 				id : proxy.__pca__objIndex
@@ -137,7 +139,7 @@
 				construct : function(args){
 					sendData("Construct", this, this.target, args);
 					Array.prototype.unshift.call(args, null);
-					return __pca__.wrapper(new (Function.prototype.bind.apply(this.target, args))); 	
+					return wrapper(new (Function.prototype.bind.apply(this.target, args))); 	
 				},
 	  	};
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,16 +178,14 @@
 			}
 			return "";
 		}
-/*//////////////////////////////////////////////////////////////////////////////
-	Public Methods
-/*//////////////////////////////////////////////////////////////////////////////
-		this.wrapper = function (obj, depth, parent, name) {
+///////////////////////////////////////////////////////////////////////////////
+		var wrapper = function (obj, depth, parent, name) {
 			if(!parent && !testObject(obj,name, parent)) return obj;
 
 			if((depth = depth || maxDepth) > 1) 
 				for(var p in obj)
 					if(testObject(obj[p],p,obj)) {
-						obj[p] = this.wrapper(obj[p], depth-1 , obj, p);
+						obj[p] = wrapper(obj[p], depth-1 , obj, p);
 			 		}
 			if(typeof(obj) !== "function" || obj.__pca__Proxied) return obj;
 
@@ -194,23 +194,37 @@
 			}));
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.setupConnection = function(){
+		var setupConnection = function(){
 			//connection = require("socket.io-client").connect('http://greenish.eu01.aws.af.cm/');
 			connection = require("socket.io-client").connect('http://localhost:8000/');
 			
-			__pca__.guid = getCookie("__pca__Uuid");
-			
-			connection.emit("__pca__Connect_Sender",{guid:__pca__.guid, source: window.location.href}, function(data){
-				setCookie("__pca__Uuid", data.guid, 1);
-				__pca__.guid = data.guid;
+			connection.emit("__pca__Connect_Sender",{guid:guid, source: window.location.href}, function(data){
 				alert("Link to Visualization:\n "+data.url+data.guid);
 			});
-		}		
+		}
+///////////////////////////////////////////////////////////////////////////////
+		var init = function(_guid){
+			guid = _guid;
+			wrapper(window);
+			setupConnection();
+			console.debug("Window Instrumented");		
+		}	
+/*//////////////////////////////////////////////////////////////////////////////
+	Public Methods
+/*//////////////////////////////////////////////////////////////////////////////
+		this.disable = function (){
+			enabled=false;
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.enable = function(_guid){
+			console.log(connection, _guid, guid);
+			enabled=true;
+			if(!connection) init(_guid);
+		}
 ///////////////////////////////////////////////////////////////////////////////
 	}
+///////////////////////////////////////////////////////////////////////////////
+	window.WEB_SOCKET_SWF_LOCATION = "http://greenish.eu01.aws.af.cm/socket.io/WebSocketMain.swf";
 	__pca__= new __pca__Instrument();
-	__pca__.wrapper(window);
-	__pca__.setupConnection();
-	console.debug("Window Instrumented");
-
+	if(typeof(__pca__UpdateScript) === "function") __pca__UpdateScript();
 })(window, document);

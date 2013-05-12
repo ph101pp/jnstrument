@@ -7,16 +7,17 @@
   "background": {
      "persistent": true,
      "scripts": [
-        "popup.js"
+       "jnstrument.js"
+//        "popup.js"
       ]
   },
-  // "content_scripts" : [
-  //   {
-  //     "js": ["inject.js"],
-  //     "run_at" : "document_start",
-  //     "matches" : ["http://*/*", "file://*/*"]
-  //   }
-  // ],
+  "content_scripts" : [
+    {
+      "js": ["inject.js"],
+      "run_at" : "document_end",
+      "matches" : ["http://*/*", "file://*/*"]
+    }
+  ],
   "permissions": [
     "tabs",
     "file://*/*",   
@@ -24,10 +25,10 @@
     "https://*/*"
   ],
   "web_accessible_resources" : [
-    "pca__ProxyInstrumentES5.js"
+    "pca__ProxyInstrumentES5chrome.js"
   ],
   "browser_action": {
-    "default_icon": "icon.png"
+    "default_icon": "inactive.png"
     // ,
     // "default_popup": "launcher.html"
   }
