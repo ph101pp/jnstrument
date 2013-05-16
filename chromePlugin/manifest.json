@@ -15,7 +15,7 @@
     {
       "js": ["inject.js"],
       "run_at" : "document_end",
-      "matches" : ["http://*/*", "file://*/*"]
+      "matches" : ["http://*/*", "file://*/*", "https://*/*"]
     }
   ],
   "permissions": [

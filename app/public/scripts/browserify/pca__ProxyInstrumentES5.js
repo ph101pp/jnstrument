@@ -9,7 +9,6 @@
 		var maxDepth=3;
 		var connection;
 		var guid;
-		var io = require("socket.io-client");
 		var enabled=false;
 /*//////////////////////////////////////////////////////////////////////////////
 	Public Properties
@@ -45,7 +44,6 @@
 				for(var i=0; i<isNotInstancesOf.length; i++) 
 					if(obj instanceof isNotInstancesOf[i]) return false
 
-			
 				if(typeIs.indexOf(typeof(obj)) < 0) return false;
 
 				if(parent) parent[name] = (function(){return obj;})(); // trigger dom exception etc
@@ -217,7 +215,6 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.enable = function(_guid){
-			console.log(connection, _guid, guid);
 			enabled=true;
 			if(!connection) init(_guid);
 		}
