@@ -3,8 +3,8 @@ new (function jnstrument(){
 	var tabs = {};
 /////////////////////////////////////////////////////////////
 	chrome.browserAction.onClicked.addListener(function(tab) {
-		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab);
-		else activateTab(tab)
+		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab.id);
+		else activateTab(tab.id);
 	});
 /////////////////////////////////////////////////////////////
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -24,30 +24,66 @@ new (function jnstrument(){
 		});
 	});
 /////////////////////////////////////////////////////////////
-	var activateTab = function(tab){
-		if(tabs[tab.id]) tabs[tab.id].status = true;
-		else tabs[tab.id] = {
+	chrome.debugger.onDetach.addListener(function(debuggee){
+		deactivateTab(debuggee.tabId);
+	});
+/////////////////////////////////////////////////////////////
+	chrome.debugger.onEvent.addListener(function(debuggee, method, data){
+		if(method !=="Debugger.scriptParsed") return;
+		if(data.url.search("^(http://|https://|file://|localhost:).*")<0) return; // only instrument scripts from the website.. not from scripts sent from chrome.
+		if(data.url.search(/pca__ProxyInstrumentES5\.js/) >= 0) return;
+		
+		var instrument="if(window.__pca__) __pca__.liner(this, arguments);";
+
+		chrome.debugger.sendCommand(debuggee, "Debugger.getScriptSource",{scriptId: data.scriptId }, function(result){
+			var instrumentedScript=result.scriptSource.replace(
+					/(function[\s\n\r\t]*([$A-Za-z_][A-Za-z_0-9$]*)?[\s\n\r\t]*\(([\s\n\r\t]*([$A-Za-z_][\w$]*)?[\s\n\r\t]*,?)*\)[\s\n\r\t]*{)/g,
+					"$1 "+instrument);
+
+			//chrome.tabs.executeScript(priv.debuggee.tabId, {code:niceScript},function(response){console.log(response)});
+			chrome.debugger.sendCommand(debuggee,"Runtime.evaluate",{expression:instrumentedScript},function(response){if(response.thrown)console.log(response)});
+		});
+	});
+/////////////////////////////////////////////////////////////
+	var activateTab = function(tabId){
+		// try{
+		// 	chrome.debugger.detach({tabId:tabId});
+		// } catch(e){};		
+		// chrome.debugger.attach({tabId:tabId}, "1.0", function(){
+		// 	chrome.debugger.sendCommand({tabId:tabId}, "Debugger.enable");
+		// });
+
+		if(tabs[tabId]) tabs[tabId].status = true;
+		else tabs[tabId] = {
 			guid: createGuid(),
 			status : true
 		};
-		chrome.tabs.sendMessage(tab.id, {
+
+		chrome.tabs.sendMessage(tabId, {
 			action: "enable", 
-			guid : tabs[tab.id].guid
+			guid : tabs[tabId].guid
 		});
+
 		chrome.browserAction.setIcon({
 			path:"active.png",
-			tabId:tab.id
+			tabId:tabId
 		});
 	}
 /////////////////////////////////////////////////////////////
-	var deactivateTab = function(tab){
-		chrome.tabs.sendMessage(tab.id, {
+	var deactivateTab = function(tabId){
+		tabId = typeof(tabId) == "object" ?
+			tabId.tabId:
+			tabId;
+		chrome.tabs.sendMessage(tabId, {
 			action: "disable"
 		});
-		tabs[tab.id].status = false;
+		tabs[tabId].status = false;
+		// try{
+		// 	chrome.debugger.detach({tabId:tabId});
+		// } catch(e){};
 		chrome.browserAction.setIcon({
 			path:"inactive.png",
-			tabId:tab.id
+			tabId:tabId
 		});
 	}
 /////////////////////////////////////////////////////////////

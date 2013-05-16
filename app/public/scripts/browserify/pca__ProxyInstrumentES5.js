@@ -22,7 +22,7 @@
 			//console.debug(event, proxy.__pca__objIndex, args, method);
 			if(!connection || !enabled) return;
 
-			var index = event === "liner" && !proxy?
+			var index = event === "Liner" && !proxy?
 				addObj(method):
 				proxy.__pca__objIndex;
 
@@ -32,7 +32,7 @@
 				id : index,
 				event: event,
 				calledBy: calledBy,
-				test: objs[objIndex],
+				test: objs[index],
 				//caller : args.callee.caller,
 				//args:args,
 				ids: objIndex,
@@ -41,10 +41,10 @@
 
 			// if(data.calledBy <0) console.log(args.callee.caller);
 			// return;
-			//console.log('__pca__Event', data);
+//			console.log('__pca__Event', data);
 
 			connection.emit('__pca__Event', data, function(data){
-				console.log(data);
+				//console.log(data);
 			});
 			wait(__pca__.wait);
 		}
@@ -66,7 +66,7 @@
 		var testObject = function(obj, name, parent) {
 			try{
 				var nameIsNot = ["Proxy",  "__pca__", "toString", "__pca__Proxied", "prototype"];
-				var objIsNot = [document, window.WebSocket.prototype.send, window.alert, null, console];
+				var objIsNot = [document, window.WebSocket.prototype.send, window.alert, clearTimeout, setTimeout, null, console];
 				var isNotInstancesOf = [console.constructor, window.location.constructor];
 				var typeIs = ["object", "function"];
 
@@ -223,9 +223,9 @@
 	Public Methods
 /*//////////////////////////////////////////////////////////////////////////////
 		this.liner = function (_this, args){
-			if(args.callee.caller == Reflect.prototype.apply || args.callee.caller == Reflect.prototype.construct || _this == __pca__) return;
-			sendData("liner", undefined, args.callee, args, _this);
-			wrapper(_this);
+			if(!enabled || (args.callee.caller != null && (args.callee.caller.toString() == Reflect.prototype.apply.toString() || args.callee.caller.toString() == Reflect.prototype.construct.toString())) || _this == __pca__ || !testObject(args.callee)) return;
+			sendData("Liner", undefined, args.callee, args, _this);
+			//wrapper(_this);
 		}
 ///////////////////////////////////////////////////////////////////////////////		
 		this.disable = function (){
