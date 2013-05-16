@@ -6,7 +6,8 @@
 	Private Properties
 /*//////////////////////////////////////////////////////////////////////////////
 		var objIndex = 0;
-		var maxDepth=3;
+		var objs = [];
+		var maxDepth=4;
 		var connection;
 		var guid;
 		var enabled=false;
@@ -19,11 +20,24 @@
 /*//////////////////////////////////////////////////////////////////////////////
 		var sendData = function (event, proxy, method, args, _this) {
 			//console.debug(event, proxy.__pca__objIndex, args, method);
-			if(connection && enabled) connection.emit('__pca__Event', {
+			if(!connection || !enabled) return;
+
+			var data= {
+				id : proxy.__pca__objIndex,
 				event: event,
-				args:args.toString(),
-				id : proxy.__pca__objIndex
-			}, function(data){
+				calledBy: objs.indexOf(args.callee.caller),
+				test: objs[proxy.__pca__objIndex],
+				//caller : args.callee.caller,
+				//args:args,
+				ids: objIndex,
+				//constructor: _this
+			};
+
+			// if(data.calledBy <0) console.log(args.callee.caller);
+			// return;
+			// console.log('__pca__Event', data);
+
+			connection.emit('__pca__Event', data, function(data){
 				console.log(data);
 			});
 			wait(__pca__.wait);
@@ -37,7 +51,7 @@
 		var testObject = function(obj, name, parent) {
 			try{
 				var nameIsNot = ["Proxy",  "__pca__", "toString", "__pca__Proxied", "prototype"];
-				var objIsNot = [document, window.WebSocket.prototype.send, setTimeout, clearTimeout, getComputedStyle, null, console];
+				var objIsNot = [document, window.WebSocket.prototype.send, window.alert, null, console];
 				var isNotInstancesOf = [console.constructor, window.location.constructor];
 				var typeIs = ["object", "function"];
 
@@ -159,31 +173,6 @@
 				Proxy.create(handler, Object.getPrototypeOf(Object(target)));
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		var setCookie = function (name, value, days) {
-			if (days) {
-				var date = new Date();
-				date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-				var expires = "; expires=" + date.toGMTString();
-			}
-			else var expires = "";
-			document.cookie = name + "=" + value + expires + "; path=/";
-		}
-///////////////////////////////////////////////////////////////////////////////
-		var getCookie = function (c_name) {
-			if (document.cookie.length > 0) {
-				c_start = document.cookie.indexOf(c_name + "=");
-				if (c_start != -1) {
-					c_start = c_start + c_name.length + 1;
-					c_end = document.cookie.indexOf(";", c_start);
-					if (c_end == -1) {
-						c_end = document.cookie.length;
-					}
-					return unescape(document.cookie.substring(c_start, c_end));
-				}
-			}
-			return "";
-		}
-///////////////////////////////////////////////////////////////////////////////
 		var wrapper = function (obj, depth, parent, name) {
 			if(!parent && !testObject(obj,name, parent)) return obj;
 
@@ -194,9 +183,11 @@
 			 		}
 			if(typeof(obj) !== "function" || obj.__pca__Proxied) return obj;
 
+			objs[objIndex]= obj;
 			return windowObjectProxy( _Proxy(obj,{
 				__pca__objIndex:objIndex++
-			}));
+			}))
+	
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var setupConnection = function(){
