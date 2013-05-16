@@ -1,4 +1,5 @@
 (function(){
+	if(window.__pca__) __pca__.liner(this, arguments);
 	var myClass = function(value){
 		if(window.__pca__) __pca__.liner(this, arguments);
 
@@ -21,7 +22,9 @@
 		}
 
 	}
+
 	blub = new myClass();
+	
 setInterval(function(){
 	if(!window.__pca__) return;
 	
@@ -31,7 +34,7 @@ setInterval(function(){
 	blub.bla();
 	blub.testBla();
 
-},5000);	
+},1000);	
 
 
 })();	
