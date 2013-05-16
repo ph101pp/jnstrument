@@ -1,7 +1,7 @@
 // Load/Start Dependencies
 var http = require("http");
-var client = require("./expressClient.js")();
-var server = http.createServer(client);
+var express = require("./expressEnvironment.js")();
+var server = http.createServer(express);
 var eventHandler = require("./serverEventHandler.js")(server);
 
 

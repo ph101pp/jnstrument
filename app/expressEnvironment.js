@@ -25,8 +25,6 @@ module.exports = function() {
 	// 	res.setHeader('Access-Control-Allow-Origin', '*');
 	// 	next();
 	// });
-	// app.get(/\/scripts\/client\.js/, browserify("./public/scripts/client.js"));
-	// app.get(/\/scripts\/pca__ProxyInstrumentES5\.js/, browserify("./public/scripts/pca__ProxyInstrumentES5.js"));
 
 	app.use(express.static(__dirname + '/public'))
 
