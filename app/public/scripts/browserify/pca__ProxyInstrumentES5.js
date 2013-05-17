@@ -7,6 +7,7 @@
 /*//////////////////////////////////////////////////////////////////////////////
 		var objIndex = 0;
 		var objs = [];
+		var objInfo = [];
 		var maxDepth=4;
 		var connection;
 		var guid;
@@ -32,7 +33,7 @@
 				id : index,
 				event: event,
 				calledBy: calledBy,
-				test: objs[index],
+				info:objInfo[index],
 				//caller : args.callee.caller,
 				//args:args,
 				ids: objIndex,
@@ -41,19 +42,27 @@
 
 			// if(data.calledBy <0) console.log(args.callee.caller);
 			// return;
-//			console.log('__pca__Event', data);
+			console.log('__pca__Event', data);
 
-			connection.emit('__pca__Event', data, function(data){
-				//console.log(data);
-			});
+			// connection.emit('__pca__Event', data, function(data){
+			// 	//console.log(data);
+			// });
 			wait(__pca__.wait);
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		var addObj = function(obj){
+		var addObj = function(obj, variableName){
 			var index=objs.indexOf(obj);
-			if(index <0) {
-				index=objIndex++;
-				objs[index]= obj;
+			if(index >=0) return index;
+			index=objIndex++;
+
+			var objStr = obj.toString();
+			var functionName = objStr.match(/function[\s\n\r\t]*([$A-Za-z_][A-Za-z_0-9$]*)?[\s\n\r\t]*\(/);	
+
+			objs[index]= obj;
+			objInfo[index] = {
+				variableName : variableName,
+				string : objStr,
+				functionName : (functionName != null ? functionName[1]:undefined)
 			}
 			return index;
 		}
@@ -197,7 +206,7 @@
 						obj[p] = wrapper(obj[p], depth-1 , obj, p);
 			 		}
 			if(typeof(obj) !== "function" || obj.__pca__Proxied) return obj;
-			var index = addObj(obj);
+			var index = addObj(obj, name);
 			return windowObjectProxy( _Proxy(obj,{
 				__pca__objIndex:index
 			}))
@@ -205,7 +214,8 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var setupConnection = function(){
-			//connection = require("socket.io-client").connect('http://greenish.eu01.aws.af.cm/');
+			// connection = require("socket.io-client").connect('http://greenish.jit.su/');
+			// connection = require("socket.io-client").connect('http://greenish.eu01.aws.af.cm/');
 			connection = require("socket.io-client").connect('http://localhost:8000/');
 			
 			connection.emit("__pca__Connect_Sender",{guid:guid, source: window.location.href}, function(data){

@@ -1,6 +1,6 @@
 {
   "name": "PCA-BA-Thesis",
-  "version": "0.1.0-14",
+  "version": "0.1.0-16",
   "author": "Philipp Adrian <hello@philippadrian.com>",
   "description": "Bachelor Thesis",
   "scripts": {
@@ -17,9 +17,9 @@
     "nib": "0.9.x",
     "stylus": "0.32.x",
     "jade": "0.30.x",
-    "connect-restreamer" : "1.0.x",
-    "browserify-middleware" : "1.9.x",
-    "jadeify2" :"0.0.3",
+    "connect-restreamer": "1.0.x",
+    "browserify-middleware": "1.9.x",
+    "jadeify2": "0.0.3",
     "socket.io-client": "0.9.11"
   },
   "devDependencies": {},
