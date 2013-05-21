@@ -42,11 +42,11 @@
 
 			// if(data.calledBy <0) console.log(args.callee.caller);
 			// return;
-			console.log('__pca__Event', data);
+			// console.log('__pca__Event', data);
 
-			// connection.emit('__pca__Event', data, function(data){
-			// 	//console.log(data);
-			// });
+			connection.emit('__pca__Event', data, function(data){
+				//console.log(data);
+			});
 			wait(__pca__.wait);
 		}
 ///////////////////////////////////////////////////////////////////////////////
