@@ -34,9 +34,15 @@ module.exports = function() {
 	//     proxy.url(req, res);
 	// })
 
-	app.get(/\/........-....-4...-....-p....c.....a/, function (req, res) {
-		res.render('visuals', { 
+	app.get(/\/d3\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('d3Visuals', { 
 			title : 'Visual'  
+		});
+	});
+
+	app.get(/\/gH\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('guitarHero', { 
+			title : 'Guitar Hero'  
 		});
 	});
 
