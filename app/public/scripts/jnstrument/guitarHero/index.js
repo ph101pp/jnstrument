@@ -27,6 +27,9 @@
 
 	}
 	module.exports = function(){
-		return new guitarHeroVisual();
-	}	
+		$(document).ready(function(){
+			return new guitarHeroVisual();
+		});
+	}
+	module.exports(); // Start
 })(jQuery, THREE, window, document)

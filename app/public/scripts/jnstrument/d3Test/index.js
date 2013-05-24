@@ -48,6 +48,9 @@
 		}
 	}
 	module.exports = function(){
-		return new d3Test();
+		$(document).ready(function(){
+			return new d3Test();
+		});
 	}	
+	module.exports(); //Start
 })(jQuery, d3, window, document)

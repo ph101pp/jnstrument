@@ -20,7 +20,7 @@ module.exports = function() {
 		  return stylus(str).set('filename', path).use(require('nib')());
 		}
 	}))
-	app.use('/scripts', browserify("./public/scripts/browserify"));
+	app.use('/scripts', browserify("./public/scripts/jnstrument"));
 	// app.use(function(req, res, next){
 	// 	res.setHeader('Access-Control-Allow-Origin', '*');
 	// 	next();
