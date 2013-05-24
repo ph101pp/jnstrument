@@ -1,94 +1,32 @@
 (function($, THREE, window, document, undefined) {	
-	var hello  = "test";
-	var guitarHeroVisual = function(eventHandler){
+	var guitarHeroVisual = function(){
+		var eventHandler = require("../eventHandler.js")('127.0.0.1:8000');
+		var env = require("./environment.js")($("#scene"));
+		
+		var dataSet = [];
+		var dataIndexes = {};
 
-
-		test = require("./test.js");
-
-		bla = new test();
-		bla.draw();
-		console.log(test,bla);
-
-
-		// set the scene size
-		var WIDTH = $(window).width(),
-		  HEIGHT = $(window).height();
-
-		// set some camera attributes
-		var VIEW_ANGLE = 45,
-		  ASPECT = WIDTH / HEIGHT,
-		  NEAR = 0.1,
-		  FAR = 10000;
-
-		// get the DOM element to attach to
-		// - assume we've got jQuery to hand
-		var $container = $('#scene');
-
-		// create a WebGL renderer, camera
-		// and a scene
-		var renderer = new THREE.WebGLRenderer();
-		var camera =
-		  new THREE.PerspectiveCamera(
-		    VIEW_ANGLE,
-		    ASPECT,
-		    NEAR,
-		    FAR);
-
-		var scene = new THREE.Scene();
-
-		// add the camera to the scene
-		scene.add(camera);
-
-		// the camera starts at 0,0,0
-		// so pull it back
-		camera.position.z = 300;
-
-		// start the renderer
-		renderer.setSize(WIDTH, HEIGHT);
-
-		// attach the render-supplied DOM element
-		$container.append(renderer.domElement);
-
-
-		// set up the sphere vars
-		var radius = 50,
-		    segments = 16,
-		    rings = 16;
-
-		var sphereMaterial = new THREE.MeshLambertMaterial({
-	    	color: 0xCC0000
+		eventHandler.addListener(function(data){
+			if(!dataIndexes[data.id]) {
+				data.events = [];
+				data.eventCount = 0;
+				dataIndexes[data.id] = dataSet.push(data)-1;
+			}
+			dataSet[dataIndexes[data.id]].events.push(Date.now());
+			dataSet[dataIndexes[data.id]].eventCount++;
 		});
-		// create a new mesh with
-		// sphere geometry - we will cover
-		// the sphereMaterial next!
-		var sphere = new THREE.Mesh(
 
-		  new THREE.SphereGeometry(
-		    radius,
-		    segments,
-		    rings),
+		env.addRenderer("rotateCube", function(){
+			//console.log(dataSet);
+		});
 
-		  sphereMaterial);
 
-		// add the sphere to the scene
-		scene.add(sphere);
+		env.start();
 
-		// create a point light
-		var pointLight =
-		  new THREE.PointLight(0xFFFFFF);
 
-		// set its position
-		pointLight.position.x = 10;
-		pointLight.position.y = 50;
-		pointLight.position.z = 130;
-
-		// add to the scene
-		scene.add(pointLight);
-		// draw!
-		renderer.render(scene, camera);
 
 	}
-	module.exports = function(eventHandler){
-		return new guitarHeroVisual(eventHandler);
+	module.exports = function(){
+		return new guitarHeroVisual();
 	}	
 })(jQuery, THREE, window, document)

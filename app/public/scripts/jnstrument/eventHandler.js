@@ -4,8 +4,9 @@
 		var url = require("url");
 		var urlObj = url.parse(window.location);
 		var listener= {"all":[]};
+		console.log(urlObj);
 ///////////////////////////////////////////////////////////////////////////////
-		connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.substr(1)}, function(data){
+		connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.match(/.*\/(.*)/)[1]}, function(data){
 			console.log("Connected", data);
 			if(data.status != 200) connection.disconnect();
 		});
@@ -17,7 +18,7 @@
 		});
 ///////////////////////////////////////////////////////////////////////////////
 		this.addListener = function(event, callback){
-			if(typeof(event) === "function") {
+			if(typeof(event) === "function" && callback === undefined) {
 				callback=event;
 				event="all";
 			}

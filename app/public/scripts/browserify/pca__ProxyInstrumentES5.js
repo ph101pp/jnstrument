@@ -45,7 +45,7 @@
 			// console.log('__pca__Event', data);
 
 			connection.emit('__pca__Event', data, function(data){
-				//console.log(data);
+				console.log(data);
 			});
 			wait(__pca__.wait);
 		}
@@ -219,7 +219,7 @@
 			connection = require("socket.io-client").connect('http://localhost:8000/');
 			
 			connection.emit("__pca__Connect_Sender",{guid:guid, source: window.location.href}, function(data){
-				alert("Link to Visualization:\n"+data.url+"d3/"+data.guid+"\n"+data.url+"gH/"+data.guid));
+				alert("Link to Visualization:\n"+data.url+"d3/"+data.guid+"\n"+data.url+"gH/"+data.guid);
 			});
 		}
 ///////////////////////////////////////////////////////////////////////////////

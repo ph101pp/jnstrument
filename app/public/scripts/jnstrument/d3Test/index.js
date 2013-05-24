@@ -1,5 +1,7 @@
 (function($, d3, window, document, undefined) {	
-	var d3Test = function(eventHandler){
+	var d3Test = function(){
+		var eventHandler = require("../eventHandler.js")('127.0.0.1:8000');
+		
 		var dataStore = {};
 
 		var width = 500,
@@ -11,22 +13,7 @@
 		  .append("g")
 		    .attr("transform", "translate(0,0)");
 
-		// var svg = d3.select("body")
-		//   .append("svg")
-		//   .append("g")
-		//     .attr("transform", "translate(0,0)");
-
-
-		// var resizeCanvas = function(){
-		// 	d3.select("g").attr("transform", "scale(" + $("body").width()+ ")");
-		// 	$("svg").height($("body").height());
-		// }
-		// resizeCanvas();
-		// d3.select(window)
-		// 	.on("resize", resizeCanvas);
-
-
-		eventHandler.addListener(function (data){
+		eventHandler.addListener("all",function (data){
 			data = normalize(data);
 			var circle = svg.selectAll("circle")
 				.data(data, function(d){ 
@@ -60,7 +47,7 @@
 
 		}
 	}
-	module.exports = function(eventHandler){
-		return new d3Test(eventHandler);
+	module.exports = function(){
+		return new d3Test();
 	}	
 })(jQuery, d3, window, document)
