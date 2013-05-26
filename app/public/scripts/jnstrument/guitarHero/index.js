@@ -1,23 +1,26 @@
 (function($, THREE, window, document, undefined) {	
 	var guitarHeroVisual = function(){
 		var eventHandler = require("../eventHandler.js")('127.0.0.1:8000');
-		var env = require("./environment.js")($("#scene"));
+		var env = require("./Environment.js")($("#scene"));
 		
-		var dataSet = [];
-		var dataIndexes = {};
+		env.elements = [];
+		env.elementIndexes = {};
 
 		eventHandler.addListener(function(data){
-			if(!dataIndexes[data.id]) {
-				data.events = [];
-				data.eventCount = 0;
-				dataIndexes[data.id] = dataSet.push(data)-1;
+			if(!env.elementIndexes[data.id]) {
+				var element = new (require("./FunctionElement.js"))(env, data);
+				env.elementIndexes[data.id] = env.elements.push(element)-1;
 			}
-			dataSet[dataIndexes[data.id]].events.push(Date.now());
-			dataSet[dataIndexes[data.id]].eventCount++;
+			var event = new (require("./EventElement.js"))(env, env.elements[env.elementIndexes[data.id]]);
+			event.time = Date.now();
+			env.elements[env.elementIndexes[data.id]].events.push(event);
+			env.elements[env.elementIndexes[data.id]].eventCount++;
 		});
 
-		env.addRenderer("rotateCube", function(){
-			//console.log(dataSet);
+		env.addRenderer("drawElements", function(now){
+			for(var i =0; i<env.elements.length; i++) {
+				env.elements[i].update(now);
+			}
 		});
 
 
@@ -26,10 +29,12 @@
 
 
 	}
+///////////////////////////////////////////////////////////////////////////////	
 	module.exports = function(){
-		$(document).ready(function(){
-			return new guitarHeroVisual();
-		});
+		return new guitarHeroVisual();
 	}
-	module.exports(); // Start
+///////////////////////////////////////////////////////////////////////////////
+	$(document).ready(function(){
+		module.exports(); // Start
+	});
 })(jQuery, THREE, window, document)
