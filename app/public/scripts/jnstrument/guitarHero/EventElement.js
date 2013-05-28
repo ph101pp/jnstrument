@@ -1,8 +1,10 @@
 (function($, THREE, window, document, undefined) {
-	var EventElement = function(env, functionElement){
+	var EventElement = function(){
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Properties
 /*/////////////////////////////////////////////////////////////////////////////
+		var env;
+		var functionElement;
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Properties
 /*/////////////////////////////////////////////////////////////////////////////
@@ -14,15 +16,11 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////
-		this.update = function(now){
+		this.tick = function(now){
 			if(functionElement.eventElement.position.y - (-this.element.position.y) > env.height){
-				functionElement.eventElement.remove(this.element);
-				this.element.geometry.dispose();
-				this.element.material.dispose();
-				//this.element.texture.dispose();
-				var index = functionElement.events.indexOf(this);
-				delete functionElement.events[index];
+				this.detachElement();
 			}
+
 			// var gap= env.width/(env.elements.length);
 			// var newRadius = gap/3;
 			// if(this.element.geometry.radius != newRadius) {
@@ -34,17 +32,33 @@
 
 			// }
 		}
-/*/////////////////////////////////////////////////////////////////////////////
-	Constructor
-/*/////////////////////////////////////////////////////////////////////////////
-		var geometry =  new THREE.SphereGeometry(3,16,16);
-		var material = new THREE.LineBasicMaterial( { color: 0xFF3333, opacity: 1.0} );
+///////////////////////////////////////////////////////////////////////////////
+		this.attachElement = function(_functionElement) {
+			functionElement = _functionElement;
+			this.time = Date.now();
+			this.setUnavailable();
+			this.element.position.set(0,-functionElement.eventElement.position.y,0);
+			functionElement.eventElement.add(this.element);
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.detachElement = function(){
+			functionElement.eventElement.remove(this.element);
+			this.setAvailable();
+			this.ticker.removeTick(this);
+			functionElement = null;
 
-		this.element = new THREE.Mesh( geometry, material );
-		this.element.position.set(0,-functionElement.eventElement.position.y,0);
-		functionElement.eventElement.add(this.element);
+		}
+///////////////////////////////////////////////////////////////////////////////		
+		this.construct = function(_env){
+			env = _env;
+			var geometry =  new THREE.SphereGeometry(3,16,16);
+			var material = new THREE.LineBasicMaterial( { color: 0xFF3333, opacity: 1.0} );
+			this.element = new THREE.Mesh( geometry, material );
+			// this.element.position.set(0,-functionElement.eventElement.position.y,0);
+			// functionElement.eventElement.add(this.element);
+		}
 
 	};
 
-	module.exports = require("../pcaClass.js")(EventElement);
+	module.exports = require("../Class.js")(EventElement).extend(require("./poolable.js")).extend(require("./tickable.js"));
 })(jQuery, THREE, window, document)

@@ -3,60 +3,41 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Properties
 /*/////////////////////////////////////////////////////////////////////////////
-		container = $(container);
-		var renderLoop;
-		var renderers = {};
-		var width = container.innerWidth();
-		var height = container.innerHeight();
-		var scene = new THREE.Scene();
-		var camera = new THREE.OrthographicCamera( 0, width, 0, height, 1, 1000);
-		var renderer = new THREE.WebGLRenderer();
+
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Properties
 /*/////////////////////////////////////////////////////////////////////////////
-		this.renderer = renderer;
-		this.scene = scene;
-		this.camera = camera;
-		this.height = height;
-		this.width = width;
+		this.renderer;
+		this.scene;
+		this.camera;
+		this.height;
+		this.width;
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
-		var render = function() {
-			renderLoop = requestAnimationFrame(render);
-			var now = Date.now();
-			for(method in renderers) 
-				renderers[method](now);
-			renderer.render(scene, camera);
-		}
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////
-		this.start = function() {
-			render();
-		}		
-///////////////////////////////////////////////////////////////////////////////
-		this.stop = function() {
-			cancelAnimationFrame(renderLoop);	
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.addRenderer = function(name,renderer) {
-			renderers[name]=renderer;
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.removeRenderer = function(name) {
-			delete renderers[name];
+		this.tick = function() {
+			this.renderer.render(this.scene, this.camera);
 		}
 /*/////////////////////////////////////////////////////////////////////////////
 	Constructor
 /*/////////////////////////////////////////////////////////////////////////////
-		camera.position.z = 300;
-		scene.add(camera);
-		renderer.setSize(width, height); 
-		container.append(renderer.domElement);
+		this.construct  = function(_container){
+			var container = $(_container);
+			this.width = container.innerWidth();
+			this.height = container.innerHeight();			
+			this.scene = new THREE.Scene();
+			this.camera = new THREE.OrthographicCamera( 0, this.width, 0, this.height, 1, 1000);
+			this.renderer = new THREE.WebGLRenderer();
+
+			this.camera.position.z = 300;
+			this.scene.add(this.camera);
+			this.renderer.setSize(this.width, this.height); 
+			container.append(this.renderer.domElement);
+		}
 	}
-///////////////////////////////////////////////////////////////////////////////
-	module.exports = function(container){
-		return new Environment(container);
-	}	
+///////////////////////////////////////////////////////////////////////////////	
+	module.exports = require("../Class.js")(Environment).extend(require("./tickable.js"));
 })(jQuery, THREE, window, document)

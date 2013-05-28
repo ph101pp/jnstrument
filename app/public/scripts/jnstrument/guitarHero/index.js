@@ -1,40 +1,42 @@
 (function($, THREE, window, document, undefined) {	
-	var guitarHeroVisual = function(){
-		var eventHandler = require("../eventHandler.js")('127.0.0.1:8000');
-		var env = require("./Environment.js")($("#scene"));
+	var guitarHeroVisual = function(){			
+		var loop = 			new (require("./Loop.js"))();
+		var globalTick = 	new (require("./GlobalTicker.js"))();
+		var eventHandler = 	new (require("../EventHandler.js"))('127.0.0.1:8000');
+		var env = 			new (require("./Environment.js"))($("#scene"));
+		var eventPool = 	new (require("./EventPool.js"))(env);	
 		
+
+	//	console.log( ticker instanceof );
+		
+		loop.addTick(globalTick);	
+		loop.startTick();
+		globalTick.addTick(env);
+		globalTick.startTick();
+
 		env.elements = [];
 		env.elementIndexes = {};
 
 		eventHandler.addListener(function(data){
 			if(!env.elementIndexes[data.id]) {
 				var element = new (require("./FunctionElement.js"))(env, data);
+				globalTick.addTick(element);
 				env.elementIndexes[data.id] = env.elements.push(element)-1;
 			}
-			var event = new (require("./EventElement.js"))(env, env.elements[env.elementIndexes[data.id]]);
-			event.time = Date.now();
-			env.elements[env.elementIndexes[data.id]].events.push(event);
-			env.elements[env.elementIndexes[data.id]].eventCount++;
+			var functionElement = env.elements[env.elementIndexes[data.id]];
+			functionElement.eventCount++;
+			var event = eventPool.getElement();
+			event.attachElement(functionElement);
+			globalTick.addTick(event);
 		});
-
-		env.addRenderer("drawElements", function(now){
-			for(var i =0; i<env.elements.length; i++) {
-				env.elements[i].update(now);
-			}
-		});
-
-
-		env.start();
-
-
 
 	}
 ///////////////////////////////////////////////////////////////////////////////	
-	module.exports = function(){
-		return new guitarHeroVisual();
-	}
+	// module.exports = function(){
+	// 	return new guitarHeroVisual();
+	// }
 ///////////////////////////////////////////////////////////////////////////////
 	$(document).ready(function(){
-		module.exports(); // Start
+		guitarHeroVisual(); // Start
 	});
 })(jQuery, THREE, window, document)
