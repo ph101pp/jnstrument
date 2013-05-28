@@ -2,29 +2,27 @@
 	var test = function(){			
 		var time = Date.now();
 		var timer =0;
-		var iterations = 10000000;
-		var instance1 = new (require("./plvl3.js"))();
+		var iterations = 1000000;
+		var instance1 = new (require("./lvl3.js"))();
 		var instance2 = new (require("./lvl3.js"))();
-		var bla;
+		var bla = require("./lvl3.js");
 
+		bla.test();
 		console.log(instance1, instance2);
-
-
-
-		for( var i=0; i<iterations; i++)
-			bla = instance1 instanceof require("./plvl3.js");
+		// for( var i=0; i<iterations; i++)
+		// 	(require("./plvl3.js"));
 		
-		timer = Date.now()-time;
-		console.log(timer, timer/iterations);
-		time= Date.now();
+		// timer = Date.now()-time;
+		// console.log(timer, timer/iterations);
+		// time= Date.now();
 		
 
-		for( var i=0; i<iterations; i++)
-			bla = instance2.instanceof(require("./lvl3.js"));
+		// for( var i=0; i<iterations; i++)
+		// 	(require("./lvl3.js"));
 
 
-		timer = Date.now()-time;
-		console.log(timer, timer/iterations);
+		// timer = Date.now()-time;
+		// console.log(timer, timer/iterations);
 
 
 	}

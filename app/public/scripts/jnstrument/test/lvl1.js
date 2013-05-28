@@ -2,7 +2,7 @@
 	var lvl1 = function(){
 
 		this.construct = function(){
-			console.log("lvl1");
+			//console.log("lvl1");
 			//this._super();
 
 		}
@@ -24,5 +24,8 @@
 		}
 	}
 	lvl1.prototype.test = function(){};
-	module.exports = require("../Class.js")(lvl1);
+	lvl1.test=function(){
+		console.log("lvl1 TEST");
+	};
+	module.exports = require("../Class.js").abstract(lvl1);
 })(jQuery, THREE, window, document)
