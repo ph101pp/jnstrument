@@ -23,5 +23,5 @@
 
 		}
 	}
-	module.exports = require("./lvl1").extend(require("../Class.js").abstract(lvl2));
+	module.exports = require("./lvl1").extend.abstract(require("../Class.js").abstract(lvl2));
 })(jQuery, THREE, window, document)
