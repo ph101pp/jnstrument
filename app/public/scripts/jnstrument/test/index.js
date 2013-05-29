@@ -1,25 +1,31 @@
 (function($, THREE, window, document, undefined) {	
 	var test = function(){			
-		var time = Date.now();
 		var timer =0;
-		var iterations = 5000;
+		var time,i;
+		var iterations = 1000000;
 		var instance1 = new (require("./lvl3.js"))();
-		var instance2 = new (require("./lvl3.js"))();
+		var instance2 = new (require("./plvl3.js"))();
 		// var bla = require("./lvl3.js");
+
+
 
 		// bla.test();
 		console.log(instance1, instance2);
 
-		// for( var i=0; i<iterations; i++)
-		// 	new (require("./plvl3.js"))();
+		console.log(instance1.instanceof(require("./lvl1.js")));
+		console.log(instance1.instanceof(require("./lvl3.js")));
+		console.log(instance1.instanceof(require("./lvl2.js")));
+		// time = Date.now();
+		// for(i=0; i<iterations; i++)
+		// 	instance2.blub();
 		
 		// timer = Date.now()-time;
 		// console.log(timer, timer/iterations);
 		// time= Date.now();
 		
 
-		// for( var i=0; i<iterations; i++)
-		// 	new (require("./lvl3.js"))();
+		// for(i=0; i<iterations; i++)
+		// 	instance1.blub();
 
 
 		// timer = Date.now()-time;

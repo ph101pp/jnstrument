@@ -3,7 +3,7 @@
 
 		this.construct = function(){
 			//console.log("lvl2");
-			this._super();
+		//	this._super();
 
 		}
 		this.blub = function(){
@@ -23,5 +23,5 @@
 
 		}
 	}
-	module.exports = require("./lvl1").extend.abstract(require("../Class.js").abstract(lvl2));
+	module.exports = require("../Class.js").abstract(lvl2);
 })(jQuery, THREE, window, document)

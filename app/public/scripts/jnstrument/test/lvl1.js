@@ -7,7 +7,7 @@
 
 		}
 		this.blub = function(){
-			this._super();
+		
 
 		}		
 		this.bla = function(){

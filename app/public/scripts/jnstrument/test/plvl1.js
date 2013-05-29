@@ -5,7 +5,7 @@
 			//console.log("lvl1");
 		}
 		this.blub = function(){
-			this._super();
+			
 
 		}		
 		this.bla = function(){
@@ -21,5 +21,6 @@
 		
 		}
 	}
+	lvl1.prototype.test = function(){};
 	module.exports = require("../pcaClass.js")(lvl1);
 })(jQuery, THREE, window, document)

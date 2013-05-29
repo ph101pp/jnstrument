@@ -23,5 +23,5 @@
 
 		}
 	}
-	module.exports = require("./lvl2").extend(lvl3);
+	module.exports =  require("./lvl1.js").extend(lvl3);
 })(jQuery, THREE, window, document)
