@@ -43,5 +43,5 @@
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js")(ticker);
+	module.exports = require("../Class.js").abstract(ticker);
 })(jQuery, THREE, window, document)

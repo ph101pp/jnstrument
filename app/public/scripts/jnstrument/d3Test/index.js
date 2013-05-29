@@ -1,6 +1,6 @@
 (function($, d3, window, document, undefined) {	
 	var d3Test = function(){
-		var eventHandler = require("../eventHandler.js")('127.0.0.1:8000');
+		var eventHandler = 	new (require("../EventHandler.js"))('127.0.0.1:8000');
 		
 		var dataStore = {};
 

@@ -20,5 +20,5 @@
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js")(Loop).extend(require("./ticker.js"));
+	module.exports = require("./ticker.js").extend(Loop);
 })(jQuery, THREE, window, document)

@@ -39,5 +39,5 @@
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////	
-	module.exports = require("../Class.js")(Environment).extend(require("./tickable.js"));
+	module.exports = require("./tickable.js").extend(Environment);
 })(jQuery, THREE, window, document)

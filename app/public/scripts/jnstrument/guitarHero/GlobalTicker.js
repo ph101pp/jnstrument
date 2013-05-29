@@ -30,5 +30,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js")(GlobalTicker).extend(require("./ticker.js")).extend(require("./tickable.js"));
+	module.exports = require("./tickable.js").extend(require("./ticker.js")).extend(GlobalTicker);
 })(jQuery, THREE, window, document)

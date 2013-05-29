@@ -20,7 +20,6 @@
 					elements[i].setUnavailable();
 					return elements[i];
 				}
-
 			var newElement = new (require("./EventElement.js"))(env);
 			this.addElement(newElement);
 			return newElement;

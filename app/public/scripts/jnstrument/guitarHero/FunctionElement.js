@@ -48,5 +48,5 @@
 		}
 	};
 
-	module.exports = require("../Class.js")(FunctionElement).extend(require("./tickable.js"));
+	module.exports = require("./tickable.js").extend(FunctionElement);
 })(jQuery, THREE, window, document)

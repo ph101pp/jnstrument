@@ -60,5 +60,5 @@
 
 	};
 
-	module.exports = require("../Class.js")(EventElement).extend(require("./poolable.js")).extend(require("./tickable.js"));
+	module.exports = require("./tickable.js").extend(require("./poolable.js")).extend(EventElement);
 })(jQuery, THREE, window, document)
