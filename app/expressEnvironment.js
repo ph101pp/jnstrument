@@ -46,11 +46,18 @@ module.exports = function() {
 		});
 	});
 
+	app.get(/\/atom\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('atom', { 
+			title : 'atom'  
+		});
+	});
+
 	app.get(/\/test\/........-....-4...-....-p....c.....a/, function (req, res) {
 		res.render('test', { 
 			title : 'test'  
 		});
 	});
+
 	app.get(/\/|\/*/, /*proxy.middleware,*/ function (req, res) {
 		res.render('index', { 
 			title : 'Home'  
