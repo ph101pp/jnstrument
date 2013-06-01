@@ -1,0 +1,16 @@
+(function($, THREE, window, document, undefined) {	
+	var CollisionElement = function(){
+// 		var actionRadius=0;
+// ///////////////////////////////////////////////////////////////////////////////
+// 		this.setActionRadius = function(radius){
+// 			actionRadius=radius;			
+// 		}
+// ///////////////////////////////////////////////////////////////////////////////
+// 		this.collision = function(hit){
+// 			console.log("Hit", hit);
+
+// 		}
+	}
+///////////////////////////////////////////////////////////////////////////////
+	module.exports = require("../Class.js").extend(THREE.Mesh);
+})(jQuery, THREE, window, document)

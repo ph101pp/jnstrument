@@ -1,14 +1,14 @@
 (function($, THREE, window, document, undefined) {	
-	var atom = function(){			
-		console.log("hello");
-
+	var index = function(){			
+		var socket = 		new (require("./Socket.js"))('127.0.0.1:8000');
+		var loop = 			new (require("./Loop.js"))();
+		var atom = 			new (require("./Atom.js"))(socket, loop);
+		atom.initialize($("#scene"));
 	}
 ///////////////////////////////////////////////////////////////////////////////	
-	// module.exports = function(){
-	// 	return new guitarHeroVisual();
-	// }
+
 ///////////////////////////////////////////////////////////////////////////////
 	$(document).ready(function(){
-		atom(); // Start
+		index(); // Start
 	});
 })(jQuery, THREE, window, document)
