@@ -22,5 +22,5 @@
 		}
 	}
 	lvl1.prototype.test = function(){};
-	module.exports = require("../pcaClass.js")(lvl1);
+	module.exports = require("./pcaClass.js")(lvl1);
 })(jQuery, THREE, window, document)
