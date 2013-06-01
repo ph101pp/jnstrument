@@ -3,7 +3,7 @@
 
 		this.construct = function(){
 			//console.log("lvl3");
-			this._super();
+			//this._super();
 
 		}
 		this.blub = function(){

@@ -2,9 +2,13 @@
 	var test = function(){			
 		var timer =0;
 		var time,i;
-		var iterations = 50000;
+		var iterations = 5000;
 		var instance1 = new (require("./lvl3.js"))();
-		var instance2 = new (require("./plvl3.js"))();
+
+			console.log(instance1);
+
+
+		// var instance2 = new (require("./plvl3.js"))();
 		// var bla = require("./lvl3.js");
 
 
