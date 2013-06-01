@@ -2,7 +2,7 @@
 	var guitarHeroVisual = function(){			
 		var loop = 			new (require("./Loop.js"))();
 		var globalTick = 	new (require("./GlobalTicker.js"))();
-		var eventHandler = 	new (require("../EventHandler.js"))('127.0.0.1:8000');
+		var eventHandler = 	new (require("./EventHandler.js"))('127.0.0.1:8000');
 		var env = 			new (require("./Environment.js"))($("#scene"));
 		var eventPool = 	new (require("./EventPool.js"))(env);	
 		
