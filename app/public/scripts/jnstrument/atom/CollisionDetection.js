@@ -3,18 +3,20 @@
 		var rays = [];
 		var elements = [];
 ///////////////////////////////////////////////////////////////////////////////
-		this.testElement = function(element){
+		this.testElement = function(element, group, recursive){
 			var hitElements=[];
 			var elementHits={};
 			var id;
-			for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.DoubleSide;
+			//for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.DoubleSide;
 			this.far = element.actionRadius;
 			for(var i=0; i<rays.length; i++) {
 				this.set(element.position, rays[i]);
-				var hits = this.intersectObjects(elements, true);
+				var hits = this.intersectObjects(elements, group || recursive);
 				for(var k=0; k<hits.length; k++)
 					if(hits[k].object !== element) {
-						console.log("hit", hits[k].object.position);
+						if(group === true) 
+							while(elements.indexOf(hits[k].object) < 0)
+								hits[k].object = hits[k].object.parent;
 						id = hitElements.indexOf(hits[k].object);
 						if(id < 0) id=hitElements.push(hits[k].object)-1;
 						if(typeof elementHits[id] !== "object") elementHits[id]=[];
@@ -23,7 +25,18 @@
 			}
 			for(var i=0; i<hitElements.length; i++) 
 				element.collision(hitElements[i], elementHits[i], this);
-			for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.FrontSide;
+			//for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.FrontSide;
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.testElements = function(group, recursive){
+			var temp =[];
+			var element;
+			while(elements.length > 0) {
+				element= elements.shift();
+				this.testElement(element, group, recursive);
+				temp.push(element);
+			}
+			elements = temp;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.addRay = function(ray) {
@@ -45,6 +58,7 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.removeElement = function(element){
+			console.log(elements.indexOf(element));
 			delete elements[elements.indexOf(element)];
 		}	
 	}

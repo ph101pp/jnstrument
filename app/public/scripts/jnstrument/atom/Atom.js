@@ -12,27 +12,31 @@
 			env = 	new (require("./Environment.js"))($(container));
 			globalTick.addListener(env.render.bind(env));
 
+
+//			var geometry =  new THREE.CircleGeometry(10,16);
+//			var geometry =  new THREE.CubeGeometry( 10, 10, 10 );
+
 			var element1 = new (require("./FunctionElement.js"))();
 			var element2 = new (require("./FunctionElement.js"))();
 			var element3 = new (require("./FunctionElement.js"))();
 			var element4 = new (require("./FunctionElement.js"))();
 			var element5 = new (require("./FunctionElement.js"))();
 
-			console.log(element1,element1.instanceof(require("./CollisionElement.js")));
+			//	console.log(element5, element5.instanceof(require("./CollisionElement.js")));
 			// console.log(element, element instanceof THREE.Mesh);
 			// console.log(element2, element2 instanceof THREE.Mesh);
 			// console.log(element2, element2 instanceof THREE.Mesh);
 
-
-			env.scene.add(element1);
+ 			env.scene.add(element1);
 			env.scene.add(element2);
 			env.scene.add(element3);
 			env.scene.add(element4);
 			env.scene.add(element5);
 			
+		//	element1.actionRadius=300;
 			
 			element1.position.set(0,0,0);
-			element2.position.set(-1,0,0);
+			element2.position.set(-100,0,0);
 			element3.position.set(0, 100 ,0);
 			element4.position.set(100,0,0);
 			element5.position.set(0, -100,0);
@@ -43,6 +47,10 @@
 			CollisionDetection.addRay(new THREE.Vector3(0, 1, 0));
 			CollisionDetection.addRay(new THREE.Vector3(1, 0, 0));
 			CollisionDetection.addRay(new THREE.Vector3(-1, 0, 0));
+			CollisionDetection.addRay(new THREE.Vector3(1, 1, 0));
+			CollisionDetection.addRay(new THREE.Vector3(-1, 1, 0));				
+			CollisionDetection.addRay(new THREE.Vector3(1, -1, 0));
+			CollisionDetection.addRay(new THREE.Vector3(-1, -1, 0));			
 
 			CollisionDetection.addElement(element1);
 			CollisionDetection.addElement(element2);
@@ -52,15 +60,15 @@
 
 
 
-			var ray =  new THREE.Vector3(0,-1,0);
-			var caster = new THREE.Raycaster();
-
+			// var ray =  new THREE.Vector3(0,-1,0);
+			// var caster = new THREE.Raycaster();
 			globalTick.activate();
+
 
 			$(window).bind("click", function(){
 
 
-				CollisionDetection.testElement(element1);
+				CollisionDetection.testElements(true, true);
 
 
 
