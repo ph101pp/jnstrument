@@ -1,16 +1,13 @@
 (function($, THREE, window, document, undefined) {	
 	var CollisionElement = function(){
-// 		var actionRadius=0;
-// ///////////////////////////////////////////////////////////////////////////////
-// 		this.setActionRadius = function(radius){
-// 			actionRadius=radius;			
-// 		}
-// ///////////////////////////////////////////////////////////////////////////////
-// 		this.collision = function(hit){
-// 			console.log("Hit", hit);
+		this.actionRadius=10;
 
-// 		}
+		this.construct = function(){
+			this.rotation.x = 90 * (Math.PI/180); // Turn spheres to avoid hitting the north or south pole.
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.collision = Function; // (object, hits, collisionDetection)
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js").extend(THREE.Mesh);
+	module.exports = require("../Class.js").extend.abstract(CollisionElement);
 })(jQuery, THREE, window, document)

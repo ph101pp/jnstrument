@@ -1,39 +1,53 @@
 (function($, THREE, window, document, undefined) {	
 	var CollisionDetection = function(){
-		var caster;
 		var rays = [];
 		var elements = [];
-
-		this.construct = function(_socket, _loop){		
-			caster = new THREE.Raycaster();
-		}
-
+///////////////////////////////////////////////////////////////////////////////
 		this.testElement = function(element){
+			var hitElements=[];
+			var elementHits={};
+			var id;
+			for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.DoubleSide;
+			this.far = element.actionRadius;
 			for(var i=0; i<rays.length; i++) {
-				caster.set(element.position, rays[i]);
-				var hits = caster.intersectObjects(elements);
+				this.set(element.position, rays[i]);
+				var hits = this.intersectObjects(elements, true);
 				for(var k=0; k<hits.length; k++)
-					if(hits[k].distance < element.actionRadius)
-						element.collision(hits[k]);
+					if(hits[k].object !== element) {
+						console.log("hit", hits[k].object.position);
+						id = hitElements.indexOf(hits[k].object);
+						if(id < 0) id=hitElements.push(hits[k].object)-1;
+						if(typeof elementHits[id] !== "object") elementHits[id]=[];
+						elementHits[id].push(hits[k]);
+					}
 			}
+			for(var i=0; i<hitElements.length; i++) 
+				element.collision(hitElements[i], elementHits[i], this);
+			for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.FrontSide;
 		}
-
-
+///////////////////////////////////////////////////////////////////////////////
 		this.addRay = function(ray) {
 			if(!(ray instanceof THREE.Vector3)) throw("Only instances of THREE.Vector3 can be rays.");
-			rays.add(ray);
+			rays.push(ray.normalize());
 		}
+///////////////////////////////////////////////////////////////////////////////
 		this.removeRay = function(ray){
 			delete rays[rays.indexOf(ray)];
 		}
-		this.addCollisionElement = function(element){
+///////////////////////////////////////////////////////////////////////////////
+		this.addElement = function(element){
 			if(!element.instanceof(require("./CollisionElement.js"))) throw("Only instances of CollisionElement can be added to CollisionDetection.");
-			elements.add(element);
+			elements.push(element);
 		}
-		this.removeCollisionElement = function(element){
+///////////////////////////////////////////////////////////////////////////////
+		this.addElements = function(elements){
+			for(var i=0; i<elements.length; i++) this.addElement(elements[i]);
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.removeElement = function(element){
 			delete elements[elements.indexOf(element)];
 		}	
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js")(CollisionDetection);
+	module.exports = require("../Class.js").extend(THREE.Raycaster).extend(CollisionDetection);
 })(jQuery, THREE, window, document)

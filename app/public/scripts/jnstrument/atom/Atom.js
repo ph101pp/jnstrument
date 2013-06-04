@@ -10,56 +10,89 @@
 
 		this.initialize = function(container) {
 			env = 	new (require("./Environment.js"))($(container));
-			globalTick.addListener(env.tick.bind(env));
+			globalTick.addListener(env.render.bind(env));
 
-			var geometry =  new THREE.SphereGeometry(10,16,16);
-			var material = new THREE.LineBasicMaterial( { color: 0xFF3333, opacity: 1.0} );
-			var material2 = new THREE.LineBasicMaterial( { color: 0xFF3333, opacity: 1.0} );
-			var element = new (require("./CollisionElement.js"))( geometry, material );
-			var element2 = new THREE.Mesh( geometry, material2 );
+			var element1 = new (require("./FunctionElement.js"))();
+			var element2 = new (require("./FunctionElement.js"))();
+			var element3 = new (require("./FunctionElement.js"))();
+			var element4 = new (require("./FunctionElement.js"))();
+			var element5 = new (require("./FunctionElement.js"))();
+
+			console.log(element1,element1.instanceof(require("./CollisionElement.js")));
+			// console.log(element, element instanceof THREE.Mesh);
+			// console.log(element2, element2 instanceof THREE.Mesh);
+			// console.log(element2, element2 instanceof THREE.Mesh);
 
 
-			element.position.set(env.width/2,env.height/2,0);
-			element2.position.set(env.width/3,env.height/3,0);
-
-			console.log(element instanceof THREE.Mesh);
-			
-			env.scene.add(element);
+			env.scene.add(element1);
 			env.scene.add(element2);
+			env.scene.add(element3);
+			env.scene.add(element4);
+			env.scene.add(element5);
+			
+			
+			element1.position.set(0,0,0);
+			element2.position.set(-1,0,0);
+			element3.position.set(0, 100 ,0);
+			element4.position.set(100,0,0);
+			element5.position.set(0, -100,0);
+
+			var CollisionDetection = new (require("./CollisionDetection.js"))();
+			
+			CollisionDetection.addRay(new THREE.Vector3(0, -1, 0));
+			CollisionDetection.addRay(new THREE.Vector3(0, 1, 0));
+			CollisionDetection.addRay(new THREE.Vector3(1, 0, 0));
+			CollisionDetection.addRay(new THREE.Vector3(-1, 0, 0));
+
+			CollisionDetection.addElement(element1);
+			CollisionDetection.addElement(element2);
+			CollisionDetection.addElement(element3);
+			CollisionDetection.addElement(element4);
+			CollisionDetection.addElement(element5);
 
 
-			var ray =  new THREE.Vector3(-env.width/6, -env.height/6);
+
+			var ray =  new THREE.Vector3(0,-1,0);
 			var caster = new THREE.Raycaster();
 
 			globalTick.activate();
 
 			$(window).bind("click", function(){
 
-				caster.set(element.position, ray);
 
-				var hits = caster.intersectObjects([element2]);
+				CollisionDetection.testElement(element1);
 
-				console.log(hits);
 
-				for(var i=0; i<hits.length; i++) hits[i].object.material.color.setHex(0x0000ff);
 
-				console.log(element);
+
+				// var elements = [element3, element2];
+
+				// console.log(element.position, ray, elements);
+				// caster.set(element.position, ray);
+
+				// var hits = caster.intersectObjects(elements);
+
+				//  console.log(hits);
+
+				// for(var i=0; i<hits.length; i++) hits[i].object.material.color.setHex(0x0000ff);
+
+				// //console.log(element);
 
 				// element.scale.set(10,10,10);
 				// element2.material.color.setHex(0x0000ff);
 
 
 
-			 	// element.geometry.verticesNeedUpdate = true;
-			 	// element.geometry.normalsNeedUpdate = true;
-			 	// element.geometry.uvsNeedUpdate = true;
-			 	// element.geometry.tangentsNeedUpdate = true;
-			 	// element.geometry.morphTargetsNeedUpdate = true;
-			 	// element.geometry.lineDistancesNeedUpdate = true;
-			 	// element.geometry.elementsNeedUpdate = true;
-			 	// element.geometry.buffersNeedUpdate = true;
-			 	// element.geometry.colorsNeedUpdate = true;
-			 	// element.geometry.dynamic = true;
+			 // 	// element.geometry.verticesNeedUpdate = true;
+			 // 	// element.geometry.normalsNeedUpdate = true;
+			 // 	// element.geometry.uvsNeedUpdate = true;
+			 // 	// element.geometry.tangentsNeedUpdate = true;
+			 // 	// element.geometry.morphTargetsNeedUpdate = true;
+			 // 	// element.geometry.lineDistancesNeedUpdate = true;
+			 // 	// element.geometry.elementsNeedUpdate = true;
+			 // 	// element.geometry.buffersNeedUpdate = true;
+			 // 	// element.geometry.colorsNeedUpdate = true;
+			 // 	// element.geometry.dynamic = true;
 
 
 
