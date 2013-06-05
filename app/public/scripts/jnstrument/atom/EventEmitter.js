@@ -5,6 +5,7 @@
 /*/////////////////////////////////////////////////////////////////////////////
 		var listener= {"all":[]};
 		var stopped = true;
+		var async = false;
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
@@ -16,7 +17,14 @@
 			var receiver = $.extend([],listener["all"], listener[eventName] || []);
 			var now = Date.now();
 			for(var i=0; i<receiver.length; i++) 
-				if(receiver[i]) receiver[i](data, answerCallback, now, this);
+				if(receiver[i]) {
+					if(async) setTimeout((function(fn, _data, _answerCallback, _now, _this){
+							return function(){
+								fn(_data, _answerCallback, _now, _this);
+							}
+						})(receiver[i], data, answerCallback, now, this),0);
+					else receiver[i](data, answerCallback, now, this);
+				}
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.activate = function() {
@@ -36,7 +44,6 @@
 				callback=eventName;
 				eventName="all";
 			}
-
 			if(!listener[eventName]) listener[eventName]=[];
 			listener[eventName].push(callback);
 		}
@@ -46,7 +53,19 @@
 				callback=eventName;
 				eventName="all";
 			}
-			delete listener[eventName][listener[eventName].indexOf(callback)];
+			if(typeof(eventName) === "string" && callback === undefined)
+				delete listener[eventName];
+			else 
+				delete listener[eventName][listener[eventName].indexOf(callback)];
+
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.makeAsync = function(){
+			async = true;
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.makeSync = function(){
+			async = false;
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////

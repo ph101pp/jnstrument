@@ -157,10 +157,10 @@
 		}
 
 ///////////////////////////////////////////////////////////////////////////////	
-		this.render = function() {
+		this.render = (function() {
 			// renderViews();
 			this.renderer.render(this.scene, this.camera);
-		}
+		}).bind(this);
 	}
 ///////////////////////////////////////////////////////////////////////////////	
 	module.exports = require("../Class.js").extend(Environment);

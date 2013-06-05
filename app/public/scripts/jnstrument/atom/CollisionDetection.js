@@ -3,12 +3,12 @@
 		var rays = [];
 		var elements = [];
 ///////////////////////////////////////////////////////////////////////////////
-		this.testElement = function(element, group, recursive){
+		this.testElement = function(element, group, recursive, bulk){
 			var hitElements=[];
 			var elementHits={};
 			var id;
 			//for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.DoubleSide;
-			this.far = element.actionRadius;
+			this.far = element.actionRadius+1;
 			for(var i=0; i<rays.length; i++) {
 				this.set(element.position, rays[i]);
 				var hits = this.intersectObjects(elements, group || recursive);
@@ -24,7 +24,11 @@
 					}
 			}
 			for(var i=0; i<hitElements.length; i++) 
-				element.collision(hitElements[i], elementHits[i], this);
+				if(hitElements[i] !== element) {
+					element.collision(hitElements[i], elementHits[i], this);	
+					if(bulk === true) hitElements[i].collision(element, elementHits[i], this);
+				}
+		
 			//for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.FrontSide;
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,7 +37,7 @@
 			var element;
 			while(elements.length > 0) {
 				element= elements.shift();
-				this.testElement(element, group, recursive);
+				this.testElement(element, group, recursive, true);
 				temp.push(element);
 			}
 			elements = temp;
@@ -58,7 +62,6 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.removeElement = function(element){
-			console.log(elements.indexOf(element));
 			delete elements[elements.indexOf(element)];
 		}	
 	}
