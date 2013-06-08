@@ -1,38 +1,31 @@
 (function($, THREE, window, document, undefined) {
 
 	var ObjectStore = function(){
-
 		var objects = [];
-		var objectIndexes = {};
-		var objectData = {};
-
+		var objectIndexes = [];
+		var objectData = [];
 ///////////////////////////////////////////////////////////////////////////////
-		this.store = function(object, id, data){
-			if(!data && typeof object.data === "object" && typeof object.object === "object" && Object.getOwnPropertyNames(object).length === 2 ) {
-				data = object.data;
-				object = object.object;
-			}
-			if(typeof object !== "object") 
+		this.store = function(object, data){
+			var id = data && data.id || null;
+			if(typeof object !== "object" && typeof object !== "function") 
 				throw("Only objects can be stored in ObjectStore");
 
 			var index =  id != null ? 
-				objectIndexes[id]: 
+				objectIndexes.indexOf(id): 
 				objects.indexOf(object);
 
-			if(index >= 0 && typeof objects[index] === "object") {
-				id = id != null ? id : index;
+			if(index >= 0 && (typeof objects[index] === "object" || typeof objects[index] === "function")) {
 				objects[index] = object;
-				if(typeof data === "object") 
+				if(typeof data === "object") {
 					objectData[index] = data;
-				objectIndexes[id] = index;
+					objectIndexes[index] = id;
+				}
 			}
 			else {
-				delete objectIndexes[id];
+				console.log("ObjectStore", "newElement");
 				index = objects.push(object)-1;
-				id = id != null ? id : index;
-				
 				objectData[index] = data;
-				objectIndexes[id] = index;
+				objectIndexes[index] = id;
 			}
 			return {
 				object : objects[index],
@@ -41,32 +34,34 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.remove = function(query){
-			var	index = typeof query === "object" ?
+			var	index = typeof query === "object" || typeof query === "function" ?
 				objects.indexOf(query):
-				objectIndexes[query];
-			
-			delete object[index];
-			delete objectData[index];
+				objectIndexes.indexOf(id);
 
-			if(typeof query !== "object")
-				delete objectIndexes[query];
+			objects.splice(index, 1);
+			objectData.splice(index, 1);
+			objectIndexes.splice(index, 1);
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.removeAll = function(query){
+			objects = [];
+			objectIndexes = [];
+			objectData = [];
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.get = function(query){
-			var	index = typeof query === "object" ?
+			var	index = typeof query === "object" || typeof query === "function" ?
 				objects.indexOf(query):
-				objectIndexes[query];
-
+				objectIndexes.indexOf(query);
 			if(index < 0 || index == null) return false;
-			
 			return {
 				object : objects[index],
 				data : objectData[index] || {}
 			}
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.getObjects = function(){
-			var ret = []
+		this.getAll = function(){
+			var ret = [];
 			for(var i=0; i<objects.length; i++)
 				ret.push({
 					object : objects[i],
@@ -78,8 +73,6 @@
 		this.size = function(){
 			return objects.length;
 		}
-
-
 	}
 ///////////////////////////////////////////////////////////////////////////////
 	module.exports = require("../Class.js").extend(ObjectStore);
