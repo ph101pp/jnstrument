@@ -7,10 +7,11 @@
 			var hitElements=[];
 			var elementHits={};
 			var id;
-			//for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.DoubleSide;
-			this.far = element.actionRadius+1;
+			for(var i=0; i<elements.length; i++) elements[i].preCollisionDetection();
 			for(var i=0; i<rays.length; i++) {
-				this.set(element.position, rays[i]);
+				var rayPosition = element.position.clone();
+				rayPosition.z = 1;
+				this.set(rayPosition, rays[i]);
 				var hits = this.intersectObjects(elements, group || recursive);
 				for(var k=0; k<hits.length; k++)
 					if(hits[k].object !== element) {
@@ -29,7 +30,7 @@
 					if(bulk === true) hitElements[i].collision(element, elementHits[i], this);
 				}
 		
-			//for(var i=0; i<elements.length; i++) elements[i].material.side = THREE.FrontSide;
+			for(var i=0; i<elements.length; i++) elements[i].postCollisionDetection;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.testElements = function(group, recursive){

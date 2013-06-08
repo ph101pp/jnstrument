@@ -7,6 +7,8 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.collision = Function; // (object, hits, collisionDetection)
+		this.preCollisionDetection = function(){};
+		this.postCollisionDetection = function(){};
 	}
 ///////////////////////////////////////////////////////////////////////////////
 	module.exports = require("../Class.js").extend.abstract(CollisionElement);
