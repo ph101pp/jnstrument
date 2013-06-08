@@ -1,5 +1,6 @@
 (function($, THREE, window, document, undefined) {
 
+	var MeshObject = require("../Class.js").extend(THREE.Mesh).extend(require("./CollisionElement.js"));
 
 	var FunctionElement = function(){
 
@@ -11,15 +12,21 @@
 		var outboundColor =  new THREE.Color("#3333FF");
 		var outboundHighlightColor = new THREE.Color("#AAAAFF");
 
-		var lerpAlpha = 0;
+		var add = new THREE.Vector3(10,10,10);
+		var scale = 0.3;
+
 
 ///////////////////////////////////////////////////////////////////////////////
-		this.inbound;
-		this.outbound;
-		this.boundingSphere;
+		this.inboundElements;
+		this.outboundElements;
+		this.container;
 
-		this.inboundElements = new (require("./ObjectStore"));
-		this.outboundElements = new (require("./ObjectStore"));
+		this.uniforms = {
+			lerpAlpha : { type:"f", value:0.5 },
+			radius : { type:"f", value:1 },			
+			outbound : { type:"f", value:0 },
+			inbound : { type:"f", value:0 }
+		};
 
 		this.inboundCount = 0;
 		this.outboundCount = 0;
@@ -27,71 +34,32 @@
 		this.velocity = new THREE.Vector3(0,0,0);
 
 ///////////////////////////////////////////////////////////////////////////////
-		var updateRadiuses = function(){
-			var add = new THREE.Vector3(10,10,10);
-			this.inbound.scale.set(this.inboundCount,this.inboundCount,this.inboundCount).add(add);
-			this.outbound.scale.set(this.outboundCount,this.outboundCount,this.outboundCount).add(add);
-			
-			var boundingRadius =Math.max(this.inboundCount, this.outboundCount)+add.x+20;
-			this.boundingSphere.scale.set(boundingRadius, boundingRadius, boundingRadius);
-			this.actionRadius =boundingRadius;
-
-
-		}.bind(this)
-///////////////////////////////////////////////////////////////////////////////
-		var updateColors = function(){
-			if(lerpAlpha > 0.01) lerpAlpha*=0.8;
-			else lerpAlpha = 0;
-			this.inbound.material.color = inboundColor.clone().lerp(inboundHighlightColor, lerpAlpha);
-			this.outbound.material.color = outboundColor.clone().lerp(outboundHighlightColor, lerpAlpha);
-		}.bind(this)
-///////////////////////////////////////////////////////////////////////////////
-		var updateOutBoundConnections = function() {
-			var elements = this.outboundElements.getObjects();
-			for(var i = 0; i<elements.length; i++) {
-
-				var distanceVector = elements[i].object.position.clone().sub(this.position);
-
-				var target = distanceVector.clone().setLength(this.actionRadius+elements[i].object.actionRadius+5);
-				var force = target.clone().add(this.position).sub(elements[i].object.position);
-				var length=force.length();
-				var maxSpeed = 10;
-				var minSpeed = 0;
-				force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, minSpeed, maxSpeed),minSpeed,maxSpeed));
-				elements[i].object.velocity.add(force);
-
-
-
-				elements[i].data.connection.geometry.vertices[1] = distanceVector;
-				elements[i].data.connection.geometry.verticesNeedUpdate = true;
-			}
-		}.bind(this)
-///////////////////////////////////////////////////////////////////////////////
-		this.construct = function(){
+		this.construct = function(geometry, material){
 			var materialOptions = {
 				transparent : true,
-				opacity : 0.7
+				opacity : 0.7,
+				color: inboundColor,
+				visible:true
 			}
-			var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
+			material =  material || new THREE.MeshBasicMaterial(materialOptions);
+			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			return new (MeshObject.extend(FunctionElement).extend({
+				construct : function(){
+					this.inboundElements = new (require("./ObjectStore"));
+					this.outboundElements = new (require("./ObjectStore"));
 
-			var inboundMaterial =  new THREE.MeshBasicMaterial($.extend({}, materialOptions, {color: inboundColor, side:THREE.FrontSide}));
-			this.inbound = new THREE.Mesh(geometry, inboundMaterial);
-			this.inbound.rotation.x=90 * (Math.PI/180); 
+					this.actionRadius=1;
 
-			var outboundMaterial =  new THREE.MeshBasicMaterial($.extend({}, materialOptions, {color: outboundColor, side:THREE.BackSide}));
-			this.outbound = new THREE.Mesh(geometry, outboundMaterial);
-			this.outbound.rotation.x=90 * (Math.PI/180); 
+					this.container = new THREE.Object3D();
+					this.add(this.container);
 
-			var boundingMaterial =  new THREE.MeshBasicMaterial({visible:false, side:THREE.DoubleSide});
-			this.boundingSphere = new THREE.Mesh(geometry, boundingMaterial);
-			this.boundingSphere.rotation.x=90 * (Math.PI/180); 
+					this.update();
+					this.material.uniforms= this.uniforms;
+					console.log(this);
+				}
+			}))(geometry, material);
 
-			this.actionRadius=1;
-			updateRadiuses();
-
-			this.add(this.outbound);
-			this.add(this.inbound);
-			this.add(this.boundingSphere);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.worldReference= function(_world){
@@ -102,37 +70,68 @@
 			if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
 			var force = this.position.clone().sub(object.position);
 			var length = force.length();
-			var maxSpeed = 10;
-			var minSpeed = 1;
+			var maxSpeed = 20;
+			var minSpeed = 5;
 			force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, maxSpeed, minSpeed),minSpeed,maxSpeed));
 			this.velocity.add(force);
 		}
+///////////////////////////////////////////////////////////////////////////////
+		this.updateColors = function(){
+			if(this.uniforms.lerpAlpha.value > 0.01) this.uniforms.lerpAlpha.value*=0.85;
+			else this.uniforms.lerpAlpha.value = 0;
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.updateOutBoundConnections = function() {
+			var elements = this.outboundElements.getAll();
+			for(var i = 0; i<elements.length; i++) {
+				var distanceVector = elements[i].object.position.clone().sub(this.position);
+				distanceVector.z=0;
 
+				var target = distanceVector.clone().setLength(this.actionRadius +elements[i].object.actionRadius+10);
+				var force = target.clone().add(this.position).sub(elements[i].object.position);
+				var length=force.length();
+				var maxSpeed = 10;
+				var minSpeed = 1;
+				force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, minSpeed, maxSpeed),minSpeed,maxSpeed));
+				elements[i].object.velocity.add(force);
+
+				elements[i].data.connection.geometry.vertices[1] = distanceVector;
+				elements[i].data.connection.geometry.verticesNeedUpdate = true;
+			}
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.updateRadius = function(){
+			var count = Math.max(this.inboundCount, this.outboundCount);			
+			var countScale = 0.3;
+			var boundingRadius =count*countScale+10;
+			this.scale.set(boundingRadius, boundingRadius, boundingRadius);
+			this.container.scale.set(1/boundingRadius, 1/boundingRadius, 1/boundingRadius);
+			this.actionRadius =boundingRadius;
+			this.uniforms.radius.value = boundingRadius;
+		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.update = function(){
-			updateOutBoundConnections();
-			updateColors();
+			this.updateRadius();
+			this.updateOutBoundConnections();
+			this.updateColors();
 
 			this.velocity.multiplyScalar(0.5);
 			this.position.add(this.velocity);
-
-
-
-
-		}.bind(this);
+			this.position.z = 0;
+		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.inboundEvent = function(FunctionElement){
 			this.inboundCount++;
 			var element = this.inboundElements.store(FunctionElement);
 			element.data.count = element.data.count+1 || 1;
-			this.inboundElements.store(element);
-			updateRadiuses();
-			lerpAlpha = 1;
+			this.inboundElements.store(element.object, element.data);
+			this.uniforms.lerpAlpha.value = 1;
+			this.uniforms.inbound.value++;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.outboundEvent = function(FunctionElement){
 			this.outboundCount++;
-			var element = this.outboundElements.store(FunctionElement);
+			var element=this.outboundElements.store(FunctionElement);
 			element.data.count = element.data.count+1 || 1;
 			if(typeof element.data.connection !== "object"){
 				var material = new THREE.LineBasicMaterial({
@@ -142,12 +141,12 @@
 				geometry.vertices.push(new THREE.Vector3(0,0,0));
 				geometry.vertices.push(element.object.position.clone().sub(this.position));
 				element.data.connection = new THREE.Line(geometry, material);
-				this.add(element.data.connection);
+				this.container.add(element.data.connection);
 			}
-			this.outboundElements.store(element);
-			updateRadiuses();
+			this.outboundElements.store(element.object, element.data);
+			this.uniforms.outbound.value++;
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js").extend(THREE.Object3D).extend(require("./CollisionElement.js")).extend(FunctionElement);
+	module.exports = require("../Class.js").extend(FunctionElement);
 })(jQuery, THREE, window, document)

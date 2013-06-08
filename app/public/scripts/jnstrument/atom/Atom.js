@@ -1,6 +1,16 @@
 (function($, THREE, window, document, undefined) {	
 	var atom = function(){
 		var globalTick, env, loop, socket, that;
+
+		var elements = new (require("./ObjectStore"));
+///////////////////////////////////////////////////////////////////////////////
+		var setupCollisionDetection = function(){
+			env.collisionDetection = new (require("./CollisionDetection.js"))();	
+			var rayCount = 16;
+			var ray = new THREE.Vector3(0, 1, 0);
+			for(var i =0; i<rayCount; i++ )	
+				env.collisionDetection.addRay(new THREE.Vector3(Math.cos( (i*360/rayCount)*(Math.PI/180) ), Math.sin( (i*360/rayCount)*(Math.PI/180) ), 0));
+		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(_socket, _loop){		
 			socket = _socket;
@@ -10,17 +20,47 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.initialize = function(container) {
-			env = 	new (require("./Environment.js"))($(container));
-			loop.addListener(globalTick.tick);
-			loop.addListener(env.render);
+			env = 	new (require("./World.js"))($(container));
+			loop.addListener(globalTick.tick, { bind:globalTick });
+			loop.addListener(env.render, { bind:env });
 
-			this.init();
+			globalTick.activate();
+
+			setupCollisionDetection();
+
+			globalTick.addListener(function(){
+				env.collisionDetection.testElements();
+			}, {eventName :"calculate"});
+
+			socket.addListener(function(data){
+				
+				var element = elements.get(data.id);
+				var caller = elements.get(data.data.calledBy);
+				if(caller === false) {
+					caller = new (require("./FunctionElement.js"))();
+					caller.position.set(Math.random()*100-50,Math.random()*100-50,Math.random()*100-50);
+					globalTick.addListener(caller.update, {bind:caller, eventName:"update"});
+					env.collisionDetection.addElement(caller);
+					env.scene.add(caller);
+					caller = elements.store(caller,{id:data.data.calledBy});
+				}
+				if(element === false) {
+					element = new (require("./FunctionElement.js"))();
+					element.position = caller.object.position.clone().add(new THREE.Vector3(Math.random()*10-5,Math.random()*10-5,Math.random()*10-5));
+					globalTick.addListener(element.update, {bind:element, eventName:"update"});
+					env.collisionDetection.addElement(element);
+					env.scene.add(element);
+					element = elements.store(element,{id:data.data.id});
+				}
+
+				element.object.inboundEvent(caller.object);
+				caller.object.outboundEvent(element.object);
+			});
+
 		}
-///////////////////////////////////////////////////////////////////////////////
-		this.init = function() {
 
-//			var geometry =  new THREE.CircleGeometry(10,16);
-//			var geometry =  new THREE.CubeGeometry( 10, 10, 10 );
+///////////////////////////////////////////////////////////////////////////////
+		this.tests = function(){
 
 			var element1 = new (require("./FunctionElement.js"))();
 			var element2 = new (require("./FunctionElement.js"))();
@@ -33,9 +73,11 @@
 			// console.log(element2, element2 instanceof THREE.Mesh);
 			// console.log(element2, element2 instanceof THREE.Mesh);
 
-			element1.outboundEvent(element2);
-			element1.outboundEvent(element2);
-			element1.outboundEvent(element2);
+			// element1.update();
+
+			// element1.outboundEvent(element2);
+			// element1.outboundEvent(element2);
+			// element1.outboundEvent(element2);
 
 
 			element1.worldReference(env);
@@ -59,81 +101,37 @@
 			element4.position.set(100,0,0);
 			element5.position.set(0, -100,0);
 
+			console.log(element1);
 
-			globalTick.addListener("update", element1.update);
-			globalTick.addListener("update", element2.update);
-			globalTick.addListener("update", element3.update);
-			globalTick.addListener("update", element4.update);
-			globalTick.addListener("update", element5.update);
+			// element1.scale.set(10,10,10);
+			// element2.scale.set(10,10,10);
+			// element3.scale.set(10,10,10);
+			// element4.scale.set(10,10,10);
+			// element5.scale.set(10,10,10);
+
+
+			// globalTick.addListener(element1.update, {bind: element1, eventName:"update"});
+			// globalTick.addListener(element2.update, {bind: element2, eventName:"update"});
+			// globalTick.addListener(element3.update, {bind: element3, eventName:"update"});
+			// globalTick.addListener(element4.update, {bind: element4, eventName:"update"});
+			// globalTick.addListener(element5.update, {bind: element5, eventName:"update"});
 
 
 
-			env.collisionDetection = new (require("./CollisionDetection.js"))();	
-			var rayCount = 50;
-			var ray = new THREE.Vector3(0, 1, 0);
-			for(var i =0; i<rayCount; i++ )	
-				env.collisionDetection.addRay(new THREE.Vector3(Math.cos( (i*360/rayCount)*(Math.PI/180) ), Math.sin( (i*360/rayCount)*(Math.PI/180) ), 0));
 
-			env.collisionDetection.addElement(element1);
-			env.collisionDetection.addElement(element2);
-			env.collisionDetection.addElement(element3);
-			env.collisionDetection.addElement(element4);
-			env.collisionDetection.addElement(element5);
+			// env.collisionDetection.addElement(element1);
+			// env.collisionDetection.addElement(element2);
+			// env.collisionDetection.addElement(element3);
+			// env.collisionDetection.addElement(element4);
+			// env.collisionDetection.addElement(element5);
 
 
 
 			// var ray =  new THREE.Vector3(0,-1,0);
 			// var caster = new THREE.Raycaster();
-			globalTick.activate();
-
-				globalTick.addListener("calculate", function(){
-					env.collisionDetection.testElements(true, true);
-				});
-			$(window).bind("click", function(){
-
-				//CollisionDetection.testElements(true, true);
-
-			element1.outboundEvent(element2);
-			element1.outboundEvent(element2);			
-			element2.inboundEvent(element1);		
-			element2.inboundEvent(element1);
 
 
 
-
-				// var elements = [element3, element2];
-
-				// console.log(element.position, ray, elements);
-				// caster.set(element.position, ray);
-
-				// var hits = caster.intersectObjects(elements);
-
-				//  console.log(hits);
-
-				// for(var i=0; i<hits.length; i++) hits[i].object.material.color.setHex(0x0000ff);
-
-				// //console.log(element);
-
-				// element.scale.set(10,10,10);
-				// element2.material.color.setHex(0x0000ff);
-
-
-
-			 // 	// element.geometry.verticesNeedUpdate = true;
-			 // 	// element.geometry.normalsNeedUpdate = true;
-			 // 	// element.geometry.uvsNeedUpdate = true;
-			 // 	// element.geometry.tangentsNeedUpdate = true;
-			 // 	// element.geometry.morphTargetsNeedUpdate = true;
-			 // 	// element.geometry.lineDistancesNeedUpdate = true;
-			 // 	// element.geometry.elementsNeedUpdate = true;
-			 // 	// element.geometry.buffersNeedUpdate = true;
-			 // 	// element.geometry.colorsNeedUpdate = true;
-			 // 	// element.geometry.dynamic = true;
-
-
-
-			})
-			
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.remove = function() {
