@@ -1,5 +1,5 @@
 (function($, THREE, window, document, undefined) {	
-	var Environment = function(container){
+	var World = function(container){
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Properties
 /*/////////////////////////////////////////////////////////////////////////////
@@ -48,6 +48,35 @@
 		this.height;
 		this.width;
 /*/////////////////////////////////////////////////////////////////////////////
+	Constructor
+/*/////////////////////////////////////////////////////////////////////////////
+		this.construct  = function(_container){
+			var container = $(_container);
+			this.width = container.innerWidth();
+			this.height = container.innerHeight();			
+			this.renderer = new THREE.WebGLRenderer();
+			this.renderer.setSize(this.width, this.height); 
+
+			this.camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
+			this.camera.position = new THREE.Vector3(0,0,1000); // move camera up
+		//	this.camera.up.set(0, 0, -1); // Turn Camera
+			this.camera.lookAt(new THREE.Vector3(0, 0, 0)); // face camera down
+
+			this.scene = new THREE.Scene();
+			this.scene.add(this.camera);
+			this.camera.up= new THREE.Vector3(100, 120, 0); // Turn Camera
+
+
+			container.append(this.renderer.domElement);
+
+
+			//setupCameras();
+
+
+
+			this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
+		}
+/*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
 		var setupCameras = function(){
@@ -91,32 +120,7 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////
-		this.construct  = function(_container){
-			var container = $(_container);
-			this.width = container.innerWidth();
-			this.height = container.innerHeight();			
-			this.renderer = new THREE.WebGLRenderer();
-			this.renderer.setSize(this.width, this.height); 
 
-			this.camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
-			this.camera.position = new THREE.Vector3(0,0,300); // move camera up
-		//	this.camera.up.set(0, 0, -1); // Turn Camera
-			this.camera.lookAt(new THREE.Vector3(0, 0, 0)); // face camera down
-
-			this.scene = new THREE.Scene();
-			this.scene.add(this.camera);
-			this.camera.up= new THREE.Vector3(100, 120, 0); // Turn Camera
-
-
-			container.append(this.renderer.domElement);
-
-
-			//setupCameras();
-
-
-
-			this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
-		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.drawCoodinateSystem = function(position){
 			var geometryX = new THREE.Geometry();
@@ -163,5 +167,5 @@
 		}).bind(this);
 	}
 ///////////////////////////////////////////////////////////////////////////////	
-	module.exports = require("../Class.js").extend(Environment);
+	module.exports = require("../Class.js").extend(World);
 })(jQuery, THREE, window, document)
