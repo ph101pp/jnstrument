@@ -6,6 +6,12 @@ html
 		script(src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
 		script(src='/scripts/libs/jquery-1.7.1.min.js')
 		script(src='/scripts/libs/three.js/three.js')
+
+		script(data-name="test", data-src="http://localhost:8000/scripts/shaders/vertexTest.c", type="x-shader/x-vertex")
+		script(data-name="test", data-src="http://localhost:8000/scripts/shaders/fragmentTest.c", type="x-shader/x-fragment")
+		script(src='/scripts/libs/AeroTwistShaderLoader.js')
+
 		script(src='/scripts/atom/index.js')
+
 	body
 		#scene

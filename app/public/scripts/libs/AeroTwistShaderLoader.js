@@ -4,9 +4,9 @@ AEROTWIST.Shaders = AEROTWIST.Shaders || {};
 // on doc ready load them in
 $(document).ready(function(){
 
-	// only bother if we think we support
-	// WebGL in the browser
-	if(Modernizr.webgl) {
+	// // only bother if we think we support
+	// // WebGL in the browser
+	// if(Modernizr.webgl) {
 		
 		$("#loading").show();
 		
@@ -23,7 +23,7 @@ $(document).ready(function(){
 			if(!shaderCount) {
 				
 				// GO!
-				AEROTWIST.WebGLEasing.init();
+				AEROTWIST.init();
 			}
 		}
 		
@@ -91,8 +91,8 @@ $(document).ready(function(){
 		// there may be none so just
 		// check that here
 		checkForComplete();
-	} else {
-		$("#loading").hide();
-		$(document.body).addClass('no-webgl');
-	}
+	// } else {
+	// 	$("#loading").hide();
+	// 	$(document.body).addClass('no-webgl');
+	// }
 });

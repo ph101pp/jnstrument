@@ -8,7 +8,7 @@
 		atom.initialize($("#scene"));
 	}	
 ///////////////////////////////////////////////////////////////////////////////
-	$(document).ready(function(){
+	AEROTWIST.init = function(){
 		index(); // Start
-	});
+	};
 })(jQuery, THREE, window, document)
