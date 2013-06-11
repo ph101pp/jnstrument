@@ -82,21 +82,22 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateOutBoundConnections = function() {
-			var elements = this.outboundElements.getAll();
+			var storedElements = this.outboundElements.getAll();
+			var elements = storedElements.objects;
 			for(var i = 0; i<elements.length; i++) {
-				var distanceVector = elements[i].object.position.clone().sub(this.position);
+				var distanceVector = elements[i].position.clone().sub(this.position);
 				distanceVector.z=0;
 
-				var target = distanceVector.clone().setLength(this.actionRadius +elements[i].object.actionRadius+10);
-				var force = target.clone().add(this.position).sub(elements[i].object.position);
+				var target = distanceVector.clone().setLength(this.actionRadius +elements[i].actionRadius+10);
+				var force = target.clone().add(this.position).sub(elements[i].position);
 				var length=force.length();
 				var maxSpeed = 10;
 				var minSpeed = 1;
 				force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, minSpeed, maxSpeed),minSpeed,maxSpeed));
-				elements[i].object.velocity.add(force);
+				elements[i].velocity.add(force);
 
-				elements[i].data.connection.geometry.vertices[1] = distanceVector;
-				elements[i].data.connection.geometry.verticesNeedUpdate = true;
+				storedElements.data[i].connection.geometry.vertices[1] = distanceVector;
+				storedElements.data[i].connection.geometry.verticesNeedUpdate = true;
 			}
 		}
 ///////////////////////////////////////////////////////////////////////////////

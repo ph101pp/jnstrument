@@ -1,20 +1,21 @@
 (function($, THREE, window, document, undefined) {
 
 	var ObjectStore = function(){
+		var empty = {}
 		var objects = [];
 		var objectIndexes = [];
 		var objectData = [];
 ///////////////////////////////////////////////////////////////////////////////
 		this.store = function(object, data){
-			var id = data && data.id || null;
 			if(typeof object !== "object" && typeof object !== "function") 
-				throw("Only objects can be stored in ObjectStore");
+				throw("Only objects and functions can be stored in ObjectStore");
+			var id = data && data.id || null;
 
 			var index =  id != null ? 
 				objectIndexes.indexOf(id): 
 				objects.indexOf(object);
 
-			if(index >= 0 && (typeof objects[index] === "object" || typeof objects[index] === "function")) {
+			if(index >= 0) {
 				objects[index] = object;
 				if(typeof data === "object") {
 					objectData[index] = data;
@@ -23,13 +24,14 @@
 			}
 			else {
 				console.log("ObjectStore", "newElement");
-				index = objects.push(object)-1;
+				index = objects.length;
+				objects[index] = object;
 				objectData[index] = data;
 				objectIndexes[index] = id;
 			}
 			return {
 				object : objects[index],
-				data : objectData[index] || {}
+				data : objectData[index] || empty
 			}
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,9 +40,16 @@
 				objects.indexOf(query):
 				objectIndexes.indexOf(id);
 
+			var object = {
+				object : objects[index],
+				data : objectData[index] || empty
+			}
+
 			objects.splice(index, 1);
 			objectData.splice(index, 1);
 			objectIndexes.splice(index, 1);
+
+			return object;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.removeAll = function(query){
@@ -53,21 +62,19 @@
 			var	index = typeof query === "object" || typeof query === "function" ?
 				objects.indexOf(query):
 				objectIndexes.indexOf(query);
-			if(index < 0 || index == null) return false;
-			return {
-				object : objects[index],
-				data : objectData[index] || {}
-			}
+
+			return index >= 0 ? {
+					object : objects[index],
+					data : objectData[index] || empty
+				}:false;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.getAll = function(){
-			var ret = [];
-			for(var i=0; i<objects.length; i++)
-				ret.push({
-					object : objects[i],
-					data : objectData[i] || {}
-				});
-			return ret;
+			return {
+				objects : objects,	
+				data : objectData,
+				ids : objectIndexes
+			};
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.size = function(){
