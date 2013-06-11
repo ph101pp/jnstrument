@@ -8,6 +8,7 @@
 		var objIndex = 0;
 		var objs = [];
 		var objInfo = [];
+		var objStrings = [];
 		var maxDepth=4;
 		var connection;
 		var guid;
@@ -22,43 +23,61 @@
 		var sendData = function (event, proxy, method, args, _this) {
 			//console.debug(event, proxy.__pca__objIndex, args, method);
 			if(!connection || !enabled) return;
+			// var callerString = args.callee.caller.toString();
+			// console.log(args.callee.caller);
+			// if(	args.callee.caller != null && 
+			// 	callerString.search(/__pca__/) < 0 && 
+			// 	callerString !== Reflect.prototype.apply.toString() && 
+			// 	callerString !== Reflect.prototype.construct.toString()
+			// ) return;
 
 			var index = event === "Liner" && !proxy?
 				addObj(method):
 				proxy.__pca__objIndex;
 
-			var calledBy = addObj(args.callee.caller);
+			// if(args.callee.caller != null) console.log(args.callee);
+			// return;
+
+
+			var calledBy = args.callee.caller != null ?
+				addObj(args.callee.caller):
+				false;
 
 			var data= {
 				id : index,
 				event: event,
-				calledBy: calledBy,
-				info:objInfo[index],
+				calledById: calledBy,
+				calledByInfo : objInfo[calledBy],
+				info: objInfo[index],
 				//caller : args.callee.caller,
 				//args:args,
 				ids: objIndex,
 				//constructor: _this
 			};
 
-			// if(data.calledBy <0) console.log(args.callee.caller);
-			// return;
+			 // if(data.calledBy <0) console.log(args.callee.caller, args.callee);
 			// console.log('__pca__Event', data);
 
 			connection.emit('__pca__Event', data, function(data){
-				console.log(data);
+				//console.log(data);
 			});
 			wait(__pca__.wait);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var addObj = function(obj, variableName){
 			var index=objs.indexOf(obj);
-			if(index >=0) return index;
-			index=objIndex++;
+			if(index >= 0) return index;
 
 			var objStr = obj.toString();
+			index = objStrings.indexOf(objStr);
+			if(index >= 0) return index;
+
+			index=objIndex++;
+
 			var functionName = objStr.match(/function[\s\n\r\t]*([$A-Za-z_][A-Za-z_0-9$]*)?[\s\n\r\t]*\(/);	
 
 			objs[index]= obj;
+			objStrings[index] = objStr;
 			objInfo[index] = {
 				variableName : variableName,
 				string : objStr,
@@ -115,85 +134,85 @@
 			return obj;
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		  var Reflect = function(target){
-		    this.target = target;
-		  }
+		var Reflect = function(target){
+			this.target = target;
+		}
 
-		  Reflect.prototype = {
-		    getOwnPropertyNames: function(){
-		      return Object.getOwnPropertyNames(this.target);
-		    },
-		    keys: function(){
-		      return Object.keys(this.target);
-		    },
-		    enumerate: function(){
-		      var i=0, keys=[];
-		      for (keys[i++] in this.target);
-		      return keys;
-		    },
-		    getPropertyDescriptor: function(key){
-		      var o = this.target;
-		      while (o) {
-		        var desc = Object.getOwnPropertyDescriptor(o, key);
-		        if (desc) {
-		          desc.configurable = true;
-		          return desc;
-		        }
-		        o = Object.getPrototypeOf(o);
-		      }
-		    },
-		    getOwnPropertyDescriptor: function x(key){
-		      var desc = Object.getOwnPropertyDescriptor(this.target, key);
-		      if (desc) {
-		        desc.configurable = true;
-		        return desc;
-		      }
-		      return desc;
-		    },
-		    defineProperty: function(key, desc){
-		      return Object.defineProperty(this.target, key, desc);
-		    },
-				get : function get(receiver, key){
-					if(key == "__pca__Proxied") return true;
-					if(key == "__pca__objInfo") return this.__pca__objInfo;
-					if(key == "__pca__objIndex") return this.__pca__objIndex;
+		Reflect.prototype = {
+			getOwnPropertyNames: function(){
+				return Object.getOwnPropertyNames(this.target);
+			},
+			keys: function(){
+				return Object.keys(this.target);
+			},
+			enumerate: function(){
+				var i=0, keys=[];
+				for (keys[i++] in this.target);
+				return keys;
+			},
+			getPropertyDescriptor: function(key){
+				var o = this.target;
+				while (o) {
+					var desc = Object.getOwnPropertyDescriptor(o, key);
+					if (desc) {
+						desc.configurable = true;
+						return desc;
+					}
+					o = Object.getPrototypeOf(o);
+				}
+			},
+			getOwnPropertyDescriptor: function x(key){
+				var desc = Object.getOwnPropertyDescriptor(this.target, key);
+				if (desc) {
+					desc.configurable = true;
+					return desc;
+				}
+				return desc;
+			},
+			defineProperty: function(key, desc){
+				return Object.defineProperty(this.target, key, desc);
+			},
+			get : function get(receiver, key){
+				if(key == "__pca__Proxied") return true;
+				if(key == "__pca__objInfo") return this.__pca__objInfo;
+				if(key == "__pca__objIndex") return this.__pca__objIndex;
 
-					return this.target[key];
-				},
-		    set: function set(receiver, key, value){
-		    	if(key == "__pca__objInfo") this[key] = value;
-		      else this.target[key] = value;
-		      return true;
-		    },
-		    has: function has(key){
-		      return key in this.target;
-		    },
-		    hasOwn: function(key){
-		      return Object.prototype.hasOwnProperty.call(this.target, key);
-		    },
-		    delete: function(key){
-		      delete this.target[key];
-		      return true;
-		    },
-				apply : function(_this, args){
-					sendData("Apply", this, this.target, args, _this);
-					return Function.prototype.apply.call(this.target, _this, args);
-				},
-				construct : function(args){
-					sendData("Construct", this, this.target, args);
-					Array.prototype.unshift.call(args, null);
-					return wrapper(new (Function.prototype.bind.apply(this.target, args))); 	
-				},
-	  	};
+				return this.target[key];
+			},
+			set: function set(receiver, key, value){
+				if(key == "__pca__objInfo") this[key] = value;
+				else this.target[key] = value;
+				return true;
+			},
+			has: function has(key){
+				return key in this.target;
+			},
+			hasOwn: function(key){
+				return Object.prototype.hasOwnProperty.call(this.target, key);
+			},
+			delete: function(key){
+				delete this.target[key];
+				return true;
+			},
+			apply : function(_this, args){
+				sendData("Apply", this, this.target, args, _this);
+				return Function.prototype.apply.call(this.target, _this, args);
+			},
+			construct : function(args){
+				sendData("Construct", this, this.target, args);
+				Array.prototype.unshift.call(args, null);
+				return wrapper(new (Function.prototype.bind.apply(this.target, args))); 	
+			}
+		};
 ///////////////////////////////////////////////////////////////////////////////
 		var _Proxy = function(target, overrides){
 			var handler = new Reflect(target);
 			for (var k in Object(overrides)) handler[k] = overrides[k];
-				
+			
 			return typeof target === 'function'?
-				Proxy.createFunction(handler,
-					function(){ return handler.apply(this, arguments) },
-					function(){ return handler.construct(arguments) }): 
+				Proxy.createFunction(handler, 
+					function(){ return handler.apply(this, arguments) }, 
+					function(){ return handler.construct(arguments) }):
 				Proxy.create(handler, Object.getPrototypeOf(Object(target)));
 		}
 ///////////////////////////////////////////////////////////////////////////////

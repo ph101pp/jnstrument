@@ -30,7 +30,7 @@
   ],
   "browser_action": {
     "default_icon": "inactive.png"
-    // ,
-    // "default_popup": "launcher.html"
+//    "debugPopu": "debugPopup.html"
+
   }
 }

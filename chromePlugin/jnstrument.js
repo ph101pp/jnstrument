@@ -1,6 +1,7 @@
 new (function jnstrument(){
 /////////////////////////////////////////////////////////////
 	var tabs = {};
+	var debugging = false;
 /////////////////////////////////////////////////////////////
 	chrome.browserAction.onClicked.addListener(function(tab) {
 		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab.id);
@@ -30,12 +31,15 @@ new (function jnstrument(){
 /////////////////////////////////////////////////////////////
 	chrome.debugger.onEvent.addListener(function(debuggee, method, data){
 		if(method !=="Debugger.scriptParsed") return;
+
 		if(data.url.search("^(http://|https://|file://|localhost:).*")<0) return; // only instrument scripts from the website.. not from scripts sent from chrome.
 		if(data.url.search(/pca__ProxyInstrumentES5\.js/) >= 0) return;
 		
 		var instrument="if(window.__pca__) __pca__.liner(this, arguments);";
 
 		chrome.debugger.sendCommand(debuggee, "Debugger.getScriptSource",{scriptId: data.scriptId }, function(result){
+			if(result.scriptSource.search(/__pca__/)>=0) return;
+			console.log(data.url, result);
 			var instrumentedScript=result.scriptSource.replace(
 					/(function[\s\n\r\t]*([$A-Za-z_][A-Za-z_0-9$]*)?[\s\n\r\t]*\(([\s\n\r\t]*([$A-Za-z_][\w$]*)?[\s\n\r\t]*,?)*\)[\s\n\r\t]*{)/g,
 					"$1 "+instrument);
@@ -51,8 +55,19 @@ new (function jnstrument(){
 		// } catch(e){};		
 		// chrome.debugger.attach({tabId:tabId}, "1.0", function(){
 		// 	chrome.debugger.sendCommand({tabId:tabId}, "Debugger.enable");
+		// 	enable(tabId);
 		// });
 
+		enable(tabId);
+
+		chrome.browserAction.setIcon({
+			path:"active.png",
+			tabId:tabId
+		});
+
+	}
+
+	var enable= function(tabId){
 		if(tabs[tabId]) tabs[tabId].status = true;
 		else tabs[tabId] = {
 			guid: createGuid(),
@@ -62,11 +77,6 @@ new (function jnstrument(){
 		chrome.tabs.sendMessage(tabId, {
 			action: "enable", 
 			guid : tabs[tabId].guid
-		});
-
-		chrome.browserAction.setIcon({
-			path:"active.png",
-			tabId:tabId
 		});
 	}
 /////////////////////////////////////////////////////////////
@@ -92,6 +102,15 @@ new (function jnstrument(){
 	    	var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
 	    	return v.toString(16);
 		});
+	}
+
+
+	//DEBUGGING
+	if(debugging) {
+		console.log("hallo");
+		var tab = {id:parseInt(window.location.hash.substr(1))};
+		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab.id);
+		else activateTab(tab.id);
 	}
 /////////////////////////////////////////////////////////////
 })();
