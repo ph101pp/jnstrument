@@ -33,28 +33,37 @@
 			}, {eventName :"calculate"});
 
 			socket.addListener(function(data){
-				
+			console.log(data);	
 				var element = elements.get(data.id);
-				var caller = elements.get(data.data.calledBy);
+				var caller = data.data.calledById !== false ?
+					elements.get(data.data.calledById):
+					null;
 				if(caller === false) {
 					caller = new (require("./FunctionElement.js"))();
 					caller.position.set(Math.random()*100-50,Math.random()*100-50,Math.random()*100-50);
 					globalTick.addListener(caller.update, {bind:caller, eventName:"update"});
 					env.collisionDetection.addElement(caller);
 					env.scene.add(caller);
-					caller = elements.store(caller,{id:data.data.calledBy});
+					caller = elements.store(caller,{id:data.data.calledById});
 				}
 				if(element === false) {
-					element = new (require("./FunctionElement.js"))();
-					element.position = caller.object.position.clone().add(new THREE.Vector3(Math.random()*10-5,Math.random()*10-5,Math.random()*10-5));
+					element = caller !== null ?
+						new (require("./FunctionElement.js"))():
+						new (require("./EventElement.js"))();
+					var startPosition = caller !== null ?
+						caller.object.position.clone():
+						new THREE.Vector3(0,0,0);
+					element.position = startPosition.add(new THREE.Vector3(Math.random()*50-25,Math.random()*50-25,Math.random()*50-25));
 					globalTick.addListener(element.update, {bind:element, eventName:"update"});
 					env.collisionDetection.addElement(element);
 					env.scene.add(element);
 					element = elements.store(element,{id:data.data.id});
 				}
-
-				element.object.inboundEvent(caller.object);
-				caller.object.outboundEvent(element.object);
+				if(caller !== null){
+					element.object.inboundEvent(caller.object);
+					caller.object.outboundEvent(element.object);
+				}
+				else element.object.inboundEvent();
 			});
 
 		}

@@ -1,6 +1,6 @@
 (function($, THREE, window, document, undefined) {
 
-	var MeshObject = require("../Class.js").extend(THREE.Mesh).extend(require("./CollisionElement.js"));
+	var MeshObject = require("../Class.js").extend(THREE.Mesh);
 
 	var FunctionElement = function(){
 
@@ -42,8 +42,7 @@
 				visible:true
 			}
 			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
-			material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			material = material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
 			return new (MeshObject.extend(FunctionElement).extend({
 				construct : function(){
 					this.inboundElements = new (require("./ObjectStore"));
@@ -116,12 +115,12 @@
 			this.updateColors();
 
 		
-			var gravity = this.position.clone().negate().multiplyScalar(0.01);
-			this.position.add(gravity);
+			// var gravity = this.position.clone().negate().multiplyScalar(0.01);
+			// this.position.add(gravity);
 
-			this.velocity.multiplyScalar(0.1);
-			this.position.add(this.velocity);
-			this.position.z = 0;
+			// this.velocity.multiplyScalar(0.1);
+			// this.position.add(this.velocity);
+			// this.position.z = 0;
 
 
 		}

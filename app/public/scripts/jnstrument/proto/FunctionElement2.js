@@ -1,6 +1,6 @@
 (function($, THREE, window, document, undefined) {
 
-	var MeshObject = require("../Class.js").extend(THREE.Mesh).extend(require("./CollisionElement.js"));
+	var MeshObject = require("../Class.js").extend(THREE.Mesh);
 
 	var FunctionElement = function(){
 
@@ -23,12 +23,12 @@
 
 		this.uniforms = {
 			lerpAlpha : { type:"f", value:0.5 },
-			radius : { type:"f", value:1 },			
+			radius : { type:"f", value:1 },	
 			outbound : { type:"f", value:0 },
 			inbound : { type:"f", value:0 }
 		};
 
-		this.inboundCount = 0;
+		this.inboundCount = 5;
 		this.outboundCount = 0;
 
 		this.velocity = new THREE.Vector3(0,0,0);
@@ -41,9 +41,8 @@
 				color: inboundColor,
 				visible:true
 			}
-			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
-			material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			geometry = geometry || new THREE.SphereGeometry( 5, 16, 16 );
+			material = material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.FunctionElement2.vertex, fragmentShader:AEROTWIST.Shaders.FunctionElement2.fragment});
 			return new (MeshObject.extend(FunctionElement).extend({
 				construct : function(){
 					this.inboundElements = new (require("./ObjectStore"));
@@ -56,6 +55,7 @@
 
 					this.update();
 					this.material.uniforms= this.uniforms;
+					this.material.transparent=true;
 					console.log(this);
 				}
 			}))(geometry, material);
@@ -100,39 +100,39 @@
 			}
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.updateRadius = function(){
-			var count = Math.max(this.inboundCount, this.outboundCount);			
-			var countScale = 0.3;
-			var boundingRadius =count*countScale+10;
-			this.scale.set(boundingRadius, boundingRadius, boundingRadius);
-			this.container.scale.set(1/boundingRadius, 1/boundingRadius, 1/boundingRadius);
-			this.actionRadius =boundingRadius;
-			this.uniforms.radius.value = boundingRadius;
+		this.updateRadiusScale = function(add){
+			if(!add) this.scale.multiplyScalar(.95, .95, .95);
+			else this.scale.add(add);
+			if(this.scale.x<1) this.scale.set(1,1,1);
+			this.container.scale = this.scale.clone().multiplyScalar(1/this.scale.x, 1/this.scale.y, 1/this.scale.z);
+			this.actionRadius =this.scale.x;
+			this.uniforms.radius.value = this.scale.x;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.update = function(){
-			this.updateRadius();
+			this.updateRadiusScale();
 			this.updateOutBoundConnections();
 			this.updateColors();
 
 		
-			var gravity = this.position.clone().negate().multiplyScalar(0.01);
-			this.position.add(gravity);
+			// var gravity = this.position.clone().negate().multiplyScalar(0.01);
+			// this.position.add(gravity);
 
-			this.velocity.multiplyScalar(0.1);
-			this.position.add(this.velocity);
-			this.position.z = 0;
+			// this.velocity.multiplyScalar(0.1);
+			// this.position.add(this.velocity);
+			// this.position.z = 0;
 
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.inboundEvent = function(FunctionElement){
 			this.inboundCount++;
-			var element = this.inboundElements.store(FunctionElement);
-			element.data.count = element.data.count+1 || 1;
-			this.inboundElements.store(element.object, element.data);
+			// var element = this.inboundElements.store(FunctionElement);
+			// element.data.count = element.data.count+1 || 1;
+			// this.inboundElements.store(element.object, element.data);
 			this.uniforms.lerpAlpha.value = 1;
 			this.uniforms.inbound.value++;
+			this.updateRadiusScale(new THREE.Vector3(.5, .5, .5));
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.outboundEvent = function(FunctionElement){
@@ -151,6 +151,7 @@
 			}
 			this.outboundElements.store(element.object, element.data);
 			this.uniforms.outbound.value++;
+
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////

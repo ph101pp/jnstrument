@@ -1,6 +1,6 @@
 (function($, THREE, window, document, undefined) {
 
-	var MeshObject = require("../Class.js").extend(THREE.Mesh).extend(require("./CollisionElement.js"));
+	var MeshObject = require("../Class.js").extend(THREE.Mesh);
 
 	var FunctionElement = function(){
 
@@ -23,7 +23,7 @@
 
 		this.uniforms = {
 			lerpAlpha : { type:"f", value:0.5 },
-			radius : { type:"f", value:1 },			
+			radius : { type:"f", value:1 },	
 			outbound : { type:"f", value:0 },
 			inbound : { type:"f", value:0 }
 		};
@@ -42,8 +42,7 @@
 				visible:true
 			}
 			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
-			material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			material = material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.FunctionElement1.vertex, fragmentShader:AEROTWIST.Shaders.FunctionElement1.fragment});
 			return new (MeshObject.extend(FunctionElement).extend({
 				construct : function(){
 					this.inboundElements = new (require("./ObjectStore"));
@@ -56,6 +55,7 @@
 
 					this.update();
 					this.material.uniforms= this.uniforms;
+					this.material.transparent=true;
 					console.log(this);
 				}
 			}))(geometry, material);
@@ -101,9 +101,9 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateRadius = function(){
-			var count = Math.max(this.inboundCount, this.outboundCount);			
+			var count = this.inboundCount+this.outboundCount;			
 			var countScale = 0.3;
-			var boundingRadius =count*countScale+10;
+			var boundingRadius =count*countScale+0;
 			this.scale.set(boundingRadius, boundingRadius, boundingRadius);
 			this.container.scale.set(1/boundingRadius, 1/boundingRadius, 1/boundingRadius);
 			this.actionRadius =boundingRadius;
@@ -116,12 +116,12 @@
 			this.updateColors();
 
 		
-			var gravity = this.position.clone().negate().multiplyScalar(0.01);
-			this.position.add(gravity);
+			// var gravity = this.position.clone().negate().multiplyScalar(0.01);
+			// this.position.add(gravity);
 
-			this.velocity.multiplyScalar(0.1);
-			this.position.add(this.velocity);
-			this.position.z = 0;
+			// this.velocity.multiplyScalar(0.1);
+			// this.position.add(this.velocity);
+			// this.position.z = 0;
 
 
 		}

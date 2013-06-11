@@ -43,7 +43,7 @@
 			}
 			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
 			material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.FunctionElement1.vertex, fragmentShader:AEROTWIST.Shaders.FunctionElement1.fragment});
 			return new (MeshObject.extend(FunctionElement).extend({
 				construct : function(){
 					this.inboundElements = new (require("./ObjectStore"));
@@ -128,9 +128,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 		this.inboundEvent = function(FunctionElement){
 			this.inboundCount++;
-			var element = this.inboundElements.store(FunctionElement);
-			element.data.count = element.data.count+1 || 1;
-			this.inboundElements.store(element.object, element.data);
+			// var element = this.inboundElements.store(FunctionElement);
+			// element.data.count = element.data.count+1 || 1;
+			// this.inboundElements.store(element.object, element.data);
 			this.uniforms.lerpAlpha.value = 1;
 			this.uniforms.inbound.value++;
 		}

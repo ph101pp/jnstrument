@@ -14,11 +14,11 @@ uniform float outbound;
 
 varying vec3 fragNormal;
 
-vec3 inHighlight = vec3(1.0, 0.9, 1.0);
-vec3 inNormal = vec3(1.0, 0.0, 1.0);
+vec3 inHighlight = vec3(1., 0.9, 0.);
+vec3 inNormal = vec3(1.0, 0.0, 0.);
 
-vec3 outHighlight = vec3(0.9, 0.9, 1.0);
-vec3 outNormal = vec3(0.0, 0.0, 1.0);
+vec3 outHighlight = vec3(.5, 1., .5);
+vec3 outNormal = vec3(0., 1., 0.);
 
 
 void main() {
@@ -39,7 +39,7 @@ void main() {
 	if( length(norm) > threshhold){
 		thisColor = outNormal; // BLUE YES
 		thisHighlight = outHighlight;
-		alpha = 1.;
+		alpha = .5;
 	}
 	else {
 		thisColor = inNormal; // PINK NO

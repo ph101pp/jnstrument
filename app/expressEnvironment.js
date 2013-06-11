@@ -52,6 +52,12 @@ module.exports = function() {
 		});
 	});
 
+	app.get(/\/proto\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('proto', { 
+			title : 'prototypes'  
+		});
+	});
+
 	app.get(/\/test\/........-....-4...-....-p....c.....a/, function (req, res) {
 		res.render('test', { 
 			title : 'test'  
