@@ -3,125 +3,70 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Properties
 /*/////////////////////////////////////////////////////////////////////////////
-		var views = [
-			{ 
-				left: 0,
-				bottom: 0.5,
-				width: 1,
-				height: 0.5,
-				background: new THREE.Color().setRGB( 0.9, 0.9, 0.9 ),
-		
-				// cameraView : {
-				// 	left : 0
-				// 	right : 1
-				// 	top : 0
-				// 	bottom : 0.5
-				// }
-				eye: [ 0, 0, 1000 ],
-				up: [ 0, 1, 0 ],
-				fov: 90
-			},
-			{ 
-				left: 0,
-				bottom: 0,
-				width: 1,
-				height: 0.5,
-				background: new THREE.Color().setRGB( 0.8, 0.8, 0.8 ),
+		var container;
+		var renderer;
+		var camera;
+		var height;
+		var width;
 
-				// cameraView : {
-				// 	left : 0
-				// 	right : 1
-				// 	top : 0.5
-				// 	bottom : 1
-				// }
-				eye: [ 0, 0, 1000 ],
-				up: [ 0, 1, 0 ],
-				fov: 45
-			}
-		]
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Properties
 /*/////////////////////////////////////////////////////////////////////////////
-		this.renderer;
 		this.scene;
-		this.camera;
-		this.height;
-		this.width;
 /*/////////////////////////////////////////////////////////////////////////////
 	Constructor
 /*/////////////////////////////////////////////////////////////////////////////
 		this.construct  = function(_container){
-			var container = $(_container);
-			this.width = container.innerWidth();
-			this.height = container.innerHeight();			
-			this.renderer = new THREE.WebGLRenderer();
-			this.renderer.setSize(this.width, this.height); 
+			container = $(_container);
+			width = container.innerWidth();
+			height = container.innerHeight();			
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize(width, height); 
 
-			this.camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
-			this.camera.position = new THREE.Vector3(0,0,1000); // move camera up
+
+			camera = new THREE.OrthographicCamera( width/-2, width/2, height/2, height/-2, 1, 10000 );
+//			camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 10000 );
+ 			camera.position = new THREE.Vector3(0,0,1000); // move camera up
 		//	this.camera.up.set(0, 0, -1); // Turn Camera
-			this.camera.lookAt(new THREE.Vector3(0, 0, 0)); // face camera down
+			camera.lookAt(new THREE.Vector3(0, 0, 0)); // face camera down
 
 			this.scene = new THREE.Scene();
-			this.scene.add(this.camera);
-			this.camera.up= new THREE.Vector3(100, 120, 0); // Turn Camera
+			this.scene.add(camera);
+			camera.up= new THREE.Vector3(100, 120, 0); // Turn Camera
 
 
-			container.append(this.renderer.domElement);
+			container.append(renderer.domElement);
 
 
 			//setupCameras();
 
-
+			$(window).resize(onWindowResize);
 
 			this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
 		}
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
-		var setupCameras = function(){
-			for (var ii =  0; ii < views.length; ++ii ) {
-				var view = views[ii];
-				camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = view.eye[ 0 ];
-				camera.position.y = view.eye[ 1 ];
-				camera.position.z = view.eye[ 2 ];
-				camera.up.x = view.up[ 0 ];
-				camera.up.y = view.up[ 1 ];
-				camera.up.z = view.up[ 2 ];
-				view.camera = camera;
-				camera.lookAt(new THREE.Vector3(this.width, this.height, 0));
-			}
-		}
-///////////////////////////////////////////////////////////////////////////////
-		var renderViews = function(){
-			for ( var ii = 0; ii < views.length; ++ii ) {
-
-				view = views[ii];
-				camera = view.camera;
-
-				var left   = Math.floor( this.width  * view.left );
-				var bottom = Math.floor( this.height * view.bottom );
-				var width  = Math.floor( this.width  * view.width );
-				var height = Math.floor( this.height * view.height );
-				this.renderer.setViewport( left, bottom, width, height );
-				this.renderer.setScissor( left, bottom, width, height );
-				this.renderer.enableScissorTest ( true );
-				this.renderer.setClearColor( view.background );
+			var onWindowResize = function () {
+				console.log("hallo");
+				width = container.innerWidth();
+				height = container.innerHeight();
 
 				camera.aspect = width / height;
+
+				camera.left = width/-2;
+				camera.right = width/2;
+				camera.top = height/2;
+				camera.bottom = height/-2;
+
 				camera.updateProjectionMatrix();
 
-				this.renderer.render( this.scene, camera );
-			}			
-		}
-///////////////////////////////////////////////////////////////////////////////
-		
+				renderer.setSize( width, height );
+
+			}		
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
 		this.drawCoodinateSystem = function(position){
 			var geometryX = new THREE.Geometry();
 			geometryX.vertices.push(new THREE.Vector3(0, 0, 0));
@@ -156,15 +101,12 @@
 			this.scene.add(x)
 			this.scene.add(y)
 			this.scene.add(z)
-
-
 		}
 
 ///////////////////////////////////////////////////////////////////////////////	
 		this.render = (function() {
-			// renderViews();
-			this.renderer.render(this.scene, this.camera);
-		}).bind(this);
+			renderer.render(this.scene, camera);
+		});
 	}
 ///////////////////////////////////////////////////////////////////////////////	
 	module.exports = require("../Class.js").extend(World);
