@@ -6,25 +6,24 @@
 		var container;
 		var renderer;
 		var camera;
-		var height;
-		var width;
-
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Properties
 /*/////////////////////////////////////////////////////////////////////////////
 		this.scene;
+		this.width;
+		this.height;
 /*/////////////////////////////////////////////////////////////////////////////
 	Constructor
 /*/////////////////////////////////////////////////////////////////////////////
 		this.construct  = function(_container){
 			container = $(_container);
-			width = container.innerWidth();
-			height = container.innerHeight();			
+			this.width = container.innerWidth();
+			this.height = container.innerHeight();			
 			renderer = new THREE.WebGLRenderer();
-			renderer.setSize(width, height); 
+			renderer.setSize(this.width, this.height); 
 
 
-			camera = new THREE.OrthographicCamera( width/-2, width/2, height/2, height/-2, 1, 10000 );
+			camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
 //			camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 10000 );
  			camera.position = new THREE.Vector3(0,0,1000); // move camera up
 		//	this.camera.up.set(0, 0, -1); // Turn Camera
@@ -47,23 +46,22 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
-			var onWindowResize = function () {
-				console.log("hallo");
-				width = container.innerWidth();
-				height = container.innerHeight();
+			var onWindowResize = (function () {
+				this.width = container.innerWidth();
+				this.height = container.innerHeight();
 
-				camera.aspect = width / height;
+				camera.aspect = this.width / this.height;
 
-				camera.left = width/-2;
-				camera.right = width/2;
-				camera.top = height/2;
-				camera.bottom = height/-2;
+				camera.left = this.width/-2;
+				camera.right = this.width/2;
+				camera.top = this.height/2;
+				camera.bottom = this.height/-2;
 
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( width, height );
+				renderer.setSize( this.width, this.height );
 
-			}		
+			}).bind(this);		
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////

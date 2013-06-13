@@ -34,10 +34,8 @@
 			if(stopped) return;
 			var receiver = getReceiver(listener["all"].getAll(), listener[eventName] ? listener[eventName].getAll() : []);
 			var now = Date.now();
-			console.log(receiver);
 			for(var i=0; i<receiver.length; i++) 
 				if(typeof receiver[i] === "object") {
-					console.log(receiver[i].object);
 					if(async === true) {
 						if(receiver[i].data.executing !== true) 
 							setTimeout((function(receiver, _data, _answerCallback, _now, _this){

@@ -4,14 +4,6 @@
 
 		var elements = new (require("./ObjectStore"));
 ///////////////////////////////////////////////////////////////////////////////
-		var setupCollisionDetection = function(){
-			env.collisionDetection = new (require("./CollisionDetection.js"))();	
-			var rayCount = 16;
-			var ray = new THREE.Vector3(0, 1, 0);
-			for(var i =0; i<rayCount; i++ )	
-				env.collisionDetection.addRay(new THREE.Vector3(Math.cos( (i*360/rayCount)*(Math.PI/180) ), Math.sin( (i*360/rayCount)*(Math.PI/180) ), 0));
-		}
-///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(_socket, _loop){		
 			socket = _socket;
 			loop = _loop;	
@@ -26,14 +18,15 @@
 
 			globalTick.activate();
 
-			setupCollisionDetection();
+			env.collisionDetection=new (require("./BSPCollisionDetection"))(env);
 
 			globalTick.addListener(function(){
+				env.collisionDetection.reMap();
 				env.collisionDetection.testElements();
 			}, {eventName :"calculate"});
 
 			socket.addListener(function(data){
-			console.log(data);	
+//			console.log(data);	
 				var element = elements.get(data.id);
 				var caller = data.data.calledById !== false ?
 					elements.get(data.data.calledById):

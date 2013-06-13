@@ -15,11 +15,12 @@
 		var add = new THREE.Vector3(10,10,10);
 		var scale = 0.3;
 
+		var face;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 		this.inboundElements;
 		this.outboundElements;
-		this.container;
 
 		this.uniforms = {
 			lerpAlpha : { type:"f", value:0.5 },
@@ -35,6 +36,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(geometry, material){
+			this.inboundElements = new (require("./ObjectStore"));
+			this.outboundElements = new (require("./ObjectStore"));		
 			var materialOptions = {
 				transparent : true,
 				opacity : 0.7,
@@ -42,23 +45,15 @@
 				visible:true
 			}
 			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
-			material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material = new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
-			return new (MeshObject.extend(FunctionElement).extend({
-				construct : function(){
-					this.inboundElements = new (require("./ObjectStore"));
-					this.outboundElements = new (require("./ObjectStore"));
+			// material =  material || new THREE.MeshBasicMaterial(materialOptions);
+			material =  material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			face = new THREE.Mesh(geometry, material);
 
-					this.actionRadius=1;
+			this.add(face);
 
-					this.container = new THREE.Object3D();
-					this.add(this.container);
-
-					this.update();
-					this.material.uniforms= this.uniforms;
-					console.log(this);
-				}
-			}))(geometry, material);
+			this.actionRadius=1;
+			
+			this.update();
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,11 +62,11 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.collision = function(object, hits, collisionDetection) {
-			if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
+			//if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
 			var force = this.position.clone().sub(object.position);
 			var length = force.length();
-			var maxSpeed = 5;
-			var minSpeed = 2;
+			var maxSpeed = 20;
+			var minSpeed = 0;
 			force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, maxSpeed, minSpeed),minSpeed,maxSpeed));
 			this.velocity.add(force);
 		}
@@ -86,15 +81,15 @@
 			var elements = storedElements.objects;
 			for(var i = 0; i<elements.length; i++) {
 				var distanceVector = elements[i].position.clone().sub(this.position);
-				distanceVector.z=0;
-
-				var target = distanceVector.clone().setLength(this.actionRadius +elements[i].actionRadius+10);
-				var force = target.clone().add(this.position).sub(elements[i].position);
-				var length=force.length();
-				var maxSpeed = 10;
-				var minSpeed = 1;
-				force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, minSpeed, maxSpeed),minSpeed,maxSpeed));
-				elements[i].velocity.add(force);
+				// distanceVector.z=0;
+				// var targetDistance = this.actionRadius +elements[i].actionRadius+10;
+				// var target = distanceVector.clone().setLength(targetDistance);
+				// var force = target.clone().add(this.position).sub(elements[i].position);
+				// var length=force.length();
+				// var maxSpeed = 20;
+				// var minSpeed = 0;
+				// force.setLength(THREE.Math.clamp( length/(2*this.actionRadius) ,minSpeed,maxSpeed));
+				// elements[i].velocity.add(force);
 
 				storedElements.data[i].connection.geometry.vertices[1] = distanceVector;
 				storedElements.data[i].connection.geometry.verticesNeedUpdate = true;
@@ -105,9 +100,8 @@
 			var count = Math.max(this.inboundCount, this.outboundCount);			
 			var countScale = 0.3;
 			var boundingRadius =count*countScale+10;
-			this.scale.set(boundingRadius, boundingRadius, boundingRadius);
-			this.container.scale.set(1/boundingRadius, 1/boundingRadius, 1/boundingRadius);
-			this.actionRadius =boundingRadius;
+			face.scale.set(boundingRadius, boundingRadius, boundingRadius);
+			this.actionRadius = boundingRadius+40;
 			this.uniforms.radius.value = boundingRadius;
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,14 +111,12 @@
 			this.updateColors();
 
 		
-			var gravity = this.position.clone().negate().multiplyScalar(0.01);
+			var gravity = this.position.clone().negate().multiplyScalar(0.001);
 			this.position.add(gravity);
 
 			this.velocity.multiplyScalar(0.1);
 			this.position.add(this.velocity);
 			this.position.z = 0;
-
-
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.inboundEvent = function(FunctionElement){
@@ -148,12 +140,12 @@
 				geometry.vertices.push(new THREE.Vector3(0,0,0));
 				geometry.vertices.push(element.object.position.clone().sub(this.position));
 				element.data.connection = new THREE.Line(geometry, material);
-				this.container.add(element.data.connection);
+				this.add(element.data.connection);
 			}
 			this.outboundElements.store(element.object, element.data);
 			this.uniforms.outbound.value++;
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js").extend(FunctionElement);
+	module.exports = require("../Class.js").extend(THREE.Object3D).extend(require("./CollisionElement.js")).extend(FunctionElement);
 })(jQuery, THREE, window, document)
