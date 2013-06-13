@@ -57,6 +57,13 @@ module.exports = function() {
 			title : 'Base'  
 		});
 	});
+
+	app.get(/\/curtain\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('curtain', { 
+			title : 'curtain'  
+		});
+	});
+
 	app.get(/\/proto\/........-....-4...-....-p....c.....a/, function (req, res) {
 		res.render('proto', { 
 			title : 'prototypes'  
