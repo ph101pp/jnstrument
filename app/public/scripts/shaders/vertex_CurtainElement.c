@@ -6,11 +6,10 @@
  * vertex position
  */
 
-varying vec3 fragNormal;
+attribute float functions[1000];
+
+
 void main() {
-
-	fragNormal = normal;
-
   	gl_Position = projectionMatrix *
                 modelViewMatrix *
                 vec4(position,1.0);

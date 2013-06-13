@@ -4,13 +4,14 @@
 		var elements = new (require("./ObjectStore"));
 		var stage;
 
-		this.uniforms = {
-			lerpAlpha : { type:"f", value:0.5 },
-			radius : { type:"f", value:1 },			
-			outbound : { type:"f", value:0 },
-			inbound : { type:"f", value:0 }
-		};
+		var msPerFunction = 1000;
 
+		this.attributes = {
+			events : {type:"fv1",value:[]},
+		} 
+
+		var material =  new THREE.ShaderMaterial({ attributes:this.attributes, vertexShader:AEROTWIST.Shaders.CurtainElement.vertex, fragmentShader:AEROTWIST.Shaders.CurtainElement.fragment});
+		material.side = THREE.DoubleSide;
 
 ///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(_socket, _loop){		
@@ -23,77 +24,79 @@
 		this.initialize = function(container) {
 			world = new (require("./World.js"))($(container));
 			loop.addListener(globalTick.tick, { bind:globalTick });
-			loop.addListener(world.render, { bind:world });
+//			loop.addListener(world.render, { bind:world });
 			globalTick.addListener(world.onWindowResize, { bind:world, eventName :"resize" });
 			globalTick.activate();
 
+			globalTick.addListener(this.resizeStage, {bind:this, eventName :"resize" });	
 
-			var geometry = new THREE.Geometry()
+			socket.addListener(function(data, answer, now){
+				var knownElement = elements.get(data.id);
+				var element = knownElement || {object:[]};
+				element.object.unshift(now);
+				elements.store(element.object, {id:data.id});
+				if(!knownElement) this.updateStage();
+			}, {bind : this});
 
-			geometry.vertices.push( new THREE.Vector3( -10,  10, 0 ) );
-			geometry.vertices.push( new THREE.Vector3( 10, 10, 0 ) );
-			geometry.vertices.push( new THREE.Vector3( 10, -10, 0 ) );
-			geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
-			geometry.faces.push( new THREE.Face4( 0, 1, 2, 3, new THREE.Vector3( 0, 0, -1 ), 0xFF00FF, 0) );
-		
-			var material =  new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.CurtainElement.vertex, fragmentShader:AEROTWIST.Shaders.CurtainElement.fragment});
-			material.side = THREE.DoubleSide;
+			globalTick.addListener(function(data, answer, now){
+				var store = elements.getAll();
+				var objects = store.objects;
+				var eventGap = world.height/(msPerFunction+1);
+
+				for(var i=0; i < objects.length; i++) {
+					for(var k=0; k < objects[i].length; k++) {
+						if(objects[i][k] < now-msPerFunction) {
+							objects[i].splice(k, objects[i].length-k);
+							continue;
+						}
+						this.attributes.events.value[i] =  this.attributes.events.value[i] || [];
+						this.attributes.events.value[i].push((k+1)*eventGap);
+					}
+					elements.store(objects[i], store.data[i]);
+				}				
+			}, { bind: this, eventName :"calculate"});
+
+
+
+			globalTick.addListener(function(data, answer, now){
+				
+				console.log(this.attributes);
+			}, {bind: this, eventName :"update"});			
+
+			globalTick.addListener(world.render, { bind:world, eventName :"update" });
+
+
+
+		}
+
+///////////////////////////////////////////////////////////////////////////////
+		this.resizeStage = function(){
+ 			this.updateGeometry();
+ 		}
+///////////////////////////////////////////////////////////////////////////////
+		this.updateStage= function(){
+			if(stage) {
+				world.scene.remove(stage);
+				stage.geometry.dispose();
+			}
+
+			var store = elements.getAllObjects();
+			var gap = world.width / (store.length+1);
+			var vertexWidth = 3;
+
+			var geometry = new THREE.Geometry();
+			
+			for(var i = 0; i< store.length; i++) {
+				geometry.vertices.push( new THREE.Vector3( (i+1)*gap-vertexWidth/2, 0, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( (i+1)*gap+vertexWidth/2, 0, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( (i+1)*gap+vertexWidth/2, world.height, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( (i+1)*gap-vertexWidth/2, world.height, 0 ) );
+				geometry.faces.push( new THREE.Face4( 0+i*4, 1+i*4, 2+i*4, 3+i*4, new THREE.Vector3(0,0,1), 0x00FF00,0));
+			}
+
 			stage = new THREE.Mesh(geometry, material);
 			world.scene.add(stage);
-
-			stage.scale.set(world.width, world.height, 1);
-
-			globalTick.addListener(function(){
-			}, {eventName :"calculate"});
-
-
-			socket.addListener(function(data){
-
-
-
-			});
-
-		}
-
-		this.createTextureFromArray = function(array) {
-			var texH = array.length;
-			var texW = 0;
-			var data = [];
-			var addColor = function(num) {
-				typeof num !== "integer" && throw("Error Array must only contain integers");
-				color = int2RGBA(num);
-				data.push(color.r);
-				data.push(color.g);
-				data.push(color.b);
-				data.push(color.a);
-			}
-			var color;
-			for(var i=0; i<array.length; i++)
-				if(typeof array[i] === "object") {
-					texW=Math.max(texW, array[i].length);
-					for(var k=0; k<array[i].length; k++) {
-						addColor(array[i][k]);
-					}
-				}
-				else addColor(array[i]);
-
-
-
-
-
-		}
-///////////////////////////////////////////////////////////////////////////////
-		var int2RGBA = function(num){
-			num >>>= 0;
-			var b = num & 0xFF,
-				g = (num & 0xFF00) >>> 8,
-				r = (num & 0xFF0000) >>> 16,
-				a = ( (num & 0xFF000000) >>> 24 ) / 255 ;
-			return {r : r, g:g, b:b, a:a};
-		}
-///////////////////////////////////////////////////////////////////////////////
-		var RGBA2int = function(r,g,b,a) {
-			return ((a << 24) | (r << 16) | (g << 8) | b);
+			stage.position.set(-world.width/2, -world.height/2, 0);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.remove = function() {

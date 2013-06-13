@@ -5,51 +5,51 @@
  * runs from 0.0 to 1.0
  */
 
+uniform int functions[1000];
+uniform int events[1000];
+uniform float functionsLength;
+uniform float eventsLength;
 
+uniform float msPerFunction;
 
-uniform float lerpAlpha;
-uniform float radius;
-uniform float inbound;
-uniform float outbound;
-
-varying vec3 fragNormal;
-
-vec3 inHighlight = vec3(1.0, 0.9, 1.0);
-vec3 inNormal = vec3(1.0, 0.0, 1.0);
-
-vec3 outHighlight = vec3(0.9, 0.9, 1.0);
-vec3 outNormal = vec3(0.0, 0.0, 1.0);
-
+uniform float width;
+uniform float height;
 
 void main() {
-	vec3 thisColor;
-	vec3 thisHighlight;
-	vec2 norm = normalize(fragNormal).xy;
-	// float alpha = degrees(atan(abs(fragNormal.y),(fragNormal.z)));
-	// float beta = degrees(atan(abs(fragNormal.x),(fragNormal.z)));
+	float x = gl_FragCoord.x;
+	float y = width-gl_FragCoord.y;
+	vec2 coords = vec2(gl_FragCoord.x, width-gl_FragCoord.y);
+	float lineGap = width/(functionsLength+1.);
+	float eventGap = height/msPerFunction;
 
-	// if(alpha > 90.) alpha = 180. - alpha;
-	// if(beta > 90.) beta = 180. - beta;
+	// BackgroundColor
+	vec4 color = vec4(1, 0, 1, 1);
 
-	// float a= cos(radians(alpha));
-	// float c= cos(radians(beta));
-	float threshhold = inbound/(inbound+outbound);
-	float alpha = 1.;
+	// // Create Lines
+	// int k =0;
+	// int c =0;
+	// int j= 0;
+	// for( float i=0.; i<functionsLength; i++) {
+	// 	float targetX = lineGap*(i+1.);
+	// 	if(abs(coords.x-targetX) < .5) {
+			
+	// 		if(abs(coords.x-targetX) < .5) 
+	// 			color = vec4(1, 0, 1, 1);
+			
+	// 		j = int(i);
+	// 		for( c = 0 ; c<functions[j]; c++) {
+	// 			// if(abs(coords.y - (eventGap* float(events[k]))) < 3.) 
+	// 			// 	color = vec4(1, 0, 0, 1);
+	// 			k+=1;
+	// 		}
 
-	if( length(norm) > threshhold){
-		thisColor = outNormal; // BLUE YES
-		thisHighlight = outHighlight;
-		alpha = 1.;
-	}
-	else {
-		thisColor = inNormal; // PINK NO
-		thisHighlight = inHighlight;
-	}
+	// 	}
+	// }
 
-	float r = thisColor.x + ( thisHighlight.x - thisColor.x ) * lerpAlpha;
-	float g = thisColor.y + ( thisHighlight.y - thisColor.y ) * lerpAlpha;
-	float b = thisColor.z + ( thisHighlight.z - thisColor.z ) * lerpAlpha;
+	gl_FragColor = color;
 
- 	gl_FragColor = vec4(r, g, b, alpha); // A
+
 }
+
+
 
