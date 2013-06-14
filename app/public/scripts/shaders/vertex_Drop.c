@@ -9,12 +9,12 @@
 attribute vec4 events1;
 attribute vec4 events2;
 
-varying vec4 vevents1;
-varying vec4 vevents2;
+varying vec4 vEvents1;
+varying vec4 vEvents2;
 
 void main() {
-	vevents1 = vec4(200,0,0,0);
-	vevents2 = events2;
+	vEvents1 = events1;
+	vEvents2 = events2;
   	gl_Position = projectionMatrix *
                 modelViewMatrix *
                 vec4(position,1.0);

@@ -5,20 +5,36 @@
  * runs from 0.0 to 1.0
  */
 
-varying vec4 vevents1;
-varying vec4 vevents2;
+uniform float height;
+uniform float width;
 
+varying vec4 vEvents1;
+varying vec4 vEvents2;
+
+float lineWidth = 1.;
 // vec2 center = vec2(width/2., height/2.);
 // float maxRadius = length(center - vec2(0,0));
 
 void main() {
+	float radius = length( vec2(width/2., height/2.) - gl_FragCoord.xy);
 
-	if(vevents1.x < 199.) {
-		gl_FragColor = vec4(1., .0, 0., 1.);
+	// if(abs(vEvents1.y-radius) < lineWidth ) gl_FragColor=vec4(1., 1., 1., 1.);
+	// else gl_FragColor=vec4(0., 0., 0., 1.);
 
-	}
-	else gl_FragColor = vec4(0., 1., 0., 1.);
+	// return;
 
+	vec4 color = vec4(0., 0., 0., 1.);
+
+	if(	abs(vEvents1.x-radius) < lineWidth )  color.a -= 1.;
+	else if( abs(vEvents1.y-radius) < lineWidth )  color.a -= 1.;
+	else if( abs(vEvents1.z-radius) < lineWidth ) 	color.a -= 1.;
+	else if( abs(vEvents1.w-radius) < lineWidth )  color.a -= 1.;
+	else if( abs(vEvents2.x-radius) < lineWidth )  color.a -= 1.;
+	else if( abs(vEvents2.y-radius) < lineWidth )  color.a -= 1.;
+	else if( abs(vEvents2.z-radius) < lineWidth )  color.a -= 1.;
+	else if( abs(vEvents2.w-radius) < lineWidth )  color.a -= 1.;
+
+	gl_FragColor=color;
 
 return;
 
