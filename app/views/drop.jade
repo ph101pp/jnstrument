@@ -1,0 +1,18 @@
+!!!5
+html
+	head
+		title #{title} - My Site
+		link(rel='stylesheet', href='/stylesheets/guitarHero.css')
+		script(src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
+		script(src='/scripts/libs/jquery-1.7.1.min.js')
+		script(src='/scripts/libs/three.js/three.js')
+
+		script(data-name="Drop", data-src="http://localhost:8000/scripts/shaders/vertex_Drop.c", type="x-shader/x-vertex")
+		script(data-name="Drop", data-src="http://localhost:8000/scripts/shaders/fragment_Drop.c", type="x-shader/x-fragment")
+		
+		script(src='/scripts/libs/AeroTwistShaderLoader.js')
+
+		script(src='/scripts/drop/index.js')
+
+	body
+		#scene

@@ -4,7 +4,7 @@
 		var elements = new (require("./ObjectStore"));
 		var stage;
 
-		var msPerFunction = 1000;
+		var msPerFunction = 3000;
 
 		this.attributes = {
 			events : {type:"fv1",value:[]},
