@@ -10,6 +10,8 @@ uniform float width;
 
 varying vec4 vEvents1;
 varying vec4 vEvents2;
+varying vec4 vEvents3;
+varying vec4 vEvents4;
 
 float lineWidth = 1.;
 // vec2 center = vec2(width/2., height/2.);
@@ -17,23 +19,35 @@ float lineWidth = 1.;
 
 void main() {
 	float radius = length( vec2(width/2., height/2.) - gl_FragCoord.xy);
+	vec4 color;
+
+
+	if(vEvents1.x >300.) color = vec4(0., 0., 1., 0.);
+	else if(vEvents1.x >200.) color = vec4(0., 1., 0., 0.);
+	else color = vec4(1., 0., 0., 0.);
 
 	// if(abs(vEvents1.y-radius) < lineWidth ) gl_FragColor=vec4(1., 1., 1., 1.);
 	// else gl_FragColor=vec4(0., 0., 0., 1.);
 
 	// return;
 
-	vec4 color = vec4(0., 0., 0., 1.);
 
-	if(	abs(vEvents1.x-radius) < lineWidth )  color.a -= 1.;
-	else if( abs(vEvents1.y-radius) < lineWidth )  color.a -= 1.;
-	else if( abs(vEvents1.z-radius) < lineWidth ) 	color.a -= 1.;
-	else if( abs(vEvents1.w-radius) < lineWidth )  color.a -= 1.;
-	else if( abs(vEvents2.x-radius) < lineWidth )  color.a -= 1.;
-	else if( abs(vEvents2.y-radius) < lineWidth )  color.a -= 1.;
-	else if( abs(vEvents2.z-radius) < lineWidth )  color.a -= 1.;
-	else if( abs(vEvents2.w-radius) < lineWidth )  color.a -= 1.;
-
+	if(	abs(vEvents1.x - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents1.y - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents1.z - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents1.w - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents2.x - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents2.y - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents2.z - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents2.w - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents3.x - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents3.y - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents3.z - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents3.w - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents4.x - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents4.y - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents4.z - radius) <= lineWidth ) color.a += 0.3;
+	if( abs(vEvents4.w - radius) <= lineWidth ) color.a += 0.3;
 	gl_FragColor=color;
 
 return;
