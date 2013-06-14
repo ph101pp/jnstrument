@@ -19,7 +19,8 @@
 			container = $(_container);
 			this.width = container.innerWidth();
 			this.height = container.innerHeight();			
-			renderer = new THREE.WebGLRenderer({ clearColor: 0x333333, clearAlpha: 1 });
+			renderer = new THREE.WebGLRenderer();
+			renderer.setClearColor(0x333333);
 			renderer.setSize(this.width, this.height); 
 
 			camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );

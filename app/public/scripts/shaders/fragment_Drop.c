@@ -5,27 +5,34 @@
  * runs from 0.0 to 1.0
  */
 
-uniform float events[100];
-uniform float eventCount;
-uniform float onScreen;
-uniform float width;
-uniform float height;
+varying vec4 vevents1;
+varying vec4 vevents2;
 
-vec2 center = vec2(width/2., height/2.);
-float maxRadius = length(center - vec2(0,0));
+// vec2 center = vec2(width/2., height/2.);
+// float maxRadius = length(center - vec2(0,0));
 
 void main() {
+
+	if(vevents1.x < 199.) {
+		gl_FragColor = vec4(1., .0, 0., 1.);
+
+	}
+	else gl_FragColor = vec4(0., 1., 0., 1.);
+
+
+return;
+
 	// float x = gl_FragCoord.x;
 	// float y = width-gl_FragCoord.y;
-	float radius = length(center - gl_FragCoord.xy);
+	// float radius = length(center - gl_FragCoord.xy);
 
-	gl_FragColor = vec4(.2, .2, .2, 1.);
+	// gl_FragColor = vec4(.2, .2, .2, 1.);
 	
-	for(float i = 0.; i<eventCount; i++) {
-		if( abs( (maxRadius*events[int(i)]) / onScreen - radius) < 1. ) {
-			gl_FragColor.a -= 0.1;
-		}
-	}
+	// for(float i = 0.; i<eventCount; i++) {
+	// 	if( abs( (maxRadius*events[int(i)]) / onScreen - radius) < 1. ) {
+	// 		gl_FragColor.a -= 0.1;
+	// 	}
+	// }
 
 	// float lineGap = width/(functionsLength+1.);
 	// float eventGap = height/msPerFunction;

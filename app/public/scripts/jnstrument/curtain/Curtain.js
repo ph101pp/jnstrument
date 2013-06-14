@@ -59,8 +59,7 @@
 
 
 			globalTick.addListener(function(data, answer, now){
-				
-				console.log(this.attributes);
+
 			}, {bind: this, eventName :"update"});			
 
 			globalTick.addListener(world.render, { bind:world, eventName :"update" });
