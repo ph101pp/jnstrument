@@ -64,9 +64,9 @@
 						}
 						radiuses.push( Math.round(radius) );
 				
-						if(radiuses.length >= 8) {
+						if(radiuses.length >= 1) {
 							this.createCircle(radiuses);
-							radiuses.splice(0,7);
+							radiuses.splice(0,1);
 						}
 					}
 				radiuses.push(maxRadius);
@@ -94,7 +94,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 		this.createCircle = function(radiuses){
-			var segments = 64;
+			var segments = 16;
 			var circle = new THREE.CircleGeometry(radiuses[radiuses.length-1], segments);
 			var v41 = new THREE.Vector4(radiuses[0]||0, radiuses[1]||0, radiuses[2]||0, radiuses[3]||0);
 			var v42 = new THREE.Vector4(radiuses[4]||0, radiuses[5]||0, radiuses[6]||0, radiuses[7]||0);
@@ -131,13 +131,18 @@
 					this.attributes.events4.value.push(v44);	
 
 					// geometry.faces.push(new THREE.Face4(j, j-1, j-2, j-3, normal,new THREE.Color(new THREE.Vector3(Math.random()*255,Math.random()*255,Math.random()*255))));
-					geometry.faces.push(new THREE.Face3(j-1, j-1-segments, j-segments, normal ));
-					geometry.faces.push(new THREE.Face3(j, j-1, j-segments, normal ));
+					// geometry.faces.push(new THREE.Face3(j-1, j-1-segments, j-segments, normal ));
+					// geometry.faces.push(new THREE.Face3(j, j-1, j-segments, normal ));
+
+					 geometry.faces.push(new THREE.Face4(j, j-1, j-1-segments, j-segments, normal ));
 
 				}
 				
-				geometry.faces.push(new THREE.Face3(k, k+segments-1-segments,k-segments ));
-				geometry.faces.push(new THREE.Face3(k, k+segments-1, k+segments-1-segments ));
+				// geometry.faces.push(new THREE.Face3(k, k+segments-1-segments,k-segments ));
+				// geometry.faces.push(new THREE.Face3(k, k+segments-1, k+segments-1-segments ));
+
+				geometry.faces.push(new THREE.Face4(k, k+segments-1, k+segments-1-segments, k-segments, normal ));
+
 			}
 
 			circle.dispose();		
