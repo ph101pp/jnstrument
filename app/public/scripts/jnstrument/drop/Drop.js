@@ -17,7 +17,7 @@
 
 		var material =  new THREE.ShaderMaterial({ uniforms:this.uniforms, attributes:this.attributes, vertexShader:AEROTWIST.Shaders.Drop.vertex, fragmentShader:AEROTWIST.Shaders.Drop.fragment});
 		material.side = THREE.DoubleSide;
-		material = new THREE.MeshBasicMaterial({transparent:false, opacity:0.5, wireframe:true, side: THREE.DoubleSide});
+		//material = new THREE.MeshBasicMaterial({transparent:false, opacity:0.5, wireframe:true, side: THREE.DoubleSide});
 		var geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,14 +90,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 		this.createCircle = function(radiuses){
-			var segments = 16;
+			var segments = 5;
 			var circle = new THREE.CircleGeometry(radiuses[radiuses.length-1], segments);
 			var v41 = new THREE.Vector4(radiuses[0]||0, radiuses[1]||0, radiuses[2]||0, radiuses[3]||0);
 			var v42 = new THREE.Vector4(radiuses[4]||0, radiuses[5]||0, radiuses[6]||0, radiuses[7]||0);
-			var faceVertexKeys= ["a","b","c"];
-			var normal = new THREE.Vector3( 0, 1, 0 );
-
-			if(geometry.vertices.length === 0) {
+			var normal = new THREE.Vector3( 0, 0, -1 );
+			
+			circle.mergeVertices();
+			if(geometry.vertices.length === 0) {	
 				geometry.vertices= circle.vertices;
 				geometry.faces= circle.faces;
 				for(var i = 0; i<geometry.vertices.length; i++) {
@@ -105,10 +105,14 @@
 					this.attributes.events2.value.push(v42);
 				}
 			}
-			else
+			else {
 				for(var i=1, l = circle.vertices.length; i<l; i++) { // i=1 so (0,0,0) is not added to vertices again.
-					//if(i===1 && geometry.vertices.length === 0) continue; 
-					
+					if(i===1) {
+						var k=geometry.vertices.push(circle.vertices[i])-1;
+						this.attributes.events1.value.push(v41);
+						this.attributes.events2.value.push(v42);
+						continue; 
+					}
 					var j=geometry.vertices.push(circle.vertices[i])-1;
 
 					// if(geometry.vertices.length <= segments*4+1) { // frist circle
@@ -126,10 +130,14 @@
 					this.attributes.events2.value.push(v42);
 
 					// geometry.faces.push(new THREE.Face4(j, j-1, j-2, j-3, normal,new THREE.Color(new THREE.Vector3(Math.random()*255,Math.random()*255,Math.random()*255))));
-					geometry.faces.push(new THREE.Face4(j, j-1, j-segments-1, j-segments));
+					geometry.faces.push(new THREE.Face4(j, j-1, j-1-segments, j-segments, normal ));
 
 				}
-		
+				
+				geometry.faces.push(new THREE.Face4(k, k+segments-1, k+segments-1-segments, k-segments ));
+			}
+
+			circle.dispose();		
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.resizeStage = function(){
