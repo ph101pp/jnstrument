@@ -17,7 +17,7 @@
 
 		var material =  new THREE.ShaderMaterial({ uniforms:this.uniforms, attributes:this.attributes, vertexShader:AEROTWIST.Shaders.Drop.vertex, fragmentShader:AEROTWIST.Shaders.Drop.fragment});
 		material.side = THREE.DoubleSide;
-		//material = new THREE.MeshBasicMaterial({transparent:false, opacity:0.5, wireframe:true, side: THREE.DoubleSide});
+		material = new THREE.MeshBasicMaterial({transparent:false, opacity:0.5, wireframe:true, side: THREE.DoubleSide});
 		var geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@
 			}
 			else
 				for(var i=1, l = circle.vertices.length; i<l; i++) { // i=1 so (0,0,0) is not added to vertices again.
-					if(i===1 && geometry.vertices.length === 0) continue; 
+					//if(i===1 && geometry.vertices.length === 0) continue; 
 					
 					var j=geometry.vertices.push(circle.vertices[i])-1;
 
