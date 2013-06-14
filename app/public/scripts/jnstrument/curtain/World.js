@@ -20,6 +20,7 @@
 			this.width = container.innerWidth();
 			this.height = container.innerHeight();			
 			renderer = new THREE.WebGLRenderer();
+			renderer.setClearColor(0x333333);
 			renderer.setSize(this.width, this.height); 
 
 
@@ -39,7 +40,7 @@
 
 			//setupCameras();
 
-			this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
+//			this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
 		}
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
