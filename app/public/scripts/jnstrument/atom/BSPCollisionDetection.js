@@ -35,7 +35,7 @@
 			elements.remove(element);
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.testElement = function(element){
+		this.testElement = function(element, bulk){
 			var map = placeOnMap(element);
 			var screenCoords = index2ScreenCoords(map.gridSize, map.i);
 			var quadrantBounds = {
@@ -46,7 +46,7 @@
 			}
 
 			for(gridSize in maps) 
-				testMapArea(element, gridSize, quadrantBounds);
+				testMapArea(element, gridSize, quadrantBounds, bulk);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.testElements = function (){
@@ -62,15 +62,17 @@
 			height = world.height;
 			maps = {};
 			var objects = elements.getAllObjects();
-			console.log(objects.length);
-			for(var i=0; i<objects.length; i++)
+			console.log("remap", objects.length);
+			for(var i=0; i<objects.length; i++) {
+				objects[i].remap();
 				addToMap(objects[i]);
+			}
 
 		}	
 ///////////////////////////////////////////////////////////////////////////////
 		var removeFromMap = function(element){
 			element = elements.get(element);
-			var index = maps[element.data.gridSize][element.data.i].indexOf(element);
+			var index = maps[element.data.gridSize][element.data.i].indexOf(element.object);
 			maps[element.data.gridSize][element.data.i].splice(index, 1);
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,10 +95,11 @@
 				for(var k = top.y; k<= bot.y; k++) {
 					index = quadrantCoords2Index(gridSize, i, k);
 					if(index>=0 && maps[gridSize] && maps[gridSize][index])
-						for(var o = 0; o < maps[gridSize][index].length; o++) {
-							element.collision(maps[gridSize][index][o], that);
-							if(bulk === true) maps[gridSize][index][o].collision(element, that);
-						}
+						for(var o = 0; o < maps[gridSize][index].length; o++) 
+							if(element !== maps[gridSize][index][o]) {
+								element.collision(maps[gridSize][index][o], that);
+								if(bulk === true) maps[gridSize][index][o].collision(element, that);
+							}
 				}
 		}
 ///////////////////////////////////////////////////////////////////////////////
