@@ -25,7 +25,7 @@
 
 			camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
 //			camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 10000 );
- 			camera.position = new THREE.Vector3(0,0,1000); // move camera up
+ 			camera.position = new THREE.Vector3(0,0,10); // move camera up
 		//	this.camera.up.set(0, 0, -1); // Turn Camera
 			camera.lookAt(new THREE.Vector3(0, 0, 0)); // face camera down
 
