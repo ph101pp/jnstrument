@@ -1,4 +1,4 @@
-(function(undefined) {	
+(function($, undefined) {	
 	var GlobalTicker = function(){
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Properties
@@ -27,7 +27,10 @@
 			showFrameRate(now);
 		}).bind(this);
 ///////////////////////////////////////////////////////////////////////////////
+		$(window).resize(function(e){
+			this.emitEvent(e, undefined, "resize");
+		}.bind(this));
 	}
 ///////////////////////////////////////////////////////////////////////////////
 	module.exports = require("./eventEmitter.js").extend(GlobalTicker);
-})()
+})(jQuery)

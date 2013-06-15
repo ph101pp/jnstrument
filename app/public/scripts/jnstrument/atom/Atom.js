@@ -15,6 +15,7 @@
 			env = 	new (require("./World.js"))($(container));
 			loop.addListener(globalTick.tick, { bind:globalTick });
 			loop.addListener(env.render, { bind:env });
+			globalTick.addListener(env.onWindowResize, { bind:env, eventName :"resize" });
 
 			globalTick.activate();
 

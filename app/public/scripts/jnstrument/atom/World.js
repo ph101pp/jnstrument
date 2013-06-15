@@ -20,8 +20,8 @@
 			this.width = container.innerWidth();
 			this.height = container.innerHeight();			
 			renderer = new THREE.WebGLRenderer();
+			renderer.setClearColor(0x333333);
 			renderer.setSize(this.width, this.height); 
-
 
 			camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
 //			camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 10000 );
@@ -39,32 +39,31 @@
 
 			//setupCameras();
 
-			$(window).resize(onWindowResize);
-
-			this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
+		//	this.drawCoodinateSystem(new THREE.Vector3(0,0,0));
 		}
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
-			var onWindowResize = (function () {
-				this.width = container.innerWidth();
-				this.height = container.innerHeight();
-
-				camera.aspect = this.width / this.height;
-
-				camera.left = this.width/-2;
-				camera.right = this.width/2;
-				camera.top = this.height/2;
-				camera.bottom = this.height/-2;
-
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( this.width, this.height );
-
-			}).bind(this);		
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////
+		this.onWindowResize = function () {
+			this.width = container.innerWidth();
+			this.height = container.innerHeight();
+
+			camera.aspect = this.width / this.height;
+
+			camera.left = this.width/-2;
+			camera.right = this.width/2;
+			camera.top = this.height/2;
+			camera.bottom = this.height/-2;
+
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( this.width, this.height );
+
+		}		
+///////////////////////////////////////////////////////////////////////////////
 		this.drawCoodinateSystem = function(position){
 			var geometryX = new THREE.Geometry();
 			geometryX.vertices.push(new THREE.Vector3(0, 0, 0));
