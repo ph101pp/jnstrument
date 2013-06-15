@@ -41,17 +41,18 @@
 			var materialOptions = {
 				transparent : true,
 				opacity : 0.7,
-				color: inboundColor,
+				color: 0x000000,
 				visible:true
 			}
-			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
-			// material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material =  material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			geometry = geometry || new THREE.SphereGeometry( 10, 16, 16 );
+			material =  material || new THREE.MeshBasicMaterial(materialOptions);
+			//material =  material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
 			face = new THREE.Mesh(geometry, material);
 
 			this.add(face);
+			console.log(face);
 
-			this.actionRadius=1;
+			this.actionRadius=10;
 			
 			this.update();
 
@@ -61,13 +62,24 @@
 			world = _world;
 		}
 ///////////////////////////////////////////////////////////////////////////////
+		this.remap = function(){
+			console.log("remaped");
+			face.material.color = new THREE.Color(0x00FF00);
+		}
 		this.collision = function(object, hits, collisionDetection) {
-			//if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
 			var force = this.position.clone().sub(object.position);
+			var distance = force.length();
+			var interactionRadius = this.actionRadius+object.actionRadius+10;
+
+			console.log(distance,this.actionRadius,object.actionRadius);
+			face.material.color = new THREE.Color(0xff0000);
+			if(distance > interactionRadius) return;
+			//if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
+
 			var length = force.length();
-			var maxSpeed = 20;
-			var minSpeed = 0;
-			force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, maxSpeed, minSpeed),minSpeed,maxSpeed));
+			var maxSpeed = 10;
+			var minSpeed = 5;
+			force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, interactionRadius, maxSpeed, minSpeed),minSpeed,maxSpeed));
 			this.velocity.add(force);
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,15 +118,15 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.update = function(){
-			this.updateRadius();
+			//this.updateRadius();
 			this.updateOutBoundConnections();
-			this.updateColors();
+			//this.updateColors();
 
 		
-			var gravity = this.position.clone().negate().multiplyScalar(0.001);
+			var gravity = this.position.clone().negate().multiplyScalar(0.0001);
 			this.position.add(gravity);
 
-			this.velocity.multiplyScalar(0.1);
+			this.velocity.multiplyScalar(0.6); // friction
 			this.position.add(this.velocity);
 			this.position.z = 0;
 		}

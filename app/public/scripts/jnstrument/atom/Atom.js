@@ -1,6 +1,6 @@
 (function($, THREE, window, document, undefined) {	
 	var atom = function(){
-		var globalTick, env, loop, socket, that;
+		var globalTick, env, loop, socket, that, senderId;
 
 		var elements = new (require("./ObjectStore"));
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,10 @@
 			}, {eventName :"calculate"});
 
 			socket.addListener(function(data){
-//			console.log(data);	
+				if(data.sender.id !== senderId) {
+					elements.removeAll();
+					senderId = data.sender.id;
+				}
 				var element = elements.get(data.id);
 				var caller = data.data.calledById !== false ?
 					elements.get(data.data.calledById):
