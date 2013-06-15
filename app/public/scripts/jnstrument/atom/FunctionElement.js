@@ -44,9 +44,9 @@
 				color: 0x000000,
 				visible:true
 			}
-			geometry = geometry || new THREE.SphereGeometry( 10, 16, 16 );
-			material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			//material =  material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
+			geometry = geometry || new THREE.SphereGeometry( 5, 16, 16 );
+			//material =  material || new THREE.MeshBasicMaterial(materialOptions);
+			material =  material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
 			face = new THREE.Mesh(geometry, material);
 
 			this.add(face);
@@ -63,24 +63,42 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.remap = function(){
-			console.log("remaped");
 			face.material.color = new THREE.Color(0x00FF00);
 		}
 		this.collision = function(object, hits, collisionDetection) {
+			if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
 			var force = this.position.clone().sub(object.position);
 			var distance = force.length();
-			var interactionRadius = this.actionRadius+object.actionRadius+10;
+			var interactionRadius = (this.actionRadius+object.actionRadius)*2;
 
-			console.log(distance,this.actionRadius,object.actionRadius);
+//			console.log(distance,this.actionRadius,object.actionRadius);
 			face.material.color = new THREE.Color(0xff0000);
 			if(distance > interactionRadius) return;
-			//if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
 
 			var length = force.length();
 			var maxSpeed = 10;
-			var minSpeed = 5;
-			force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, interactionRadius, maxSpeed, minSpeed),minSpeed,maxSpeed));
+			var minSpeed = 2;
+			force.setLength(THREE.Math.clamp( THREE.Math.mapLinear(length, 0, interactionRadius, maxSpeed, minSpeed) ,minSpeed,maxSpeed));
 			this.velocity.add(force);
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.calculateOutboundConnections = function() {
+			var storedElements = this.inboundElements.getAll();
+			var elements = storedElements.objects;
+			for(var i = 0; i<elements.length; i++) {
+				var distanceVector = elements[i].position.clone().sub(this.position);
+
+				var targetDistance = (this.actionRadius+elements[i].actionRadius)+10;
+				var target = distanceVector.clone().setLength(targetDistance);
+				var force = target.clone().add(this.position).sub(elements[i].position);
+				var length=force.length();
+				var maxSpeed = 30;
+				var minSpeed = 0;
+				//force.setLength(THREE.Math.clamp( length/3 ,minSpeed,maxSpeed));
+				
+				elements[i].position.add(force.multiplyScalar(1/5));
+				this.position.add(force.negate().multiplyScalar(1/3));
+			}
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateColors = function(){
@@ -88,25 +106,17 @@
 			else this.uniforms.lerpAlpha.value = 0;
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.updateOutBoundConnections = function() {
-			var storedElements = this.outboundElements.getAll();
+		this.updateInBoundConnections = function() {
+			var storedElements = this.inboundElements.getAll();
 			var elements = storedElements.objects;
 			for(var i = 0; i<elements.length; i++) {
-				var distanceVector = elements[i].position.clone().sub(this.position);
-				// distanceVector.z=0;
-				// var targetDistance = this.actionRadius +elements[i].actionRadius+10;
-				// var target = distanceVector.clone().setLength(targetDistance);
-				// var force = target.clone().add(this.position).sub(elements[i].position);
-				// var length=force.length();
-				// var maxSpeed = 20;
-				// var minSpeed = 0;
-				// force.setLength(THREE.Math.clamp( length/(2*this.actionRadius) ,minSpeed,maxSpeed));
-				// elements[i].velocity.add(force);
-
-				storedElements.data[i].connection.geometry.vertices[1] = distanceVector;
-				storedElements.data[i].connection.geometry.verticesNeedUpdate = true;
+				outBoundConnection = elements[i].outboundElements.get(this);
+				var distanceVector = this.position.clone().sub(elements[i].position);
+				outBoundConnection.data.connection.geometry.vertices[1] = distanceVector;
+				outBoundConnection.data.connection.geometry.verticesNeedUpdate = true;
 			}
 		}
+
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateRadius = function(){
 			var count = Math.max(this.inboundCount, this.outboundCount);			
@@ -117,18 +127,24 @@
 			this.uniforms.radius.value = boundingRadius;
 		}
 ///////////////////////////////////////////////////////////////////////////////
+		this.calculate = function(){
+
+		}
+
 		this.update = function(){
 			//this.updateRadius();
-			this.updateOutBoundConnections();
-			//this.updateColors();
+			this.calculateOutboundConnections();
+			this.updateInBoundConnections();
+			this.updateColors();
 
-		
-			var gravity = this.position.clone().negate().multiplyScalar(0.0001);
-			this.position.add(gravity);
+	
+			this.velocity.multiplyScalar(0.7); // friction
 
-			this.velocity.multiplyScalar(0.6); // friction
+			var gravity = this.position.clone().multiplyScalar(0.001);
+			if(this.position.length() < 100) this.velocity.add(gravity); // push from center
+
 			this.position.add(this.velocity);
-			this.position.z = 0;
+			this.position.z = 0; 
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.inboundEvent = function(FunctionElement){

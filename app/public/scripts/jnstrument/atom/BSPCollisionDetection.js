@@ -62,7 +62,7 @@
 			height = world.height;
 			maps = {};
 			var objects = elements.getAllObjects();
-			console.log("remap", objects.length);
+		//	console.log("remap", objects.length);
 			for(var i=0; i<objects.length; i++) {
 				objects[i].remap();
 				addToMap(objects[i]);

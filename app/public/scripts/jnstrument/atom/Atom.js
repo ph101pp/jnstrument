@@ -28,6 +28,7 @@
 
 			socket.addListener(function(data){
 				if(data.sender.id !== senderId) {
+					console.log("newSender");
 					elements.removeAll();
 					senderId = data.sender.id;
 				}
@@ -39,6 +40,7 @@
 					caller = new (require("./FunctionElement.js"))();
 					caller.position.set(Math.random()*100-50,Math.random()*100-50,Math.random()*100-50);
 					globalTick.addListener(caller.update, {bind:caller, eventName:"update"});
+					globalTick.addListener(caller.calculate, {bind:caller, eventName:"calculate"});
 					env.collisionDetection.addElement(caller);
 					env.scene.add(caller);
 					caller = elements.store(caller,{id:data.data.calledById});
@@ -52,6 +54,7 @@
 						new THREE.Vector3(0,0,0);
 					element.position = startPosition.add(new THREE.Vector3(Math.random()*50-25,Math.random()*50-25,Math.random()*50-25));
 					globalTick.addListener(element.update, {bind:element, eventName:"update"});
+					globalTick.addListener(element.calculate, {bind:element, eventName:"calculate"});
 					env.collisionDetection.addElement(element);
 					env.scene.add(element);
 					element = elements.store(element,{id:data.data.id});
