@@ -41,7 +41,7 @@ new (function jnstrument(){
 			if(result.scriptSource.search(/__pca__/)>=0) return;
 			console.log(data.url, result);
 			var instrumentedScript=result.scriptSource.replace(
-					/(function[\s\n\r\t]*([$A-Za-z_][A-Za-z_0-9$]*)?[\s\n\r\t]*\(([\s\n\r\t]*([$A-Za-z_][\w$]*)?[\s\n\r\t]*,?)*\)[\s\n\r\t]*\{)/g,
+					/(function[\s\n\r\t]*([$A-Za-z_][A-Za-z_0-9$]*)?[\s\n\r\t]*\(([\s\n\r\t]*([$A-Za-z_][\w$]*)?[\s\n\r\t]*(\/\*.*\*\/)*[\s\n\r\t,]*,?)*\)[\s\n\r\t]*\{)/g,
 					"$1 "+instrument);
 
 			//chrome.tabs.executeScript(priv.debuggee.tabId, {code:niceScript},function(response){console.log(response)});
