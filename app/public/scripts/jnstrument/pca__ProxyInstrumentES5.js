@@ -91,12 +91,14 @@
 			while (Date.now() < ms){}
 		} 
 ///////////////////////////////////////////////////////////////////////////////
-		var testObject = function(obj, name, parent) {
+		var testObject = function(obj, name, parent, liner) {
 			try{
 				var nameIsNot = ["Proxy",  "__pca__", "toString", "__pca__Proxied", "prototype"];
 				var objIsNot = [document, window.WebSocket.prototype.send, window.alert, clearTimeout, setTimeout, null, console];
 				var isNotInstancesOf = [console.constructor, window.location.constructor];
 				var typeIs = ["object", "function"];
+
+				if(!liner && /\b__pca__\b/.test(obj)) return false;
 
 				// if not main "document"
 				if((constructedFrom(parent, document.constructor) && parent != document ) || (constructedFrom(obj, document.constructor) && obj != document)) return false;
@@ -196,12 +198,22 @@
 			},
 			apply : function(_this, args){
 				sendData("Apply", this, this.target, args, _this);
+				if(!this.target.__pca__Proxied) 
+					Object.defineProperty( this.target,"__pca__Proxied", {
+						writable:true,
+						value: true,
+					});
 				return Function.prototype.apply.call(this.target, _this, args);
 			},
 			construct : function(args){
 				sendData("Construct", this, this.target, args);
+				if(!this.target.__pca__Proxied) 
+					Object.defineProperty( this.target,"__pca__Proxied", {
+						writable:true,
+						value: true,
+					});
 				Array.prototype.unshift.call(args, null);
-				return wrapper(new (Function.prototype.bind.apply(this.target, args))); 	
+				return wrapper(new (Function.prototype.bind.apply(this.target, args)));
 			}
 		};
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,7 +264,7 @@
 	Public Methods
 /*//////////////////////////////////////////////////////////////////////////////
 		this.liner = function (_this, args){
-			if(!enabled || (args.callee.caller != null && (args.callee.caller.toString() == Reflect.prototype.apply.toString() || args.callee.caller.toString() == Reflect.prototype.construct.toString())) || _this == __pca__ || !testObject(args.callee)) return;
+			if(!enabled || args.callee.__pca__Proxied || _this == __pca__ || !testObject(args.callee, undefined, undefined, true)) return;
 			sendData("Liner", undefined, args.callee, args, _this);
 			//wrapper(_this);
 		}
