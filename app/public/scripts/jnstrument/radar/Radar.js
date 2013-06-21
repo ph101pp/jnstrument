@@ -32,7 +32,7 @@
 			element.data.id=data.id
 			element.object.unshift(now);
 			elementData.store(element.object, element.data);
-			//if(isNaN(activeId)) activeId=data.id;
+			if(isNaN(activeId)) activeId=data.id;
 		}
 ///////////////////////////////////////////////////////////////////////////////
  		var calculateElements = function(data, answer, now){
@@ -153,15 +153,16 @@
 			// darkness < 1  => lighter edges
 				effectVignette.uniforms[ "offset" ].value = 1;
 				effectVignette.uniforms[ "darkness" ].value = 1;
-			effectVignette.renderToScreen = true;
+		//	effectVignette.renderToScreen = true;
 			composerVignette.addPass(effectVignette);
 
 
 			composerActive = new THREE.EffectComposer( world.renderer );
 			composerActive.addPass( new THREE.RenderPass( world.activeScene, world.camera ) );
 
-			var effectBlend = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse1" );
-				effectBlend.uniforms[ 'tDiffuse2' ].value = composerVignette.renderTarget2;
+			var effectBlend = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse2" );
+				effectBlend.uniforms[ 'tDiffuse1' ].value = composerVignette.renderTarget2;
+				effectBlend.uniforms[ 'clearColor' ].value = new THREE.Color(29,29,38);
 				effectBlend.renderToScreen = true;
 
 			composerActive.addPass(effectBlend);
@@ -169,7 +170,7 @@
 
 		var render = function(){
 			composerVignette.render();
-			//composerActive.render();
+			composerActive.render();
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(_socket, _loop){		
