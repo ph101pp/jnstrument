@@ -24,6 +24,7 @@
 			if(ticks%2 != 0) return;
 			this.emitEvent(undefined, undefined, "calculate");
 			this.emitEvent(undefined, undefined, "update");
+			this.emitEvent(undefined, undefined, "render");
 			showFrameRate(now);
 		}).bind(this);
 ///////////////////////////////////////////////////////////////////////////////

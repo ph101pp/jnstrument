@@ -5,10 +5,10 @@
 		var base = 			new (require("./Radar.js"))(socket, loop);
 
 		loop.makeAsync();
-		atom.initialize($("#scene"));
+		base.initialize($("#scene"));
 	}	
 ///////////////////////////////////////////////////////////////////////////////
-	AEROTWIST.init = function(){
+	$(function(){
 		index(); // Start
-	};
+	});
 })(jQuery, THREE, window, document)

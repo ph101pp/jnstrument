@@ -5,14 +5,14 @@ html
 		link(rel='stylesheet', href='/stylesheets/guitarHero.css')
 		script(src='/scripts/libs/jquery-2.0.2.min.js')
 		script(src='/scripts/libs/three.js/three.js')
+		script(src='/scripts/libs/three.js/postprocessing/EffectComposer.js')		
+		script(src='/scripts/libs/three.js/postprocessing/RenderPass.js')
+		script(src='/scripts/libs/three.js/postprocessing/ShaderPass.js')
+		script(src='/scripts/libs/three.js/postprocessing/MaskPass.js')
+		script(src='/scripts/libs/three.js/postprocessing/CopyShader.js')
 
-		script(data-name="test", data-src="http://localhost:8000/scripts/shaders/vertexTest.c", type="x-shader/x-vertex")
-		script(data-name="test", data-src="http://localhost:8000/scripts/shaders/fragmentTest.c", type="x-shader/x-fragment")
+		script(src='/scripts/libs/three.js/postprocessing/BloomPass.js')
 
-		script(data-name="FunctionElement1", data-src="http://localhost:8000/scripts/shaders/vertex_FunctionElement1.c", type="x-shader/x-vertex")
-		script(data-name="FunctionElement1", data-src="http://localhost:8000/scripts/shaders/fragment_FunctionElement1.c", type="x-shader/x-fragment")
-		
-		script(src='/scripts/libs/AeroTwistShaderLoader.js')
 
 		script(src='/scripts/radar/index.js')
 

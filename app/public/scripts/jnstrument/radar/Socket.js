@@ -6,7 +6,7 @@
 			var urlObj = require("url").parse(window.location);
 
 			var receiveData = function(data, answer){
-				this.emitEvent(data, answer);
+				this.emitEvent(data, answer, "jsEvent");
 			}.bind(this);
 ///////////////////////////////////////////////////////////////////////////////
 			connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.match(/.*\/(.*)/)[1]}, function(data){
