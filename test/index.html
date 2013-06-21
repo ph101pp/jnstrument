@@ -22,10 +22,10 @@
    console.log(arguments.callee.__pca__Proxied);
 
   }
+
   $(function() {
     $( "#accordion" ).accordion();
     __pca__= new __pca__Instrument();
-    if(typeof(__pca__UpdateScript) === "function") __pca__UpdateScript();
     __pca__.enable();
 
   });

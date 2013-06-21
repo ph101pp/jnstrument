@@ -55,7 +55,7 @@
 				//constructor: _this
 			};
 
-			console.log("send");
+			console.log("send", index, objInfo[index]);
 			 // if(data.calledBy <0) console.log(args.callee.caller, args.callee);
 			// console.log('__pca__Event', data);
 

@@ -69,6 +69,12 @@ module.exports = function() {
 			title : 'drop'  
 		});
 	});
+
+	app.get(/\/radar\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('radar', { 
+			title : 'Radar'  
+		});
+	});
 	
 	app.get(/\/proto\/........-....-4...-....-p....c.....a/, function (req, res) {
 		res.render('proto', { 
