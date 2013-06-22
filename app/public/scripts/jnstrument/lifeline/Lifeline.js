@@ -37,7 +37,7 @@
 				senderId = data.sender.id;
 				maxEventsOverTime = maxEventsOverAll=0;
 			}
-			var element = elementData.get(data.id) || {object:[], data: {id:null, eventCount:0, history:[], position: new THREE.Vector3(0,0,0)}};
+			var element = elementData.get(data.id) || {object:[], data: {id:null, eventCount:0, history:[new THREE.Vector3(0,0,0)], position: new THREE.Vector3(0,0,0)}};
 			element.data.id=data.id
 			element.data.eventCount++;
 			element.object.unshift(now);
@@ -70,7 +70,7 @@
 					eventsOverTime++;
 				}
 
-				actualPoint= new THREE.Vector3(data[i].eventCount, eventsOverTime, 0);
+				actualPoint= new THREE.Vector3(data[i].eventCount, eventsOverTime, data[i].history[data[i].history.length-1].z);
 				maxEventsOverAll = Math.max(maxEventsOverAll, data[i].eventCount);
 				maxEventsOverTime = Math.max(maxEventsOverTime, eventsOverTime);
 
@@ -79,9 +79,10 @@
 				// else 
 				// 	data[i].history[data[i].history.length-1] = actualPoint;	
 
-	
-				if(data[i].history.length <= 0 || !data[i].history[data[i].history.length-1].equals(actualPoint)) 
+				if(!data[i].history[data[i].history.length-1].equals(actualPoint)) {
 					data[i].history.push(actualPoint);
+				}
+				data[i].history[data[i].history.length-1].z=now;
 			}
 
 			// Create Coordinate System
@@ -107,36 +108,6 @@
 			var movement;
 			for(var i=0; i < objects.length; i++) {
 
-				// Create Curve
-				// curve = new THREE.SplineCurve3(data[i].history);
-				// points = curve.getPoints(100);
-				points=data[i].history;
-				largeStep = Math.ceil(points.length/50);
-
-						
-				for(var v=0; v< points.length; v+=step) {
-					p1 = getScreenPoints(points[v]);
-					
-					if(data[i].id === activeId) step = 1;
-					else {
-						step = v>50 ? largeStep : 1;  
-						if(v > 1000) break;
-					}
-
-					if(v-step < 0)
-						p2 = getScreenPoints(new THREE.Vector3(0,0,0));
-					else 
-						p2 = getScreenPoints(points[v-step]);
-
-					if(data[i].id === activeId) {
-						activeGeometry.vertices.push( p1 );
-						activeGeometry.vertices.push( p2 );
-					}
-					else {
-						stageGeometry.vertices.push( p1 );
-						stageGeometry.vertices.push( p2 );
-					}
-				}
 
 
 				// Set Circle
@@ -150,11 +121,45 @@
 				data[i].position=actualPoint;
 
 				EventCircle.position = getScreenPoints(actualPoint);
-
+				EventCircle.position.z=0;
 				if(data[i].id === activeId) 
 					THREE.GeometryUtils.merge(activeDotGeometry, EventCircle);
 				else
 					THREE.GeometryUtils.merge(stageDotGeometry, EventCircle);
+
+
+				// Create Curves
+				// curve = new THREE.SplineCurve3(data[i].history);
+				// points = curve.getPoints(100);
+				points=data[i].history;
+				largeStep = Math.ceil(points.length/50);
+						
+				 if(data[i].id === activeId) // nicht aktive haben linie oder nicht..
+				 for(var v=points.length-1; v>=0; v-=step) {
+					if(data[i].id === activeId) step = 1;
+					else {
+						step = points.length-v>50 ? largeStep : 1;  
+						//if(points[v].z < now-msOnScreen) continue; // mit oder ohne schweif..
+					}
+
+					p1 = getScreenPoints(points[v]);
+					if(v+step >= points.length)
+						p2 = getScreenPoints(actualPoint);
+					else 
+						p2 = getScreenPoints(points[v+step]);
+					p1.z=p2.z=0;
+
+					if(data[i].id === activeId) {
+						activeGeometry.vertices.push( p1 );
+						activeGeometry.vertices.push( p2 );
+					}
+					else {
+						stageGeometry.vertices.push( p1 );
+						stageGeometry.vertices.push( p2 );
+					}
+				}
+
+
 				elementData.store(objects[i], data[i]);
 			}
 
