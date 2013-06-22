@@ -15,7 +15,7 @@
 		var materialDot = new THREE.MeshBasicMaterial({color:0xFFFFFF, transparent:true, opacity:0.4});
 		var material = new THREE.LineBasicMaterial({ color:0xcccccc, linewidth:1, transparent:true, opacity:0.2});
 		var materialActiveDot = new THREE.MeshBasicMaterial({color:0xFFFFFF,transparent:true, opacity:0.4});
-		var materialActive = new THREE.LineBasicMaterial({ color:0xFFFFFF, linewidth:1,transparent:true, opacity:0.5});
+		var materialActive = new THREE.LineBasicMaterial({ color:0xFFFFFF, linewidth:2,transparent:true, opacity:0.5});
 		var circle = new THREE.CircleGeometry(1,32);
 		var EventCircle = new THREE.Mesh(new THREE.CircleGeometry(6,8), material);
 		var stageObject, stageGeometry;
@@ -48,7 +48,7 @@
 
 
 			for(var i=0; i < objects.length; i++) {
-				if(i==2) activeId=data[i].id;
+				if(i==0) activeId=data[i].id;
 				data[i].lines.dispose();
 				data[i].dots.dispose();
 				data[i].dots = new THREE.Geometry();
