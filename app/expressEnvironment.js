@@ -75,6 +75,12 @@ module.exports = function() {
 			title : 'Radar'  
 		});
 	});
+
+	app.get(/\/lifeline\/........-....-4...-....-p....c.....a/, function (req, res) {
+		res.render('lifeline', { 
+			title : 'Lifeline'  
+		});
+	});
 	
 	app.get(/\/proto\/........-....-4...-....-p....c.....a/, function (req, res) {
 		res.render('proto', { 
