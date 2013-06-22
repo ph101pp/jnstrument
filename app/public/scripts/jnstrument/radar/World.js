@@ -7,7 +7,7 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Properties
 /*/////////////////////////////////////////////////////////////////////////////
-		this.renderer;
+		this.renderer;		
 		this.camera;
 		this.scene;
 		this.activeScene;
@@ -21,8 +21,10 @@
 			this.width = container.innerWidth();
 			this.height = container.innerHeight();			
 			this.renderer = new THREE.WebGLRenderer();
-			this.renderer.setClearColor(new THREE.Color(29,29,38));
-			this.renderer.setSize(this.width, this.height); 
+			this.renderer.setClearColor(new THREE.Color(0,0,0));
+			// this.renderer.setClearColor(new THREE.Color(29,29,38));
+			this.renderer.setSize(this.width, this.height); 		
+
 
 
 			this.camera = new THREE.OrthographicCamera( this.width/-2, this.width/2, this.height/2, this.height/-2, 1, 10000 );
@@ -48,22 +50,22 @@
 /*/////////////////////////////////////////////////////////////////////////////
 	Private Methods
 /*/////////////////////////////////////////////////////////////////////////////
-			this.onWindowResize = (function () {
-				this.width = container.innerWidth();
-				this.height = container.innerHeight();
+		this.onWindowResize = (function () {
+			this.width = container.innerWidth();
+			this.height = container.innerHeight();
 
-				this.camera.aspect = this.width / this.height;
+			this.camera.aspect = this.width / this.height;
 
-				this.camera.left = this.width/-2;
-				this.camera.right = this.width/2;
-				this.camera.top = this.height/2;
-				this.camera.bottom = this.height/-2;
+			this.camera.left = this.width/-2;
+			this.camera.right = this.width/2;
+			this.camera.top = this.height/2;
+			this.camera.bottom = this.height/-2;
 
-				this.camera.updateProjectionMatrix();
+			this.camera.updateProjectionMatrix();
 
-				this.renderer.setSize( this.width, this.height );
+			this.renderer.setSize( this.width, this.height );
 
-			}).bind(this);		
+		}).bind(this);		
 /*/////////////////////////////////////////////////////////////////////////////
 	Public Methods
 /*/////////////////////////////////////////////////////////////////////////////

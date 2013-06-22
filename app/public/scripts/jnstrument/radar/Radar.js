@@ -4,8 +4,9 @@
 		var elementData = new (require("./ObjectStore"));
 		var senderId;
 		var shaders;
-		var composerVignette;
+		var composer;
 		var composerActive;
+		var composerBlur;
 		var activeId;
 		var msOnScreen = 3000;
 
@@ -13,8 +14,8 @@
 		// material.side = THREE.DoubleSide;
 		var materialDot = new THREE.MeshBasicMaterial({color:0xFFFFFF, transparent:true, opacity:0.4});
 		var material = new THREE.LineBasicMaterial({ color:0xcccccc, linewidth:1, transparent:true, opacity:0.2});
-		var materialActiveDot = new THREE.MeshBasicMaterial({color:0xFFFFFF});
-		var materialActive = new THREE.LineBasicMaterial({ color:0xFFFFFF, linewidth:1});
+		var materialActiveDot = new THREE.MeshBasicMaterial({color:0xFFFFFF,transparent:true, opacity:0.4});
+		var materialActive = new THREE.LineBasicMaterial({ color:0xFFFFFF, linewidth:1,transparent:true, opacity:0.5});
 		var circle = new THREE.CircleGeometry(1,32);
 		var EventCircle = new THREE.Mesh(new THREE.CircleGeometry(6,8), material);
 		var stageObject, stageGeometry;
@@ -32,14 +33,12 @@
 			element.data.id=data.id
 			element.object.unshift(now);
 			elementData.store(element.object, element.data);
-			if(isNaN(activeId)) activeId=data.id;
 		}
 ///////////////////////////////////////////////////////////////////////////////
  		var calculateElements = function(data, answer, now){
 			var store = elementData.getAll();
 			var objects = store.objects;
 			var data = store.data;
-			var lineWidth = 3;
 			var maxRadius = (new THREE.Vector3(world.width/2, world.height/2)).length();
 			var functionGap = 2*Math.PI/(objects.length);
 			var radius, w, eventAngle;
@@ -49,6 +48,7 @@
 
 
 			for(var i=0; i < objects.length; i++) {
+				if(i==2) activeId=data[i].id;
 				data[i].lines.dispose();
 				data[i].dots.dispose();
 				data[i].dots = new THREE.Geometry();
@@ -67,13 +67,14 @@
 
 				//Create Events on Function Line
 				for(var k=0; k < objects[i].length; k++) {
-					// create Large Circle
 					radius = maxRadius * (now-objects[i][k]) / msOnScreen;	
+					// Remove old events
 					if(radius > maxRadius) {
 						objects[i].splice(k, objects[i].length-k);
 						continue;
 					}
 
+					// create Large Circle
 					for(var v=1; v< circle.vertices.length; v++) {
 						w = v-1 >= 1 ? v-1 : circle.vertices.length-1;
 						if(data[i].id === activeId) {
@@ -146,31 +147,50 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var setupComposer = function() {
-			composerVignette = new THREE.EffectComposer( world.renderer );
-			composerVignette.addPass( new THREE.RenderPass( world.scene, world.camera ) );
-			var effectVignette = new THREE.ShaderPass( shaders.vignette );
-			// larger values = darker closer to center
-			// darkness < 1  => lighter edges
-				effectVignette.uniforms[ "offset" ].value = 1;
-				effectVignette.uniforms[ "darkness" ].value = 1;
-		//	effectVignette.renderToScreen = true;
-			composerVignette.addPass(effectVignette);
 
+			// BlurActive
+			composerBlur = new THREE.EffectComposer( world.renderer );
+			composerBlur.addPass( new THREE.RenderPass( world.activeScene, world.camera ) );
+			var effectTint = new THREE.ShaderPass( shaders.tint );
+				effectTint.uniforms[ "color" ].value = new THREE.Color(0x76BDE5);
+			var effectHorizBlur = new THREE.ShaderPass( shaders.horizontalBlur );
+				effectHorizBlur.uniforms[ "h" ].value = 1.5 / window.innerWidth;
+			var effectVertiBlur = new THREE.ShaderPass( shaders.verticalBlur );
+				effectVertiBlur.uniforms[ "v" ].value = 1.5 / window.innerHeight;			
+			composerBlur.addPass( effectTint );
+			composerBlur.addPass( effectHorizBlur );
+			composerBlur.addPass( effectVertiBlur );
 
+			// Active
 			composerActive = new THREE.EffectComposer( world.renderer );
 			composerActive.addPass( new THREE.RenderPass( world.activeScene, world.camera ) );
 
-			var effectBlend = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse2" );
-				effectBlend.uniforms[ 'tDiffuse1' ].value = composerVignette.renderTarget2;
-				effectBlend.uniforms[ 'clearColor' ].value = new THREE.Color(29,29,38);
-				effectBlend.renderToScreen = true;
-
-			composerActive.addPass(effectBlend);
+			// Combine With Background and add Vignette
+			composer = new THREE.EffectComposer( world.renderer );
+			composer.addPass( new THREE.RenderPass( world.scene, world.camera ) );
+			var effectVignette = new THREE.ShaderPass( shaders.vignette );
+				// larger values = darker closer to center
+				// darkness < 1  => lighter edges
+				effectVignette.uniforms[ "offset" ].value = 1;
+				effectVignette.uniforms[ "darkness" ].value = 1;
+			var effectBlend1 = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse1" );
+				effectBlend1.uniforms[ 'tDiffuse2' ].value = composerBlur.renderTarget2;
+			var effectBlend11 = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse1" );
+				effectBlend11.uniforms[ 'tDiffuse2' ].value = composerBlur.renderTarget2;
+			var effectBlend2 = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse2" );
+				effectBlend2.uniforms[ 'tDiffuse1' ].value = composerActive.renderTarget2
+				effectBlend2.renderToScreen = true;
+			composer.addPass(effectVignette);
+			composer.addPass(effectBlend1);					
+			composer.addPass(effectBlend1);					
+			composer.addPass(effectBlend1);					
+			composer.addPass(effectBlend2);
 		}
-
+///////////////////////////////////////////////////////////////////////////////
 		var render = function(){
-			composerVignette.render();
+			composerBlur.render();
 			composerActive.render();
+			composer.render();
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(_socket, _loop){		
@@ -183,6 +203,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 		this.initialize = function(container) {
 			world = new (require("./World.js"))($(container));
+
+			//Background
+			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(world.width, world.height, 1,1), new THREE.MeshBasicMaterial({color:new THREE.Color(29,29,38)})));
 
 			setupComposer();
 
