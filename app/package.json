@@ -10,6 +10,9 @@
     "type": "git",
     "url": "https://github.com/greenish/BA-Thesis.git"
   },
+  "scripts": {
+    "preinstall": "npm i -g forever"
+  },
   "dependencies": {
     "http-proxy": "0.10.x",
     "socket.io": "0.9.x",
