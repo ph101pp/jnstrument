@@ -134,7 +134,7 @@
 				points=data[i].history;
 				largeStep = Math.ceil(points.length/50);
 						
-				 if(data[i].id === activeId) // nicht aktive haben linie oder nicht..
+				// if(data[i].id === activeId) // nicht aktive haben linie oder nicht..
 				 for(var v=points.length-1; v>=0; v-=step) {
 					if(data[i].id === activeId) step = 1;
 					else {
