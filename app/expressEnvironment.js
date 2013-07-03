@@ -81,7 +81,12 @@ module.exports = function() {
 			title : 'Lifeline'  
 		});
 	});
-	
+
+	app.get(/\/neuron\/........-....-4...-....-p....c.....a|\/neuron\/installation/, function (req, res) {
+		res.render('neuron', { 
+			title : 'Neuron'  
+		});
+	});	
 	app.get(/\/proto\/........-....-4...-....-p....c.....a|\/proto\/installation/, function (req, res) {
 		res.render('proto', { 
 			title : 'prototypes'  
