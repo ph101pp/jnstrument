@@ -36,7 +36,8 @@
 			if(data.sender.id !== senderId) {
 				elementData.removeAll();
 				senderId = data.sender.id;
-				maxEventsOverTime = maxEventsOverAll=0;
+				maxEventsOverTime=10;
+				maxEventsOverAll=50;
 			}
 			var element = elementData.get(data.id) || {object:[], data: {id:null, eventCount:0, history:[new THREE.Vector3(0,0,0)], position: new THREE.Vector3(0,0,0)}};
 			element.data.id=data.id
@@ -135,19 +136,22 @@
 				points=data[i].history;
 				largeStep = Math.ceil(points.length/50);
 						
-				// if(data[i].id === activeId) // nicht aktive haben linie oder nicht..
-				 for(var v=points.length-1; v>=0; v-=step) {
+				// if(data[i].id === activeId) // aktive linie oder nicht..
+				 for(var v=0, w=points.length; v<w; v+=step) {
 					if(data[i].id === activeId) step = 1;
 					else {
-						step = points.length-v>50 ? largeStep : 1;  
-						//if(points[v].z < now-msOnScreen) continue; // mit oder ohne schweif..
+						step = v>50 ? largeStep : 1;  
 					}
 
-					p1 = getScreenPoints(points[v]);
-					if(v+step >= points.length)
-						p2 = getScreenPoints(actualPoint);
+				
+					p1 = v+step >= w ?
+						getScreenPoints(actualPoint):
+						getScreenPoints(points[v]);
+
+					if(v-step < 0)
+						p2 = getScreenPoints(new THREE.Vector3(0,0,0));
 					else 
-						p2 = getScreenPoints(points[v+step]);
+						p2 = getScreenPoints(points[v-step]);
 					p1.z=p2.z=0;
 
 					if(data[i].id === activeId) {
