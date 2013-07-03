@@ -1,4 +1,5 @@
 (function($, THREE, window, document, undefined) {	
+	var config = require("../config.js");
 	var curtain = function(){
 		var globalTick, world, loop, socket, that;
 		var elementData = new (require("./ObjectStore"));
@@ -12,10 +13,10 @@
 
 		// var material =  new THREE.ShaderMaterial({ vertexShader:AEROTWIST.Shaders.CurtainElement.vertex, fragmentShader:AEROTWIST.Shaders.CurtainElement.fragment});
 		// material.side = THREE.DoubleSide;
-		var materialDot = new THREE.MeshBasicMaterial({color:0xFFFFFF, transparent:true, opacity:0.4});
-		var material = new THREE.LineBasicMaterial({ color:0xcccccc, linewidth:1, transparent:true, opacity:0.2});
-		var materialActiveDot = new THREE.MeshBasicMaterial({color:0xFFFFFF,transparent:true, opacity:0.4});
-		var materialActive = new THREE.LineBasicMaterial({ color:0xFFFFFF, linewidth:2,transparent:true, opacity:0.5});
+		var materialDot = new THREE.MeshBasicMaterial({color:config.colors.normalDots, transparent:true, opacity:0.4});
+		var material = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1, transparent:true, opacity:0.2});
+		var materialActiveDot = new THREE.MeshBasicMaterial({color:config.colors.activeDots,transparent:true, opacity:0.4});
+		var materialActive = new THREE.LineBasicMaterial({ color:config.colors.activeLines, linewidth:2,transparent:true, opacity:0.5});
 		var circle = new THREE.CircleGeometry(1,32);
 		var EventCircle = new THREE.Mesh(new THREE.CircleGeometry(6,8), material);
 		var stageObject, stageGeometry;
@@ -48,7 +49,7 @@
 
 
 			for(var i=0; i < objects.length; i++) {
-				if(i==0) activeId=data[i].id;
+				//if(i==0) activeId=data[i].id;
 				data[i].lines.dispose();
 				data[i].dots.dispose();
 				data[i].dots = new THREE.Geometry();
@@ -57,11 +58,11 @@
 
 				// Function Line (Horizontal);
 				if(data[i].id === activeId) {
-					activeGeometry.vertices.push( eventAngle.clone().setLength(0) );
+					activeGeometry.vertices.push( eventAngle.clone().setLength(50) );
 					activeGeometry.vertices.push( eventAngle.clone());
 				}
 				else {
-					data[i].lines.vertices.push( eventAngle.clone().setLength(0) );
+					data[i].lines.vertices.push( eventAngle.clone().setLength(50) );
 					data[i].lines.vertices.push( eventAngle.clone());
 				}
 
@@ -152,7 +153,7 @@
 			composerBlur = new THREE.EffectComposer( world.renderer );
 			composerBlur.addPass( new THREE.RenderPass( world.activeScene, world.camera ) );
 			var effectTint = new THREE.ShaderPass( shaders.tint );
-				effectTint.uniforms[ "color" ].value = new THREE.Color(0x76BDE5);
+				effectTint.uniforms[ "color" ].value = new THREE.Color(config.colors.activeGlow);
 			var effectHorizBlur = new THREE.ShaderPass( shaders.horizontalBlur );
 				effectHorizBlur.uniforms[ "h" ].value = 1.5 / window.innerWidth;
 			var effectVertiBlur = new THREE.ShaderPass( shaders.verticalBlur );
@@ -205,7 +206,7 @@
 			world = new (require("./World.js"))($(container));
 
 			//Background
-			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(world.width, world.height, 1,1), new THREE.MeshBasicMaterial({color:new THREE.Color(29,29,38)})));
+			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(world.width, world.height, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background})));
 
 			setupComposer();
 
