@@ -110,8 +110,6 @@
 			var movement;
 			for(var i=0; i < objects.length; i++) {
 
-
-
 				// Set Circle
 				targetPoint = data[i].history[data[i].history.length-1];
 				position = data[i].position;
@@ -134,21 +132,18 @@
 				// curve = new THREE.SplineCurve3(data[i].history);
 				// points = curve.getPoints(100);
 				points=data[i].history;
-				largeStep = Math.ceil(points.length/50);
+				largeStep = Math.ceil(points.length/100);
 						
 				// if(data[i].id === activeId) // aktive linie oder nicht..
-				 for(var v=0, w=points.length; v<w; v+=step) {
-					if(data[i].id === activeId) step = 1;
-					else {
-						step = v>50 ? largeStep : 1;  
-					}
+
+				 for(var v=0, step=1, w=points.length; v<w; v+=step) {
 
 				
-					p1 = v+step >= w ?
+					p1 = v+step>= w ?
 						getScreenPoints(actualPoint):
 						getScreenPoints(points[v]);
 
-					if(v-step < 0)
+					if(v-step <= 1)
 						p2 = getScreenPoints(new THREE.Vector3(0,0,0));
 					else 
 						p2 = getScreenPoints(points[v-step]);
@@ -162,6 +157,15 @@
 						stageGeometry.vertices.push( p1 );
 						stageGeometry.vertices.push( p2 );
 					}
+
+
+					if(data[i].id === activeId) step = 1;
+					else {
+						step = w-v>100 ? largeStep : 1;
+						console.log(step);
+							
+					}
+
 				}
 
 
