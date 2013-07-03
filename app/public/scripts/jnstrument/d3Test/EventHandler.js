@@ -27,5 +27,5 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 	}
-	module.exports = require("./Class.js")(EventListener);
+	module.exports = require("../Class.js")(EventListener);
 })(jQuery, window, document)

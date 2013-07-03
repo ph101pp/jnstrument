@@ -21,7 +21,7 @@
 			this.width = container.innerWidth();
 			this.height = container.innerHeight();			
 			this.renderer = new THREE.WebGLRenderer();
-			this.renderer.setClearColor(new THREE.Color(0,0,0));
+			this.renderer.setClearColor(new THREE.Color(0x000000));
 			// this.renderer.setClearColor(new THREE.Color(29,29,38));
 			this.renderer.setSize(this.width, this.height); 		
 

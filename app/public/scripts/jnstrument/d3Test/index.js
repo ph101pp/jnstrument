@@ -4,8 +4,8 @@
 		
 		var dataStore = {};
 
-		var width = 500,
-		    height = 500;
+		var width = 1000,
+		    height = 700;
 
 		var svg = d3.select("body").append("svg")
 		    .attr("width", width)

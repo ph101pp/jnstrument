@@ -78,7 +78,7 @@
 					// create Large Circle
 					for(var v=1; v< circle.vertices.length; v++) {
 						w = v-1 >= 1 ? v-1 : circle.vertices.length-1;
-						if(data[i].id === activeId) {
+						if(data[i].id === activeId && false) {
 							activeGeometry.vertices.push( circle.vertices[v].clone().setLength(radius) );
 							activeGeometry.vertices.push( circle.vertices[w].clone().setLength(radius) );
 						}
@@ -128,7 +128,7 @@
 			stageGeometry = new THREE.Geometry();
 			stageDotGeometry = new THREE.Geometry();
 			for(var i=0; i < objects.length; i++) 
-				if(data[i].id !== activeId) {
+				if(data[i].id !== activeId || true) {
 					stageGeometry.vertices = stageGeometry.vertices.concat(data[i].lines.vertices);
 					THREE.GeometryUtils.merge(stageDotGeometry, data[i].dots);
 				}
