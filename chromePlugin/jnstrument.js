@@ -2,8 +2,14 @@ new (function jnstrument(){
 /////////////////////////////////////////////////////////////
 	var tabs = {};
 	var debugging = false;
+	var installation = function(tab){
+		for(var i=0; i<tabs.length; i++) 
+			if(tabs[i].id !== tab.id)
+				deactivateTab(tabs[i].id);
+	}
 /////////////////////////////////////////////////////////////
 	chrome.browserAction.onClicked.addListener(function(tab) {
+		installation(tab);
 		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab.id);
 		else activateTab(tab.id);
 	});
@@ -98,6 +104,7 @@ new (function jnstrument(){
 	}
 /////////////////////////////////////////////////////////////
 	var createGuid = function (){
+		return "installation";
 		return 'xxxxxxxx-xxxx-4xxx-yxxx-pxxxxcxxxxxa'.replace(/[xy]/g, function(c) {
 	    	var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
 	    	return v.toString(16);

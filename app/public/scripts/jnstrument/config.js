@@ -1,4 +1,4 @@
 module.exports = {
-	socketAdress : "localhost:8000"
+	socketAdress : "10.194.68.61:8000"
 
 }

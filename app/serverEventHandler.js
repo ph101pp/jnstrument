@@ -20,6 +20,11 @@ module.exports = function(server){
 			type = _type;
 			if(!sockets[guid]) sockets[guid]={};
 			if(!sockets[guid][type]) sockets[guid][type] = {};
+			
+			//For Installation
+			for(var i=0; i<sockets[guid][type].length; i++)
+				socket.disconnect();
+
 			sockets[guid][type][socket.id]=socket;		
 			return true;
 		}

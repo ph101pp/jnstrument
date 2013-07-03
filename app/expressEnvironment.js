@@ -34,61 +34,61 @@ module.exports = function() {
 	//     proxy.url(req, res);
 	// })
 
-	app.get(/\/d3\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/d3\/........-....-4...-....-p....c.....a|\/d3\/installation/, function (req, res) {
 		res.render('d3Visuals', { 
 			title : 'Visual'  
 		});
 	});
 
-	app.get(/\/gH\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/gH\/........-....-4...-....-p....c.....a|\/gH\/installation/, function (req, res) {
 		res.render('guitarHero', { 
 			title : 'Guitar Hero'  
 		});
 	});
 
-	app.get(/\/atom\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/atom\/........-....-4...-....-p....c.....a|\/atom\/installation/, function (req, res) {
 		res.render('atom', { 
 			title : 'atom'  
 		});
 	});
 
-	app.get(/\/base\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/base\/........-....-4...-....-p....c.....a|\/base\/installation/, function (req, res) {
 		res.render('base', { 
 			title : 'Base'  
 		});
 	});
 
-	app.get(/\/curtain\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/curtain\/........-....-4...-....-p....c.....a|\/curtain\/installation/, function (req, res) {
 		res.render('curtain', { 
 			title : 'curtain'  
 		});
 	});
 
-	app.get(/\/drop\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/drop\/........-....-4...-....-p....c.....a|\/drop\/installation/, function (req, res) {
 		res.render('drop', { 
 			title : 'drop'  
 		});
 	});
 
-	app.get(/\/radar\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/radar\/........-....-4...-....-p....c.....a|\/radar\/installation/, function (req, res) {
 		res.render('radar', { 
 			title : 'Radar'  
 		});
 	});
 
-	app.get(/\/lifeline\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/lifeline\/........-....-4...-....-p....c.....a|\/lifeline\/installation/, function (req, res) {
 		res.render('lifeline', { 
 			title : 'Lifeline'  
 		});
 	});
 	
-	app.get(/\/proto\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/proto\/........-....-4...-....-p....c.....a|\/proto\/installation/, function (req, res) {
 		res.render('proto', { 
 			title : 'prototypes'  
 		});
 	});
 
-	app.get(/\/test\/........-....-4...-....-p....c.....a/, function (req, res) {
+	app.get(/\/test\/........-....-4...-....-p....c.....a|\/test\/installation/, function (req, res) {
 		res.render('test', { 
 			title : 'test'  
 		});
