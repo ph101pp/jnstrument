@@ -46,12 +46,13 @@
 			var quadrantBounds = {
 				x1 : screenCoords.x,
 				y1 : screenCoords.y,
-				x2 : screenCoords.x+map.gridSize-1, // make shure to not go into next quadrant if its the same size
+				x2 : screenCoords.x+map.gridSize-1, // -1 to make shure to not go into next quadrant if its the same size
 				y2 : screenCoords.y-map.gridSize+1
 			}
 
 			for(gridSize in maps) 
 				testMapArea(element, gridSize, quadrantBounds, bulk);
+			testBounds(element);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.testElements = function (){
@@ -69,7 +70,7 @@
 			var objects = elements.getAllObjects();
 		//	console.log("remap", objects.length);
 			for(var i=0; i<objects.length; i++) {
-				objects[i].remap();
+				objects[i].preReMap();
 				addToMap(objects[i]);
 			}
 
@@ -79,6 +80,19 @@
 			element = elements.get(element);
 			var index = maps[element.data.gridSize][element.data.i].indexOf(element.object);
 			maps[element.data.gridSize][element.data.i].splice(index, 1);
+		}
+///////////////////////////////////////////////////////////////////////////////
+		var testBounds = function(element){
+			var x= (Math.abs(element.position.x) > world.width/2-element.actionRadius);
+			var y= (Math.abs(element.position.y) > world.height/2-element.actionRadius);
+
+			if(x||y) 
+				element.hitBounds(
+					(y && element.position.y > 0), // top 
+					(x && element.position.x > 0), // right
+					(y && element.position.y < 0), // bottom
+					(x && element.position.x < 0)  // left
+				);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var testMapArea = function(element, gridSize, areaBounds, bulk){

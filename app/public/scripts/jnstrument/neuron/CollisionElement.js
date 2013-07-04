@@ -8,7 +8,8 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.collision = Function; // (object, hits, collisionDetection)
-		this.hitBounds = function(){};
+		this.hitBounds = function(top, right, bottom, left){};
+		this.preReMap = function(){};
 		this.preCollisionDetection = function(){};
 		this.postCollisionDetection = function(){};
 	}
