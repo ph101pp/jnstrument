@@ -23,7 +23,7 @@
 
 		var baseElementCircle = new THREE.Mesh(new THREE.CircleGeometry(1,8));
 
-
+		var showDebugStuff=false;
 
 		var functionCollisionDetection;
 		var groupCollisionDetection;
@@ -33,6 +33,7 @@
 		var clicked = function(data, answer, now){
 			console.log(elementGroups.getAll());
 			console.log(elementData.getAll());
+			showDebugStuff=!showDebugStuff;
 
 		}
 
@@ -56,11 +57,13 @@
 			element.data.id = data.id;
 
 			// get group
-			if(element.object.group && caller.object.group && element.object.group !== caller.object.group) {
-				var group = elementGroups.get( element.object.group.merge( caller.object.group ) );
+			if(element.object.group && caller.object.group && element.object.group.id !== caller.object.group.id) {
 				elementGroups.remove(caller.object.group);
+				groupCollisionDetection.removeElement(caller.object.group);
+				var group = elementGroups.get( element.object.group.merge( caller.object.group ) );
 			}
 			else var group = elementGroups.get(element.object.group) || elementGroups.get(caller.object.group) || {object:new (require("./GroupElement"))(data.id+"_"+data.data.calledById), data:{id:data.id+"_"+data.data.calledById}};
+			groupCollisionDetection.addElement(group.object);
 
 			// if there is a caller
 			if(caller.data !== false) {
@@ -78,6 +81,9 @@
 
 				caller.object.outboundCounts.total++;
 				caller.object.events.unshift(now);
+
+				functionCollisionDetection.addElement(caller.object);
+
 				elementData.store(caller.object, caller.data);
 			}
 
@@ -86,6 +92,7 @@
 			element.object.group = group.object;
 			element.object.inboundCounts.total++;
 			element.object.events.unshift(now);
+			functionCollisionDetection.addElement(element.object);
 
 			elementGroups.store(group.object, group.data);
 			elementData.store(element.object, element.data);
@@ -97,11 +104,9 @@
 			var functionElements = elementData.getAllObjects();
 
 			// Update collision detections
-			functionCollisionDetection.clearElements();
-			groupCollisionDetection.clearElements();
+			functionCollisionDetection.reMap();
+			groupCollisionDetection.reMap();
 
-			functionCollisionDetection.addElements(functionElements);
-			groupCollisionDetection.addElements(groupElements);
 
 			// Collide
 			functionCollisionDetection.testElements();
@@ -110,7 +115,7 @@
  			// Update Group positions
  			for(var i=0; i<groupElements.length; i++) {
  				groupElements[i].updatePosition();
- 				groupElements[i].upateActionRadius();
+ 				groupElements[i].updateActionRadius();
  			}
 			// Update functionElement Positions
  			for(var i=0; i<functionElements.length; i++) 
@@ -157,8 +162,9 @@
 
 			// Show group elements temp
 
+			if(showDebugStuff){
+
 			var groupElements = elementGroups.getAllObjects();
-			console.log(groupElements.length)
 			for(var i=0; i < groupElements.length; i++) {
 				
 				baseElementCircle.position = groupElements[i].position;
@@ -170,7 +176,7 @@
 				activeGeometry.vertices.push(groupElements[i].boundingBox.max);
 
 			}
-
+		}
 			updateScenes();
  		}
 

@@ -5,6 +5,7 @@
 		var objects = [];
 		var objectIndexes = [];
 		var objectData = [];
+		this.length=0;
 ///////////////////////////////////////////////////////////////////////////////
 		this.store = function(object, data){
 			if(typeof object !== "object" && typeof object !== "function") 
@@ -29,6 +30,7 @@
 				objectData[index] = data;
 				objectIndexes[index] = id;
 			}
+			this.length = this.size();
 			return {
 				object : objects[index],
 				data : objectData[index] || empty
@@ -48,6 +50,7 @@
 			objects.splice(index, 1);
 			objectData.splice(index, 1);
 			objectIndexes.splice(index, 1);
+			this.length = this.size();
 
 			return object;
 		}
@@ -56,6 +59,7 @@
 			objects = [];
 			objectIndexes = [];
 			objectData = [];
+			this.length = this.size();
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.get = function(query){

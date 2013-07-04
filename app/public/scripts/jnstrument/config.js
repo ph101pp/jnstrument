@@ -8,6 +8,25 @@ module.exports = {
 		activeDots : 0xFF0000,
 		activeLines : 0xFFFFFF,
 		activeGlow : 0x76BDE5
+	},
+
+
+	neuron : {
+		fE : {
+			pairDistance : 30,
+			actionRadius : 60,
+			maxPushForce : 5,
+			minPushForce : 0,
+			maxPullForce : 100,
+			minPullForce : 0,
+
+			maxAcceleration : 1.4
+		},
+		gE : {
+			maxPushForce : 50,
+			minPushForce : 20
+		},
+		boundForce : 80
 	}
 
 }
