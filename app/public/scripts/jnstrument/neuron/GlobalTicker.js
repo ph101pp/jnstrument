@@ -25,11 +25,15 @@
 			this.emitEvent(undefined, undefined, "calculate");
 			this.emitEvent(undefined, undefined, "update");
 			this.emitEvent(undefined, undefined, "render");
-			//showFrameRate(now);
+			showFrameRate(now);
 		}).bind(this);
 ///////////////////////////////////////////////////////////////////////////////
 		$(window).resize(function(e){
 			this.emitEvent(e, undefined, "resize");
+		}.bind(this));
+///////////////////////////////////////////////////////////////////////////////
+		$(window).click(function(e){
+			this.emitEvent(e, undefined, "click");
 		}.bind(this));
 ///////////////////////////////////////////////////////////////////////////////
 	}

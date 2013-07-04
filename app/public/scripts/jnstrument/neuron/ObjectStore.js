@@ -23,7 +23,7 @@
 				}
 			}
 			else {
-				console.log("ObjectStore", "newElement");
+				//console.log("ObjectStore", "newElement");
 				index = objects.length;
 				objects[index] = object;
 				objectData[index] = data;

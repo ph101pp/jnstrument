@@ -1,68 +1,38 @@
-(function($, THREE, window, document, undefined) {
-
-	var MeshObject = require("../Class.js").extend(THREE.Mesh).extend(require("./CollisionElement.js"));
-
+(function($, THREE, window, document, undefined) {	
 	var FunctionElement = function(){
-
 ///////////////////////////////////////////////////////////////////////////////
-		var world;
+		this.id = null;
+		this.group = null;
+		this.active = false;
 
-		var inboundColor = new THREE.Color("#FF3333");
-		var inboundHighlightColor = new THREE.Color("#FFAAAA");
-		var outboundColor =  new THREE.Color("#3333FF");
-		var outboundHighlightColor = new THREE.Color("#AAAAFF");
+		this.inboundElements = new (require("./ObjectStore"));
+		this.outboundElements = new (require("./ObjectStore"));
 
-		var add = new THREE.Vector3(10,10,10);
-		var scale = 0.3;
+		this.inboundCounts = {total:0};
+		this.outboundCounts = {total:0};
 
-		var face;
+		this.events = [];
 
-
-///////////////////////////////////////////////////////////////////////////////
-		this.inboundElements;
-		this.outboundElements;
-
-		this.uniforms = {
+		this.shaderAttributes = {
 			lerpAlpha : { type:"f", value:0.5 },
 			radius : { type:"f", value:1 },			
 			outbound : { type:"f", value:0 },
 			inbound : { type:"f", value:0 }
 		};
 
-		this.inboundCount = 0;
-		this.outboundCount = 0;
-
 		this.velocity = new THREE.Vector3(0,0,0);
+		this.actionRadius = 20;
 
 ///////////////////////////////////////////////////////////////////////////////
-		this.construct = function(geometry, material){
-			this.inboundElements = new (require("./ObjectStore"));
-			this.outboundElements = new (require("./ObjectStore"));		
-			var materialOptions = {
-				transparent : true,
-				opacity : 0.7,
-				color: inboundColor,
-				visible:true
-			}
-			geometry = geometry || new THREE.SphereGeometry( 1, 16, 16 );
-			// material =  material || new THREE.MeshBasicMaterial(materialOptions);
-			material =  material || new THREE.ShaderMaterial({ uniforms:this.uniforms, vertexShader:AEROTWIST.Shaders.test.vertex, fragmentShader:AEROTWIST.Shaders.test.fragment});
-			face = new THREE.Mesh(geometry, material);
-
-			this.add(face);
-
-			this.actionRadius=1;
-			
-			this.update();
-
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.worldReference= function(_world){
-			world = _world;
+		this.construct = function(_id){
+			this.id=_id;
+			var randomArea = 100;
+			this.position.add(new THREE.Vector3(Math.random()*randomArea*2-randomArea,Math.random()*randomArea*2-randomArea,0));
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.collision = function(object, hits, collisionDetection) {
 			//if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
+
 			var force = this.position.clone().sub(object.position);
 			var length = force.length();
 			var maxSpeed = 20;
@@ -70,82 +40,33 @@
 			force.setLength(THREE.Math.clamp(THREE.Math.mapLinear(length, 0, this.actionRadius, maxSpeed, minSpeed),minSpeed,maxSpeed));
 			this.velocity.add(force);
 		}
-///////////////////////////////////////////////////////////////////////////////
-		this.updateColors = function(){
-			if(this.uniforms.lerpAlpha.value > 0.01) this.uniforms.lerpAlpha.value*=0.85;
-			else this.uniforms.lerpAlpha.value = 0;
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.updateOutBoundConnections = function() {
-			var storedElements = this.outboundElements.getAll();
-			var elements = storedElements.objects;
-			for(var i = 0; i<elements.length; i++) {
-				var distanceVector = elements[i].position.clone().sub(this.position);
-				// distanceVector.z=0;
-				// var targetDistance = this.actionRadius +elements[i].actionRadius+10;
-				// var target = distanceVector.clone().setLength(targetDistance);
-				// var force = target.clone().add(this.position).sub(elements[i].position);
-				// var length=force.length();
-				// var maxSpeed = 20;
-				// var minSpeed = 0;
-				// force.setLength(THREE.Math.clamp( length/(2*this.actionRadius) ,minSpeed,maxSpeed));
-				// elements[i].velocity.add(force);
 
-				storedElements.data[i].connection.geometry.vertices[1] = distanceVector;
-				storedElements.data[i].connection.geometry.verticesNeedUpdate = true;
-			}
-		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.updateRadius = function(){
-			var count = Math.max(this.inboundCount, this.outboundCount);			
-			var countScale = 0.3;
-			var boundingRadius =count*countScale+10;
-			face.scale.set(boundingRadius, boundingRadius, boundingRadius);
-			this.actionRadius = boundingRadius+40;
-			this.uniforms.radius.value = boundingRadius;
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.update = function(){
-			this.updateRadius();
-			this.updateOutBoundConnections();
-			this.updateColors();
+		this.updatePosition = function(){
+			// Gravity
+			// var gravity = this.position.clone().negate().multiplyScalar(0.01);
+			// this.velocity.add(gravity);
 
-		
-			var gravity = this.position.clone().negate().multiplyScalar(0.001);
-			this.position.add(gravity);
+			// Group Velocity
+			// this.group.velocity.multiplyScalar(0.9);
+			// this.velocity.add(this.group.velocity);
 
+			// Move towards Group center 
+			var force = this.group.position.clone().sub(this.position);
+
+			if(force.length() > this.group.actionRadius)
+				this.velocity.add(force.multiplyScalar(0.1));
+
+			// Object Velocity
 			this.velocity.multiplyScalar(0.1);
 			this.position.add(this.velocity);
+
+
+			// Make it 2D
 			this.position.z = 0;
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.inboundEvent = function(FunctionElement){
-			this.inboundCount++;
-			var element = this.inboundElements.store(FunctionElement);
-			element.data.count = element.data.count+1 || 1;
-			this.inboundElements.store(element.object, element.data);
-			this.uniforms.lerpAlpha.value = 1;
-			this.uniforms.inbound.value++;
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.outboundEvent = function(FunctionElement){
-			this.outboundCount++;
-			var element=this.outboundElements.store(FunctionElement);
-			element.data.count = element.data.count+1 || 1;
-			if(typeof element.data.connection !== "object"){
-				var material = new THREE.LineBasicMaterial({
-					color: 0x0000ff
-				});
-				var geometry = new THREE.Geometry();
-				geometry.vertices.push(new THREE.Vector3(0,0,0));
-				geometry.vertices.push(element.object.position.clone().sub(this.position));
-				element.data.connection = new THREE.Line(geometry, material);
-				this.add(element.data.connection);
-			}
-			this.outboundElements.store(element.object, element.data);
-			this.uniforms.outbound.value++;
-		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("../Class.js").extend(THREE.Object3D).extend(require("./CollisionElement.js")).extend(FunctionElement);
+	module.exports = require("../Class.js").extend(require("./CollisionElement.js")).extend(FunctionElement);
 })(jQuery, THREE, window, document)
