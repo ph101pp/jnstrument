@@ -21,9 +21,9 @@
 		var activeObject, activeGeometry;
 		var activeDotObject, activeDotGeometry;
 
-		var baseElementCircle = new THREE.Mesh(new THREE.CircleGeometry(1,8));
+		var baseElementCircle = new THREE.Mesh(new THREE.CircleGeometry(1,16));
 
-		var showDebugStuff=false;
+		var showDebugStuff=true;
 
 		var functionCollisionDetection;
 		var groupCollisionDetection;
@@ -33,6 +33,9 @@
 		var clicked = function(data, answer, now){
 			console.log(elementGroups.getAll());
 			console.log(elementData.getAll());
+			console.log(groupCollisionDetection.getElements());
+
+
 			showDebugStuff=!showDebugStuff;
 
 		}
@@ -47,22 +50,24 @@
 				senderId = data.sender.id;
 			}
 
-			// get caller
-			var caller = data.data.calledById !== false ?
-				elementData.get(data.data.calledById) || {object:new (require("./FunctionElement"))(data.data.calledById), data:{}}:
+			// get caller and element
+			var caller = data.data.calledById !== false ? 
+				elementData.get(data.data.calledById):
 				{object:{}, data:false};
+			var element = elementData.get(data.id);
 
-			// get element
-			var element = elementData.get(data.id) || {object:new (require("./FunctionElement"))(data.id), data:{}};
-			element.data.id = data.id;
+			if(element === false) element= {object:new (require("./FunctionElement"))(data.id, caller ? caller.object.position:undefined, world), data:{}};
+			if(caller === false) caller=  {object:new (require("./FunctionElement"))(data.data.calledById, element.object.position, world), data:{}};
 
 			// get group
 			if(element.object.group && caller.object.group && element.object.group.id !== caller.object.group.id) {
+				debugger;
 				elementGroups.remove(caller.object.group);
 				groupCollisionDetection.removeElement(caller.object.group);
 				var group = elementGroups.get( element.object.group.merge( caller.object.group ) );
 			}
-			else var group = elementGroups.get(element.object.group) || elementGroups.get(caller.object.group) || {object:new (require("./GroupElement"))(data.id+"_"+data.data.calledById), data:{id:data.id+"_"+data.data.calledById}};
+			else var group = elementGroups.get(element.object.group) || elementGroups.get(caller.object.group) || {object:new (require("./GroupElement"))(data.id+"_"+data.data.calledById, element.object.position, world), data:{id:data.id+"_"+data.data.calledById}};
+			
 			groupCollisionDetection.addElement(group.object);
 
 			// if there is a caller
@@ -80,7 +85,7 @@
 					caller.object.outboundCounts[element.object.id]+1 : 1;
 
 				caller.object.outboundCounts.total++;
-				caller.object.events.unshift(now);
+				//caller.object.events.unshift(now);
 
 				functionCollisionDetection.addElement(caller.object);
 
@@ -89,9 +94,11 @@
 
 			group.object.elements.store(element.object);
 
+			element.data.id = data.id;
 			element.object.group = group.object;
 			element.object.inboundCounts.total++;
 			element.object.events.unshift(now);
+			element.object.updateRadius();
 			functionCollisionDetection.addElement(element.object);
 
 			elementGroups.store(group.object, group.data);
@@ -119,7 +126,7 @@
  			}
 			// Update functionElement Positions
  			for(var i=0; i<functionElements.length; i++) 
- 				functionElements[i].updatePosition();
+ 				functionElements[i].update(now);
  		}
 ///////////////////////////////////////////////////////////////////////////////
  		var updateElements = function(data, answer, now){
@@ -135,21 +142,11 @@
 			activeDotGeometry = new THREE.Geometry();
 
 			// Update Data
-			for(var i=0; i < objects.length; i++) {
-				//if(i==0) activeId=data[i].id;
-				// eventsOverTime=0;
-				// //Count events over Time
-				// for(var k=0; k < objects[i].length; k++) {
-				// 	// Remove old events
-				// 	if(objects[i][k] < now-msOnScreen) {
-				// 		objects[i].splice(k, objects[i].length-k);
-				// 		continue;
-				// 	}
-				// 	eventsOverTime++;
-				// }			
+			for(var i=0; i < objects.length; i++) {		
 
+				// stageDotGeometry.vertices.push(objects[i].position);
 				baseElementCircle.position = objects[i].position;
-				baseElementCircle.scale.set(3,3,3);
+				baseElementCircle.scale.set(objects[i].radius,objects[i].radius,objects[i].radius);
 				THREE.GeometryUtils.merge(stageDotGeometry, baseElementCircle);
 
 				outboundElements = objects[i].outboundElements.getAllObjects(); 
@@ -164,19 +161,21 @@
 
 			if(showDebugStuff){
 
-			var groupElements = elementGroups.getAllObjects();
-			for(var i=0; i < groupElements.length; i++) {
-				
-				baseElementCircle.position = groupElements[i].position;
-				baseElementCircle.scale.set(groupElements[i].actionRadius,groupElements[i].actionRadius,groupElements[i].actionRadius);
-				THREE.GeometryUtils.merge(activeDotGeometry, baseElementCircle);
+				var groupElements = elementGroups.getAllObjects();
+				for(var i=0; i < groupElements.length; i++) {
+					
+					baseElementCircle.position = groupElements[i].position;
+					baseElementCircle.scale.set(groupElements[i].actionRadius,groupElements[i].actionRadius,groupElements[i].actionRadius);
+					THREE.GeometryUtils.merge(activeDotGeometry, baseElementCircle);
 
 
-				activeGeometry.vertices.push(groupElements[i].boundingBox.min);
-				activeGeometry.vertices.push(groupElements[i].boundingBox.max);
+					activeGeometry.vertices.push(groupElements[i].boundingBox.min);
+					activeGeometry.vertices.push(groupElements[i].boundingBox.max);
+
+				}
 
 			}
-		}
+			groupCollisionDetection.drawGrids(world, showDebugStuff);
 			updateScenes();
  		}
 
@@ -264,6 +263,11 @@
 			world = new (require("./World.js"))($(container));
 			functionCollisionDetection = new (require("./BSPCollisionDetection"))(world);
 			groupCollisionDetection = new (require("./BSPCollisionDetection"))(world);
+
+			//mouseelement
+			var mouse = new (require("./MouseElement.js"))(world);
+			groupCollisionDetection.addElement(mouse);
+			globalTick.addListener(mouse.update, { bind: mouse, eventName :"update"});
 
 			//Background
 			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(world.width, world.height, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background})));

@@ -2,11 +2,16 @@
 	var BSPCollisionDetection = function(){
 		var elements = new (require("./ObjectStore"));
 		var maxGridSize = 500;
+		var minGridSize = 20;
+		var divident = 1.5;
 		var maps = {};
 		var world;
 		var width;
 		var height;
 		var that;
+		var gridDrawing;
+		var drawingLineMaterial = new THREE.LineBasicMaterial({ color:0x00FF00, linewidth:1, transparent:true, opacity:0.2});
+
 
 ///////////////////////////////////////////////////////////////////////////////
 		this.construct = function(_world, _elements){
@@ -27,7 +32,7 @@
 			if(!element.instanceof || !element.instanceof(require("./CollisionElement.js")))
 				throw("Only instances of CollisionElement can be added to CollisionDetection.");			
 			elements.store(element);
-			addToMap(element);
+//			addToMap(element);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.removeElement = function(element){
@@ -41,17 +46,8 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.testElement = function(element, bulk){
-			var map = placeOnMap(element);
-			var screenCoords = index2ScreenCoords(map.gridSize, map.i);
-			var quadrantBounds = {
-				x1 : screenCoords.x,
-				y1 : screenCoords.y,
-				x2 : screenCoords.x+map.gridSize-1, // -1 to make shure to not go into next quadrant if its the same size
-				y2 : screenCoords.y-map.gridSize+1
-			}
-
 			for(gridSize in maps) 
-				testMapArea(element, gridSize, quadrantBounds, bulk);
+				testMap(element, gridSize, bulk);
 			testBounds(element);
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,11 +60,15 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.reMap= function(){
-			width = world.width;
-			height = world.height;
+			width = height = 0;
 			maps = {};
 			var objects = elements.getAllObjects();
 		//	console.log("remap", objects.length);
+
+			for(var i=0; i<objects.length; i++) {
+				width = Math.max(Math.abs(objects[i].position.x)*2, width);
+				height = Math.max(Math.abs(objects[i].position.y)*2, height);				
+			}
 			for(var i=0; i<objects.length; i++) {
 				objects[i].preReMap();
 				addToMap(objects[i]);
@@ -76,15 +76,48 @@
 
 		}	
 ///////////////////////////////////////////////////////////////////////////////
+		this.getElements = function(){
+			return elements.getAll();
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.drawGrids = function(world, showDebugStuff){
+			var y;
+			if(gridDrawing){
+				world.scene.remove(gridDrawing);								
+				gridDrawing.geometry.dispose();
+			}
+			if(!showDebugStuff) return;
+
+			var geometry = new THREE.Geometry();
+			for(var gridSize in maps) {
+
+				for(var i=0; i*gridSize < width; i++){
+					geometry.vertices.push(new THREE.Vector3(i*gridSize-width/2,height/2,0));
+					geometry.vertices.push(new THREE.Vector3(i*gridSize-width/2,-height/2,0));
+
+				}
+				for(var i=0; i*gridSize < height; i++){
+					y = i*gridSize > height/2 ? 
+						-(i*gridSize-height/2):
+						height/2-i*gridSize;					
+					geometry.vertices.push(new THREE.Vector3(width/2,y,0));
+					geometry.vertices.push(new THREE.Vector3(-width/2,y,0));
+				}	
+			}
+			gridDrawing = new THREE.Line(geometry, drawingLineMaterial, THREE.LinePieces);
+			world.scene.add(gridDrawing);
+		}
+///////////////////////////////////////////////////////////////////////////////
 		var removeFromMap = function(element){
 			element = elements.get(element);
+			if(!element.data.gridSize) return;
 			var index = maps[element.data.gridSize][element.data.i].indexOf(element.object);
 			maps[element.data.gridSize][element.data.i].splice(index, 1);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var testBounds = function(element){
-			var x= (Math.abs(element.position.x) > world.width/2-element.actionRadius);
-			var y= (Math.abs(element.position.y) > world.height/2-element.actionRadius);
+			var x= (Math.abs(element.position.x) > width/2-element.actionRadius);
+			var y= (Math.abs(element.position.y) > height/2-element.actionRadius);
 
 			if(x||y) 
 				element.hitBounds(
@@ -95,7 +128,13 @@
 				);
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		var testMapArea = function(element, gridSize, areaBounds, bulk){
+		var testMap = function(element, gridSize, bulk){
+			var areaBounds = {
+				x1 : element.position.x-element.actionRadius,
+				y1 : element.position.y+element.actionRadius,
+				x2 : element.position.x+element.actionRadius,
+				y2 : element.position.y-element.actionRadius
+			}
 			var topIndex = screenCoords2Index(gridSize, areaBounds.x1, areaBounds.y1);
 			var botIndex = screenCoords2Index(gridSize, areaBounds.x2, areaBounds.y2);
 			var topCoords = index2QuadrantCoords(gridSize, topIndex);
@@ -132,10 +171,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 		var placeOnMap= function(element){
 			// element.geometry.computeBoundingSphere();
-			// var minGridSize = element.geometry.boundingSphere.radius *2;
-			var minGridSize = element.actionRadius*2;
-			for(var i= 0; minGridSize < Math.floor(maxGridSize/Math.pow(2, i)); i++);	
-			var gridSize = Math.floor(maxGridSize/Math.pow(2, i));
+			// var elementSize = element.geometry.boundingSphere.radius *2;
+			var elementSize = Math.max(element.actionRadius*2, minGridSize);
+			for(var i= 0; elementSize < Math.floor(elementSize/Math.pow(divident, i)); i++);	
+			var gridSize = Math.floor(elementSize/Math.pow(divident, i-1));
 			return {
 				gridSize : gridSize,
 				i : screenCoords2Index(gridSize, element.position.x, element.position.y)
@@ -157,7 +196,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 		var screenCoords2Index = function(gridSize, x,y){
 			x+=width/2;
-			y=y < 0 ? height/2+Math.abs(y) : height/2 - y;
+			y= height/2 - y;
 
 			var coordX = Math.floor(x/gridSize);			
 			var coordY = Math.floor(y/gridSize);
@@ -173,7 +212,7 @@
 
 			return {	
 				x : x-width/2,
-				y : y < height/2 ? height/2 - y : 0 - (y - height/2)
+				y : y < height/2 ? height/2 - y : - (y - height/2)
 			}
 		}	
 	}

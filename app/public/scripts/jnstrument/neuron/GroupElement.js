@@ -16,12 +16,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 			var maxSpeed = 20;
 			var minSpeed = 0;
+			var world;
 ///////////////////////////////////////////////////////////////////////////////
 
-		this.construct = function(_id){
+		this.construct = function(_id, _position, _world){
 			this.id=_id;
-			var randomArea = 100;
-			this.position.add(new THREE.Vector3(Math.random()*randomArea*2-randomArea,Math.random()*randomArea*2-randomArea,0));
+			world=_world;
+			var randomAreaX = 200; //world.width/2;
+			var randomAreaY = 200; //world.height/2;
+			if(_position) this.position = _position.clone().add(new THREE.Vector3(Math.random(),Math.random(),0));
+			else this.position.add(new THREE.Vector3(Math.random()*randomAreaX*2-randomAreaX,Math.random()*randomAreaY*2-randomAreaY,0));
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.collision = function(object, hits, collisionDetection) {
@@ -31,7 +35,9 @@
 
 			if(length > actionRadius) return;
 
-			force.setLength(mapEase( length, 0, actionRadius, config.neuron.gE.maxPushForce, config.neuron.gE.minPushForce, "easeNot"));
+			force.setLength(mapEase( length, 0, actionRadius, config.neuron.gE.maxPushForce, config.neuron.gE.minPushForce, "easeInQuad"));
+
+			force.multiplyScalar(0.5*(object.actionRadius/this.actionRadius+0.1));
 
 			//force.multiplyScalar(0.5);
 
@@ -39,18 +45,25 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.hitBounds = function(top, right, bottom, left){
-			if(top) this.velocity.add(new THREE.Vector3(0,-config.neuron.boundForce,0));
-			if(right) this.velocity.add(new THREE.Vector3(-config.neuron.boundForce,0,0));
-			if(bottom) this.velocity.add(new THREE.Vector3(0,config.neuron.boundForce,0));
-			if(left) this.velocity.add(new THREE.Vector3(config.neuron.boundForce,0,0));
+			return
+			if(top) this.velocity.add((new THREE.Vector3(0,-1,0)).multiplyScalar(config.neuron.boundForce));
+			if(right) this.velocity.add((new THREE.Vector3(-1,0,0)).multiplyScalar(config.neuron.boundForce));
+			if(bottom) this.velocity.add((new THREE.Vector3(0,1,0)).multiplyScalar(config.neuron.boundForce));
+			if(left) this.velocity.add((new THREE.Vector3(1,0,0)).multiplyScalar(config.neuron.boundForce));
+
+
+			// if(top) this.position.y = world.height/2-this.actionRadius;
+			// if(right) this.position.x = world.width/2-this.actionRadius;
+			// if(bottom) this.position.y = -world.height/2+this.actionRadius;
+			// if(left) this.position.x = -world.width/2+this.actionRadius;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updatePosition = function(){
 			// Gravity
-			var gravity = this.position.clone().negate().multiplyScalar(0.001);
-		//	this.velocity.add(gravity);
+			var gravity = this.position.clone().negate().multiplyScalar(this.actionRadius/1000);
+			this.velocity.add(gravity);
 
-			this.velocity.multiplyScalar(0.3);
+			this.velocity.multiplyScalar(0.6);
 			this.position.add(this.velocity);
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,7 +85,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateActionRadius = function(){
 			this.calculateBoundingbox();
-			this.actionRadius = this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5).length()+config.neuron.fE.actionRadius+10;
+			var elements = this.elements.getAllObjects();
+			var radius=0;
+			for(var k=0; k<elements.length; k++) {
+				radius= Math.max(elements[k].position.clone().sub(this.position).length(), radius);
+			}
+			this.actionRadius=Math.min(radius, this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5).length())+20;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.calculatePosition = function(){

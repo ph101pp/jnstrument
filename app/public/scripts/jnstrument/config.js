@@ -13,20 +13,26 @@ module.exports = {
 
 	neuron : {
 		fE : {
-			pairDistance : 30,
-			actionRadius : 60,
-			maxPushForce : 5,
+			maxPushForce : 30,
 			minPushForce : 0,
-			maxPullForce : 100,
+			maxPullForce : 70,
 			minPullForce : 0,
+			maxAcceleration : 1.4,
 
-			maxAcceleration : 1.4
+			pairDistance : 5,
+			elementPadding : 30,
+			elementMargin : 40,
+			minRadius: 3,
+			maxRadius: 60
+
+
 		},
 		gE : {
-			maxPushForce : 50,
-			minPushForce : 20
+			maxPushForce : 40,
+			minPushForce : 0
 		},
-		boundForce : 80
+		boundForce : 60,
+		msOnScreen : 1000
 	}
 
 }
