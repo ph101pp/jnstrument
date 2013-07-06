@@ -82,6 +82,19 @@ module.exports = function(server){
 			})
 		});
 ///////////////////////////////////////////////////////////////
+		socket.on('__pca__ActiveElement', function (data, answer) {	
+			if(sockets[guid] && sockets[guid].receiver)
+				for(var id in sockets[guid].receiver) 
+					if(sockets[guid].receiver[id] !== socket) 
+					{
+					sockets[guid].receiver[id].emit("__pca__ActiveElement", data);
+				}
+			// if(!sent) answer({
+			// 	status : 404,
+			// 	message : "No receiver listening" 
+			// })
+		});
+///////////////////////////////////////////////////////////////
 	});
 ///////////////////////////////////////////////////////////////////////////////
 }

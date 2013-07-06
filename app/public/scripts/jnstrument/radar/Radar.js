@@ -49,7 +49,6 @@
 
 
 			for(var i=0; i < objects.length; i++) {
-				//if(i==0) activeId=data[i].id;
 				data[i].lines.dispose();
 				data[i].dots.dispose();
 				data[i].dots = new THREE.Geometry();
@@ -213,6 +212,12 @@
 			loop.addListener(globalTick.tick, { bind:globalTick });
 
 			socket.addListener(socketJSEvent, {bind : this, eventName:"jsEvent"});
+			
+
+			socket.addListener(function(data){
+				activeId = data.id;
+			}, {bind : this, eventName:"activeElement"});
+
 			
 			globalTick.addListener(world.onWindowResize, { bind:world, eventName :"resize" });
 

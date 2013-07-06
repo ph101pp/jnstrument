@@ -134,8 +134,6 @@
 				points=data[i].history;
 				largeStep = Math.ceil(points.length/100);
 						
-				// if(data[i].id === activeId) // aktive linie oder nicht..
-
 				 for(var v=0, step=1, w=points.length; v<w; v+=step) {
 
 				
@@ -272,7 +270,11 @@
 			loop.addListener(globalTick.tick, { bind:globalTick });
 			
 			socket.addListener(socketJSEvent, {bind : this, eventName:"jsEvent"});
-			
+		
+			socket.addListener(function(data){
+				activeId = data.id;
+			}, {bind : this, eventName:"activeElement"});
+		
 			globalTick.addListener(world.onWindowResize, { bind:world, eventName :"resize" });
 //			globalTick.addListener(setupComposer, { bind:this, eventName :"resize" });
 			globalTick.addListener(calculateElements, { bind: this, eventName :"calculate"});

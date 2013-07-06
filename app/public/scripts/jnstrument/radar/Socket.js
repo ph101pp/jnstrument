@@ -7,6 +7,10 @@
 
 			var receiveData = function(data, answer){
 				this.emitEvent(data, answer, "jsEvent");
+			}.bind(this);			
+
+			var receiveActive = function(data, answer){
+				this.emitEvent(data, answer, "activeElement");
 			}.bind(this);
 ///////////////////////////////////////////////////////////////////////////////
 			connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.match(/.*\/(.*)/)[1]}, function(data){
@@ -15,7 +19,13 @@
 			});
 ///////////////////////////////////////////////////////////////////////////////
 			connection.on("__pca__Event", receiveData);
+			connection.on("__pca__ActiveElement", receiveActive);
 			this.activate();
+
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.sendData = function(data, answer) {
+			connection.emit("__pca__ActiveElement",data, answer);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 	}
