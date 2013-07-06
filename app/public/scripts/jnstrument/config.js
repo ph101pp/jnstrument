@@ -21,7 +21,7 @@ module.exports = {
 
 			pairDistance : 5,
 			elementPadding : 30,
-			elementMargin : 40,
+			elementMargin : 30,
 			minRadius: 3,
 			maxRadius: 60
 

@@ -47,6 +47,8 @@
 			if(data.sender.id !== senderId) {
 				elementGroups.removeAll();
 				elementData.removeAll();
+				groupCollisionDetection.clearElements();
+				functionCollisionDetection.clearElements();
 				senderId = data.sender.id;
 			}
 
@@ -61,7 +63,6 @@
 
 			// get group
 			if(element.object.group && caller.object.group && element.object.group.id !== caller.object.group.id) {
-				debugger;
 				elementGroups.remove(caller.object.group);
 				groupCollisionDetection.removeElement(caller.object.group);
 				var group = elementGroups.get( element.object.group.merge( caller.object.group ) );
@@ -270,7 +271,7 @@
 			globalTick.addListener(mouse.update, { bind: mouse, eventName :"update"});
 
 			//Background
-			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(world.width, world.height, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background})));
+			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(999999, 999999, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background})));
 			setupComposer();
 
 			loop.addListener(globalTick.tick, { bind:globalTick });
