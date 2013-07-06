@@ -4,14 +4,26 @@
 		var globalTick, world, loop, socket, that;
 		var elementData = new (require("./ObjectStore"));
 		var senderId;
-		var shaders;
-		var mapEase;
+		var shaders = require("./shaders.js");
+		var	mapEase = require("./mapEase.js");
+		var projector = new THREE.Projector();
+		var background;
 		var composer;
 		var composerActive;
 		var composerBlur;
 		var activeId;
 
-		var materialDot = new THREE.MeshBasicMaterial({color:config.colors.normalDots, transparent:true, opacity:0.4});
+		var mouse;
+
+		//var materialDot = new THREE.MeshBasicMaterial({color:config.colors.normalDots, transparent:true, opacity:0.4});
+		//var materialDot = new THREE.ParticleBasicMaterial({size:config.neuron.fE.minRadius*config.neuron.fE.minRadius*Math.PI, color:config.colors.normalDots, transparent:true, opacity:0.4});
+		var attributes = {
+			lerpAlpha : {type:"f", value:[]},
+			outline : {type:"f", value:[]},
+			radius : {type:"f", value:[]}
+		};
+
+		var materialDot = new THREE.ShaderMaterial({ transparent:true, vertexShader: shaders.particle.vertexShader,fragmentShader: shaders.particle.fragmentShader, attributes:attributes, uniforms: shaders.particle.uniforms});
 		var material = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1, transparent:true, opacity:0.2});
 		var materialActiveDot = new THREE.MeshBasicMaterial({color:config.colors.activeDots,transparent:true, opacity:0.4});
 		var materialActive = new THREE.LineBasicMaterial({ color:config.colors.activeLines, linewidth:2,transparent:true, opacity:0.5});
@@ -22,6 +34,7 @@
 		var activeDotObject, activeDotGeometry;
 
 		var baseElementCircle = new THREE.Mesh(new THREE.CircleGeometry(1,16));
+		baseElementCircle.geometry.mergeVertices();
 
 		var showDebugStuff=true;
 
@@ -30,13 +43,44 @@
 
 		var elementGroups = new (require("./ObjectStore"));
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////
 		var clicked = function(data, answer, now){
-			console.log(elementGroups.getAll());
 			console.log(elementData.getAll());
-			console.log(groupCollisionDetection.getElements());
-
-
+			console.log(materialDot);
+			console.log(attributes);
 			showDebugStuff=!showDebugStuff;
+
+			var vector = new THREE.Vector3( ( data.clientX / world.width ) * 2 - 1, - ( data.clientY / world.height ) * 2 + 1, 0.5 );
+			projector.unprojectVector( vector, world.camera );
+			var raycaster = new THREE.Raycaster( world.camera.position, vector.sub( world.camera.position ).normalize() );
+			var intersects = raycaster.intersectObject( background );
+
+			var activeElement=world.activeElement;
+			if ( intersects.length > 0 ) {
+				mouse.position = intersects[0].point;
+				mouse.position.z =0;
+				mouse.minDistance = 9999;
+				var collisionDetection = new (require("./BSPCollisionDetection"))(elementData.getAllObjects());
+
+				collisionDetection.testElement(mouse);
+				if(mouse.minDistance === 9999) world.activeElement = undefined;
+			}
+
+			// Send active to other visualizations
+			if(activeElement !== world.activeElement) 
+				socket.sendData("__pca__ActiveElement", {id:world.activeElement});
+
+			/*
+			// Parse all the faces
+			for ( var i in intersects ) {
+
+				intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+
+			}
+			*/
 
 		}
 
@@ -50,6 +94,7 @@
 				groupCollisionDetection.clearElements();
 				functionCollisionDetection.clearElements();
 				senderId = data.sender.id;
+				//groupCollisionDetection.addElement(mouse);
 			}
 
 			// get caller and element
@@ -74,7 +119,7 @@
 			// if there is a caller
 			if(caller.data !== false) {
 				caller.data.id = data.data.calledById;
-				group.object.elements.store(caller.object);
+				group.object.elements.store(caller.object, {id:caller.data.id});
 				caller.object.group = group.object;
 
 				caller.object.outboundElements.store(element.object, { id: element.object.id });
@@ -82,6 +127,7 @@
 
 				element.object.inboundCounts[caller.object.id] = element.object.inboundCounts[caller.object.id] > 0 ? 
 					element.object.inboundCounts[caller.object.id]+1 : 1;
+
 				caller.object.outboundCounts[element.object.id] = caller.object.outboundCounts[element.object.id] > 0 ? 
 					caller.object.outboundCounts[element.object.id]+1 : 1;
 
@@ -91,9 +137,12 @@
 				functionCollisionDetection.addElement(caller.object);
 
 				elementData.store(caller.object, caller.data);
+
+				caller.object.updateRadius();
+
 			}
 
-			group.object.elements.store(element.object);
+			group.object.elements.store(element.object, {id: data.id});
 
 			element.data.id = data.id;
 			element.object.group = group.object;
@@ -136,24 +185,49 @@
 			var data = store.data;
 			var outboundElements;
 			
-
 			stageGeometry = new THREE.Geometry();
 			stageDotGeometry = new THREE.Geometry();
 			activeGeometry = new THREE.Geometry();
 			activeDotGeometry = new THREE.Geometry();
+			for(var attribute in attributes) {
+				attributes[attribute].value = [];
+				attributes[attribute].needsUpdate = true;
+			}
+
 
 			// Update Data
 			for(var i=0; i < objects.length; i++) {		
 
 				// stageDotGeometry.vertices.push(objects[i].position);
+				// attributes.sizes.value.push(Math.pow(objects[i].radius,2)*Math.PI);				
 				baseElementCircle.position = objects[i].position;
 				baseElementCircle.scale.set(objects[i].radius,objects[i].radius,objects[i].radius);
 				THREE.GeometryUtils.merge(stageDotGeometry, baseElementCircle);
 
-				outboundElements = objects[i].outboundElements.getAllObjects(); 
+
+
+				if(objects[i].id === world.activeElement) this.drawActiveElement(objects[i]);
+
+
+				// add object attributes to Shader Attributes (per vertex).
+				for(var x=0; x<baseElementCircle.geometry.vertices.length; x++)
+					for(var attribute in attributes)
+						attributes[attribute].value.push(objects[i].shaderAttributes[attribute]);
+
+				// Add Lines
+				outboundElements = objects[i].outboundElements.getAllObjects(); 				
 				for(var k=0;  k<outboundElements.length; k++) {
 					stageGeometry.vertices.push(objects[i].position);
 					stageGeometry.vertices.push(outboundElements[k].position);
+
+
+					//Add arrows
+					var arrowLength=   objects[i].radius + config.neuron.fE.elementPadding * objects[i].outboundCounts[outboundElements[k].id] / objects[i].outboundCounts.total;
+					var arrow = outboundElements[k].position.clone().sub(objects[i].position);
+				
+					activeGeometry.vertices.push(objects[i].position.clone().add(arrow.setLength(arrowLength)));
+					activeGeometry.vertices.push(objects[i].position.clone().add(arrow.setLength(objects[i].radius-1)));
+
 				}
 
 			}
@@ -176,7 +250,7 @@
 				}
 
 			}
-			groupCollisionDetection.drawGrids(world, showDebugStuff);
+			functionCollisionDetection.drawGrids(world, showDebugStuff);
 			updateScenes();
  		}
 
@@ -184,26 +258,53 @@
  		var updateScenes=function(data, answer, now){
 			if(stageObject) {
 				world.scene.remove(stageObject);	
-				world.scene.remove(stageDotObject);	
 				stageObject.geometry.dispose();									
+			}
+			if(stageDotObject) {
+				world.scene.remove(stageDotObject);	
 				stageDotObject.geometry.dispose();
-
+			}
+			if(activeObject) {
 				world.activeScene.remove(activeObject);	
-				world.activeScene.remove(activeDotObject);	
 				activeObject.geometry.dispose();								
+			}
+			if(activeDotObject) {
+				world.activeScene.remove(activeDotObject);	
 				activeDotObject.geometry.dispose();
 			}
-			stageObject = new THREE.Line(stageGeometry, material, THREE.LinePieces);
-			stageDotObject = new THREE.Mesh(stageDotGeometry, materialDot);
-			stageDotObject.position.set(0,0,1);
-			world.scene.add(stageObject);
-			world.scene.add(stageDotObject);
 
-			activeObject = new THREE.Line(activeGeometry, materialActive, THREE.LinePieces);
-			activeDotObject = new THREE.Mesh(activeDotGeometry, materialActiveDot);
-			activeDotObject.position.set(0,0,1);
-			world.activeScene.add(activeObject);
-			world.activeScene.add(activeDotObject);
+			if(stageGeometry && stageGeometry.vertices.length >0){
+				stageObject = new THREE.Line(stageGeometry, material, THREE.LinePieces);
+				world.scene.add(stageObject);
+			}
+			if(stageDotGeometry && stageDotGeometry.vertices.length >0){
+				// stageDotObject = new THREE.ParticleSystem(stageDotGeometry, materialDot);
+				stageDotObject = new THREE.Mesh(stageDotGeometry, materialDot);
+				stageDotObject.position.set(0,0,1);
+				world.scene.add(stageDotObject);
+			}
+			if(activeGeometry && activeGeometry.vertices.length >0){
+				activeObject = new THREE.Line(activeGeometry, materialActive, THREE.LinePieces);
+				world.activeScene.add(activeObject);
+			}
+			if(activeDotGeometry && activeDotGeometry.vertices.length >0){
+				activeDotObject = new THREE.Mesh(activeDotGeometry, materialActiveDot);
+				activeDotObject.position.set(0,0,1);
+				world.activeScene.add(activeDotObject);
+			}
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.drawActiveElement =function(element) {
+			var circle = new THREE.Mesh(new THREE.CircleGeometry(1,40));
+			circle.geometry.mergeVertices();
+
+			circle.geometry.vertices.shift();
+			circle.position = element.position;
+			circle.scale.set(element.actionRadius,element.actionRadius,element.actionRadius);
+			THREE.GeometryUtils.merge(activeGeometry, circle);
+
+
+
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var setupComposer = function() {
@@ -255,23 +356,22 @@
 			socket = _socket;
 			loop = _loop;	
 			that = this;
-			shaders = require("./shaders.js");
-			mapEase = require("./mapEase.js");
 			globalTick = new (require("./GlobalTicker.js"))();
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.initialize = function(container) {
 			world = new (require("./World.js"))($(container));
-			functionCollisionDetection = new (require("./BSPCollisionDetection"))(world);
-			groupCollisionDetection = new (require("./BSPCollisionDetection"))(world);
+			functionCollisionDetection = new (require("./BSPCollisionDetection"))();
+			groupCollisionDetection = new (require("./BSPCollisionDetection"))();
 
 			//mouseelement
-			var mouse = new (require("./MouseElement.js"))(world);
-			groupCollisionDetection.addElement(mouse);
-			globalTick.addListener(mouse.update, { bind: mouse, eventName :"update"});
+			mouse = new (require("./MouseElement.js"))(world);
+			// groupCollisionDetection.addElement(mouse);
+			// globalTick.addListener(mouse.update, { bind: mouse, eventName :"update"});
 
 			//Background
-			world.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(999999, 999999, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background})));
+			background = new THREE.Mesh(new THREE.PlaneGeometry(999999, 999999, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background}));
+			world.scene.add(background);
 			setupComposer();
 
 			loop.addListener(globalTick.tick, { bind:globalTick });

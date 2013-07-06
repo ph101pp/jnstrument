@@ -22,8 +22,8 @@
 		this.construct = function(_id, _position, _world){
 			this.id=_id;
 			world=_world;
-			var randomAreaX = 200; //world.width/2;
-			var randomAreaY = 200; //world.height/2;
+			var randomAreaX = world.width/2;
+			var randomAreaY = world.height/2;
 			if(_position) this.position = _position.clone().add(new THREE.Vector3(Math.random(),Math.random(),0));
 			else this.position.add(new THREE.Vector3(Math.random()*randomAreaX*2-randomAreaX,Math.random()*randomAreaY*2-randomAreaY,0));
 		}
@@ -45,7 +45,7 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.hitBounds = function(top, right, bottom, left){
-			return
+			return;
 			if(top) this.velocity.add((new THREE.Vector3(0,-1,0)).multiplyScalar(config.neuron.boundForce));
 			if(right) this.velocity.add((new THREE.Vector3(-1,0,0)).multiplyScalar(config.neuron.boundForce));
 			if(bottom) this.velocity.add((new THREE.Vector3(0,1,0)).multiplyScalar(config.neuron.boundForce));
@@ -59,10 +59,17 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updatePosition = function(){
+			if(this.elements.get(world.activeElement)) return;
+
+
 			// Gravity
-			var gravity = this.position.clone().negate().multiplyScalar(this.actionRadius/1000);
+			var gravity = this.position.clone().negate().multiplyScalar(this.actionRadius/5000);
+			if(gravity.length() > config.neuron.gE.maxGravity) gravity.setLength(config.neuron.gE.maxGravity);
 			this.velocity.add(gravity);
 
+			if(this.position.length() > 1000)
+				this.velocity.add(gravity);
+				
 			this.velocity.multiplyScalar(0.6);
 			this.position.add(this.velocity);
 		}
@@ -87,10 +94,19 @@
 			this.calculateBoundingbox();
 			var elements = this.elements.getAllObjects();
 			var radius=0;
+			var active  = false;
 			for(var k=0; k<elements.length; k++) {
+				if(elements[k].id === world.activeElement) active = true;
 				radius= Math.max(elements[k].position.clone().sub(this.position).length(), radius);
 			}
-			this.actionRadius=Math.min(radius, this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5).length())+20;
+			var actionRadius = active ?
+				config.neuron.fE.activeRadius:
+				config.neuron.fE.minRadius+config.neuron.fE.elementPadding+config.neuron.fE.elementMargin;
+
+			var newRadius = Math.min(radius, this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5).length())+actionRadius/2;
+			
+			if(newRadius > this.actionRadius*config.neuron.gE.maxRadiusGrow) this.actionRadius*=config.neuron.gE.maxRadiusGrow;
+			else this.actionRadius= newRadius;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.calculatePosition = function(){

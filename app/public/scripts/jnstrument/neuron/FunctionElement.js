@@ -3,6 +3,14 @@
 	var mapEase = require("./mapEase.js");
 	var FunctionElement = function(){
 ///////////////////////////////////////////////////////////////////////////////
+
+		var outputColor = new THREE.Color(config.colors.outputColor);
+		var inputColor = new THREE.Color(config.colors.inputColor);
+		var color = new THREE.Color(config.colors.normalDots);
+		var world;
+		var outline =0;
+///////////////////////////////////////////////////////////////////////////////
+
 		this.id = null;
 		this.group = null;
 		this.active = false;
@@ -17,16 +25,13 @@
 		this.events = [];
 
 		this.shaderAttributes = {
-			lerpAlpha : { type:"f", value:0.5 },
-			radius : { type:"f", value:1 },			
-			outbound : { type:"f", value:0 },
-			inbound : { type:"f", value:0 }
+			lerpAlpha : config.neuron.fE.opacity,
+			outline : 0,	
+			radius : config.neuron.fE.minRadius,	
 		};
 
 		this.velocity = new THREE.Vector3(0,0,0);
 		this.actionRadius = config.neuron.fE.minRadius+config.neuron.fE.elementMargin;
-
-///////////////////////////////////////////////////////////////////////////////
 		this.speed = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +56,7 @@
 			if(length > actionRadius) return;
 
 			force.setLength(mapEase( length, 0, actionRadius, config.neuron.fE.maxPushForce, config.neuron.fE.minPushForce, "easeNot"));
-
+			force.multiplyScalar(1-(0.3*(this.actionRadius/object.actionRadius+0.1))); // The larger the element the more force it has
 			force.multiplyScalar(0.5);
 
 			this.velocity.add(force);
@@ -112,11 +117,14 @@
 			// this.group.velocity.multiplyScalar(0.9);
 			// this.velocity.add(this.group.velocity);
 
+
+			if(world.activeElement === this.id) return;
+
 			// Move towards Group center 
 			var force = this.group.position.clone().sub(this.position);
 
 			if(force.length() > this.group.actionRadius)
-				this.velocity.add(force.multiplyScalar(0.4));
+				this.velocity.add(force.multiplyScalar(0.1));
 			else
 				this.velocity.add(force.multiplyScalar(0.01));
 
@@ -138,8 +146,25 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateRadius = function(radius){
+			// Active Radius
 			this.radius =	radius || mapEase(this.events.length, 0, 400, config.neuron.fE.minRadius, config.neuron.fE.maxRadius, "easeOutQuint");
 			this.radius = Math.min(config.neuron.fE.maxRadius, this.radius);
+
+			//Add color Circle
+			var div= Math.abs(this.inboundCounts.total - this.outboundCounts.total);
+			var sum = this.inboundCounts.total + this.outboundCounts.total;
+			outline =  config.neuron.fE.outlineMaxWidth * (div/sum);
+
+			this.radius += outline;
+
+
+			this.shaderAttributes.lerpAlpha=config.neuron.fE.maxOpacity;
+			this.shaderAttributes.outline= outline +(this.inboundCounts.total > this.outboundCounts.total ? 100:0);
+			this.shaderAttributes.radius= this.radius;
+
+				
+
+
 			this.actionRadius=this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,14 +172,22 @@
 			this.updatePosition();
 			this.updateEvents(now);
 
+
 			//shrink radius
 			this.radius*=0.9;
 			this.actionRadius*=0.9;
-			if(this.radius<config.neuron.fE.minRadius) this.radius = config.neuron.fE.minRadius;
-			if(this.actionRadius<config.neuron.fE.minRadius+config.neuron.fE.elementMargin) this.actionRadius = config.neuron.fE.minRadius+config.neuron.fE.elementMargin;
+			this.shaderAttributes.lerpAlpha*=0.9;
+			this.shaderAttributes.lerpAlpha = Math.max(this.shaderAttributes.lerpAlpha, config.neuron.fE.opacity);
+
+			if(this.radius<config.neuron.fE.minRadius+outline) this.radius = config.neuron.fE.minRadius+outline;
+			
+			this.actionRadius = this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
+	
+			this.shaderAttributes.radius = this.radius;
 
 			this.calculateOutboundConnections();
 
+			if(world.activeElement === this.id) this.actionRadius = 200;
 
 
 

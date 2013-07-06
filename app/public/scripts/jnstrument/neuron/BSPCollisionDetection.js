@@ -11,15 +11,14 @@
 		var that;
 		var gridDrawing;
 		var drawingLineMaterial = new THREE.LineBasicMaterial({ color:0x00FF00, linewidth:1, transparent:true, opacity:0.2});
-
+		var showDebugStuff;
 
 ///////////////////////////////////////////////////////////////////////////////
-		this.construct = function(_world, _elements){
+		this.construct = function(_elements, debug){
+			showDebugStuff = debug;
 			this.addElements(_elements);
-			world = _world;
-			width = world.width;
-			height = world.height;
 			that = this;
+			this.reMap();
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.addElements = function(_elements){
@@ -45,10 +44,13 @@
 			maps = {};
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.testElement = function(element, bulk){
-			for(gridSize in maps) 
-				testMap(element, gridSize, bulk);
+		this.testElement = function(element, bulk, bla){
+			var count = 0;
+			for(gridSize in maps) {
+				count += testMap(element, gridSize, bulk);
+			}
 			testBounds(element);
+			return count;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.testElements = function (){
@@ -59,11 +61,10 @@
 			}
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.reMap= function(){
+		this.reMap= function(bla){
 			width = height = 0;
 			maps = {};
 			var objects = elements.getAllObjects();
-		//	console.log("remap", objects.length);
 
 			for(var i=0; i<objects.length; i++) {
 				width = Math.max(Math.abs(objects[i].position.x)*2, width);
@@ -129,16 +130,15 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var testMap = function(element, gridSize, bulk){
+			var count =0;
 			var areaBounds = {
 				x1 : element.position.x-element.actionRadius,
 				y1 : element.position.y+element.actionRadius,
 				x2 : element.position.x+element.actionRadius,
 				y2 : element.position.y-element.actionRadius
 			}
-			var topIndex = screenCoords2Index(gridSize, areaBounds.x1, areaBounds.y1);
-			var botIndex = screenCoords2Index(gridSize, areaBounds.x2, areaBounds.y2);
-			var topCoords = index2QuadrantCoords(gridSize, topIndex);
-			var botCoords = index2QuadrantCoords(gridSize, botIndex);
+			var topCoords = screenCoords2QuadrantCoords(gridSize, areaBounds.x1, areaBounds.y1);
+			var botCoords = screenCoords2QuadrantCoords(gridSize, areaBounds.x2, areaBounds.y2);
 
 			var top = {
 				x : topCoords.x-1,
@@ -157,8 +157,10 @@
 							if(element !== maps[gridSize][index][o]) {
 								element.collision(maps[gridSize][index][o], that);
 								if(bulk === true) maps[gridSize][index][o].collision(element, that);
+								count++;
 							}
 				}
+			return count;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var addToMap = function(element){
@@ -173,15 +175,19 @@
 			// element.geometry.computeBoundingSphere();
 			// var elementSize = element.geometry.boundingSphere.radius *2;
 			var elementSize = Math.max(element.actionRadius*2, minGridSize);
-			for(var i= 0; elementSize < Math.floor(elementSize/Math.pow(divident, i)); i++);	
-			var gridSize = Math.floor(elementSize/Math.pow(divident, i-1));
+			for(var i= 0; elementSize < Math.floor(maxGridSize/Math.pow(divident, i)); i++);	
+			var gridSize = Math.floor(maxGridSize/Math.pow(divident, i-1));
+
+			var quadrantCoords = screenCoords2QuadrantCoords(gridSize, element.position.x, element.position.y);
+
 			return {
 				gridSize : gridSize,
-				i : screenCoords2Index(gridSize, element.position.x, element.position.y)
+				i : quadrantCoords2Index(gridSize, quadrantCoords.x, quadrantCoords.y)
 			}
 		}	
 ///////////////////////////////////////////////////////////////////////////////	
 		var quadrantCoords2Index = function(gridSize, x, y){
+			if(x<0 || y<0) return -1;
 			var maxY = Math.ceil(width/gridSize);
 			return y * maxY + x;
 		}
@@ -194,27 +200,15 @@
 			}
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		var screenCoords2Index = function(gridSize, x,y){
+		var screenCoords2QuadrantCoords = function(gridSize, x,y){
 			x+=width/2;
 			y= height/2 - y;
 
-			var coordX = Math.floor(x/gridSize);			
-			var coordY = Math.floor(y/gridSize);
-
-			return quadrantCoords2Index(gridSize, coordX, coordY);
-		}
-///////////////////////////////////////////////////////////////////////////////
-		var index2ScreenCoords = function(gridSize, i){
-			var coords = index2QuadrantCoords(gridSize, i);
-
-			var x = coords.x*gridSize;
-			var y = coords.y*gridSize;
-
-			return {	
-				x : x-width/2,
-				y : y < height/2 ? height/2 - y : - (y - height/2)
+			return {
+				x : Math.floor(x/gridSize),
+				y : Math.floor(y/gridSize)
 			}
-		}	
+		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
 	module.exports = require("../Class.js").extend(BSPCollisionDetection);

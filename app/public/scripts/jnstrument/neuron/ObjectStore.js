@@ -63,6 +63,7 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.get = function(query){
+			if(!query) return false;
 			var	index = typeof query === "object" || typeof query === "function" ?
 				objects.indexOf(query):
 				objectIndexes.indexOf(query);

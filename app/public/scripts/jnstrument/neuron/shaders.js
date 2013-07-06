@@ -1,14 +1,85 @@
 (function(THREE) {	
+	var config = require("../config.js");
+	var outputColor = new THREE.Color(config.colors.outputColor);
+	var inputColor = new THREE.Color(config.colors.inputColor);
+	var color = new THREE.Color(config.colors.normalDots);
 
+	module.exports = {
+
+		particle : {
+
+			uniforms: {},
+
+			vertexShader: [
+				"attribute float outline;",
+				"attribute float lerpAlpha;",
+				"attribute float radius;",
+
+				"varying float vOutline;",
+				"varying float vRadius;",
+				"varying float vLerpAlpha;",
+				
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = uv;",
+					"vOutline = outline;",
+					"vRadius = radius;",
+					"vLerpAlpha = lerpAlpha;",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+				"varying float vOutline;",
+				"varying float vLerpAlpha;",
+				"varying float vRadius;",
+
+				"varying vec2 vUv;",
+
+				"vec4 inboundColor = vec4("+inputColor.r+","+inputColor.g+","+inputColor.b+",1.);",
+				"vec4 outboundColor = vec4("+outputColor.r+","+outputColor.g+","+outputColor.b+",1.);",
+				"vec4 color = vec4("+color.r+","+color.g+","+color.b+",1.);",
+
+				"void main() {",
+					"vec2 norm = vec2(vUv.x-0.5,vUv.y-0.5);",
+					"float outline = vOutline;",
+					"int outbound = 1;",
+
+					"if(vOutline >= 100.) {",
+						"outbound = 0;",
+						"outline = vOutline-100.;",
+					"}",
+
+					// "if(outline > 100. ) {",
+					// 	"gl_FragColor = vec4(0., 1., 0., 1.);",
+					// 	"return;",
+					// "}",
+					// "if(outline > vRadius) {",
+					// 	"gl_FragColor = vec4(1., 0., 0., 1.);",
+					// 	"return;",
+					// "}",	
+
+					"if(length(norm) > 0.5-0.5*outline/vRadius) {",
+						"if(outbound  > 0) gl_FragColor =outboundColor;",
+						"else gl_FragColor = inboundColor;",
+					"}",
+					"else gl_FragColor = vec4(color.r,color.g, color.b, vLerpAlpha);",
+
+				"}"
+
+			].join("\n")
+		},
 	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 *
 	 * Vignette shader
 	 * based on PaintEffect postprocess from ro.me
 	 * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
-	 */
-	module.exports = {
-		vignette : {
+	 */		vignette : {
 
 			uniforms: {
 
