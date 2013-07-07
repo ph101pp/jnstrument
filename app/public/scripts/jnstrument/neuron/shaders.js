@@ -64,10 +64,12 @@
 					// "}",	
 
 					"if(length(norm) > 0.5-0.5*outline/vRadius) {",
-						"if(outbound  > 0) gl_FragColor =outboundColor;",
-						"else gl_FragColor = inboundColor;",
+						"if(outbound  > 0) gl_FragColor = vec4(outboundColor.r,outboundColor.g, outboundColor.b, vLerpAlpha);",
+						"else gl_FragColor = vec4(inboundColor.r,inboundColor.g, inboundColor.b, vLerpAlpha);",
 					"}",
 					"else gl_FragColor = vec4(color.r,color.g, color.b, vLerpAlpha);",
+
+
 
 				"}"
 
