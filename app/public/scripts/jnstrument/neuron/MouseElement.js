@@ -12,10 +12,8 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.collision = function(object, hits, collisionDetection) {
-			console.log("blab");
 			var distance=this.position.clone().sub(object.position).length();
-
-			if(distance > this.actionRadius+object.actionRadius || distance > this.minDistance) return
+			if(distance > this.actionRadius+object.radius || distance > this.minDistance) return
 			this.minDistance = distance;
 			world.activeElement=object.id;
 		}
