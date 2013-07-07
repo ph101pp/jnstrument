@@ -11,8 +11,10 @@
 
 		this.boundingBox = {
 			min : new THREE.Vector3(999999,99999,99999),
-			max : new THREE.Vector3(0,0,0)
+			max : new THREE.Vector3(999999,99999,99999),
+			center : new THREE.Vector3(0,0,0)
 		};
+		this.speed=1;
 ///////////////////////////////////////////////////////////////////////////////
 			var maxSpeed = 20;
 			var minSpeed = 0;
@@ -59,7 +61,7 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updatePosition = function(){
-			if(this.elements.get(world.activeElement)) return;
+			// if(this.elements.get(world.activeElement)) return;
 
 
 			// Gravity
@@ -69,49 +71,73 @@
 
 			if(this.position.length() > 1000)
 				this.velocity.add(gravity);
+
+
+			//Move towards active Element
+			var activeElement = this.elements.get(world.activeElement);
+
+			if(activeElement) {
+				var force = activeElement.object.position.clone().sub(this.position).multiplyScalar(0.08);
+				var force = this.boundingBox.center.clone().sub(this.position).multiplyScalar(0.08);
+				this.velocity.add(force);
+			}
+
 				
 			this.velocity.multiplyScalar(0.6);
+
+			if(this.velocity.length() > this.speed*config.neuron.gE.maxAcceleration) this.velocity.setLength(this.speed*config.neuron.gE.maxAcceleration);
+			else if(this.velocity.length() < 1) this.velocity.set(0,0,0);
+			
 			this.position.add(this.velocity);
+
+			this.speed= this.velocity.length();
+			if(this.speed <=1) this.speed=1;
+
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.calculateBoundingbox =function(){
-			this.boundingBox.max.set(-999999,-99999,-99999);
-			this.boundingBox.min.set(999999,99999,99999);
+			this.boundingBox.max.set(-999999,-99999,0);
+			this.boundingBox.min.set(999999,99999,0);
 			var elements = this.elements.getAllObjects();
 
 			for(var k=0; k<elements.length; k++) {
-				this.boundingBox.max.x = Math.max(this.boundingBox.max.x, elements[k].position.x);
-				this.boundingBox.max.y = Math.max(this.boundingBox.max.y, elements[k].position.y);
-				this.boundingBox.max.z = Math.max(this.boundingBox.max.z, elements[k].position.z);
+				this.boundingBox.max.x = Math.max(this.boundingBox.max.x, elements[k].position.x+elements[k].actionRadius);
+				this.boundingBox.max.y = Math.max(this.boundingBox.max.y, elements[k].position.y+elements[k].actionRadius);
+			//	this.boundingBox.max.z = Math.max(this.boundingBox.max.z, elements[k].position.z+elements[k].actionRadius);
 
-				this.boundingBox.min.x = Math.min(this.boundingBox.min.x, elements[k].position.x);
-				this.boundingBox.min.y = Math.min(this.boundingBox.min.y, elements[k].position.y);
-				this.boundingBox.min.z = Math.min(this.boundingBox.min.z, elements[k].position.z);
+				this.boundingBox.min.x = Math.min(this.boundingBox.min.x, elements[k].position.x-elements[k].actionRadius);
+				this.boundingBox.min.y = Math.min(this.boundingBox.min.y, elements[k].position.y-elements[k].actionRadius);
+				//this.boundingBox.min.z = Math.min(this.boundingBox.min.z, elements[k].position.z+elements[k].actionRadius);
 			}
+			this.boundingBox.center=this.boundingBox.min.clone().add( this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5) );
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateActionRadius = function(){
 			this.calculateBoundingbox();
 			var elements = this.elements.getAllObjects();
-			var radius=0;
+			var newRadius=0;
+			var actionRadius =0;
 			var active  = false;
 			for(var k=0; k<elements.length; k++) {
-				if(elements[k].id === world.activeElement) active = true;
-				radius= Math.max(elements[k].position.clone().sub(this.position).length(), radius);
+				newRadius= Math.max(elements[k].position.clone().sub(this.position).length()+elements[k].actionRadius, newRadius);
+				
+				if(elements[k].id !== world.activeElement) actionRadius= Math.max(elements[k].actionRadius, actionRadius);
 			}
-			var actionRadius = active ?
-				config.neuron.fE.activeRadius:
-				config.neuron.fE.minRadius+config.neuron.fE.elementPadding+config.neuron.fE.elementMargin;
+			newRadius -= actionRadius/2;
+			// var actionRadius = active ?
+			// 	config.neuron.fE.activeRadius:
+			// 	config.neuron.fE.minRadius+config.neuron.fE.elementPadding+config.neuron.fE.elementMargin;
 
-			var newRadius = Math.min(radius, this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5).length())+actionRadius/2;
+			newRadius = Math.min(newRadius, this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5).length());
 			
 			if(newRadius > this.actionRadius*config.neuron.gE.maxRadiusGrow) this.actionRadius*=config.neuron.gE.maxRadiusGrow;
+			if(newRadius < this.actionRadius/config.neuron.gE.maxRadiusGrow) this.actionRadius/=config.neuron.gE.maxRadiusGrow;
 			else this.actionRadius= newRadius;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.calculatePosition = function(){
 			this.updateActionRadius();
-			this.position = this.boundingBox.min.clone().add( this.boundingBox.max.clone().sub( this.boundingBox.min ).multiplyScalar(0.5) );
+			this.position = this.boundingBox.center;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.merge = function(group2){

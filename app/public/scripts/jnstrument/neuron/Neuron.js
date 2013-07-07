@@ -36,31 +36,41 @@
 		var baseElementCircle = new THREE.Mesh(new THREE.CircleGeometry(1,16));
 		baseElementCircle.geometry.mergeVertices();
 
-		var showDebugStuff=true;
+		var activeCircle = new THREE.Mesh(new THREE.CircleGeometry(1,40));
+		activeCircle.geometry.mergeVertices();
+		activeCircle.geometry.vertices.shift();
+
+		var showDebugStuff=false;
 
 		var functionCollisionDetection;
 		var groupCollisionDetection;
 
 		var elementGroups = new (require("./ObjectStore"));
 
-
-
+		var mousePressed = false;
 
 ///////////////////////////////////////////////////////////////////////////////
-		var clicked = function(data, answer, now){
-			console.log(elementData.getAll());
-			console.log(materialDot);
-			console.log(attributes);
-			showDebugStuff=!showDebugStuff;
-
+		var getMousePositionOnBG = function(data){
 			var vector = new THREE.Vector3( ( data.clientX / world.width ) * 2 - 1, - ( data.clientY / world.height ) * 2 + 1, 0.5 );
 			projector.unprojectVector( vector, world.camera );
 			var raycaster = new THREE.Raycaster( world.camera.position, vector.sub( world.camera.position ).normalize() );
 			var intersects = raycaster.intersectObject( background );
+			if ( intersects.length > 0 ) 
+				return intersects[0].point;
 
+			return false
+		}
+///////////////////////////////////////////////////////////////////////////////
+		var mousedown = function(data, answer, now){
+
+			//showDebugStuff=!showDebugStuff;
+
+			mousePressed = true;
+
+			var mousePosition = getMousePositionOnBG(data);
 			var activeElement=world.activeElement;
-			if ( intersects.length > 0 ) {
-				mouse.position = intersects[0].point;
+			if ( mousePosition ) {
+				mouse.position = mousePosition;
 				mouse.position.z =0;
 				mouse.minDistance = 9999;
 				var collisionDetection = new (require("./BSPCollisionDetection"))(elementData.getAllObjects());
@@ -83,8 +93,21 @@
 			*/
 
 		}
+///////////////////////////////////////////////////////////////////////////////
+		var mousemove = function(data, answer, now){
+			if(!mousePressed) return;
 
+			var activeElement = elementData.get(world.activeElement);
+			var mousePosition = getMousePositionOnBG(data);
 
+			if(!activeElement || !mousePosition) return;
+			activeElement.object.position = mousePosition;
+			activeElement.object.position.z = 0;
+		}
+///////////////////////////////////////////////////////////////////////////////
+		var mouseup = function(data, answer, now){
+			mousePressed = false;
+		}
 ///////////////////////////////////////////////////////////////////////////////
  		var socketJSEvent= function(data, answer, now){
  			// Remove everything if new SenderId received
@@ -106,11 +129,13 @@
 			if(element === false) element= {object:new (require("./FunctionElement"))(data.id, caller ? caller.object.position:undefined, world), data:{}};
 			if(caller === false) caller=  {object:new (require("./FunctionElement"))(data.data.calledById, element.object.position, world), data:{}};
 
-			// get group
+			// get group, if there are two groups take the larger and merge the smaller into it
 			if(element.object.group && caller.object.group && element.object.group.id !== caller.object.group.id) {
-				elementGroups.remove(caller.object.group);
-				groupCollisionDetection.removeElement(caller.object.group);
-				var group = elementGroups.get( element.object.group.merge( caller.object.group ) );
+				var newGroup = caller.object.group.actionRadius >= element.object.group.actionRadius ? caller.object.group : element.object.group;
+				var oldGroup = caller.object.group.actionRadius < element.object.group.actionRadius ? caller.object.group : element.object.group;
+				elementGroups.remove(oldGroup);
+				groupCollisionDetection.removeElement(oldGroup);
+				var group = elementGroups.get( newGroup.merge( oldGroup ) );
 			}
 			else var group = elementGroups.get(element.object.group) || elementGroups.get(caller.object.group) || {object:new (require("./GroupElement"))(data.id+"_"+data.data.calledById, element.object.position, world), data:{id:data.id+"_"+data.data.calledById}};
 			
@@ -190,12 +215,12 @@
 			activeGeometry = new THREE.Geometry();
 			activeDotGeometry = new THREE.Geometry();
 			for(var attribute in attributes) {
-				attributes[attribute].value = [];
+				attributes[attribute].value = []; 
 				attributes[attribute].needsUpdate = true;
 			}
 
 
-			// Update Data
+			// Update Data 
 			for(var i=0; i < objects.length; i++) {		
 
 				// stageDotGeometry.vertices.push(objects[i].position);
@@ -206,7 +231,7 @@
 
 
 
-				if(objects[i].id === world.activeElement) this.drawActiveElement(objects[i]);
+				if(objects[i].id === world.activeElement) drawActiveElement(objects[i]);
 
 
 				// add object attributes to Shader Attributes (per vertex).
@@ -253,7 +278,19 @@
 			functionCollisionDetection.drawGrids(world, showDebugStuff);
 			updateScenes();
  		}
+///////////////////////////////////////////////////////////////////////////////
+		var drawActiveElement =function(element) {
 
+
+			activeCircle.position = element.position;
+			activeCircle.rotation.z+=0.004;
+			var radius = element.actionRadius-config.neuron.fE.activeCirclePadding;
+			activeCircle.scale.set(radius,radius,radius);
+			THREE.GeometryUtils.merge(activeGeometry, activeCircle);
+
+
+
+		}
 ///////////////////////////////////////////////////////////////////////////////
  		var updateScenes=function(data, answer, now){
 			if(stageObject) {
@@ -293,19 +330,7 @@
 				world.activeScene.add(activeDotObject);
 			}
 		}
-///////////////////////////////////////////////////////////////////////////////
-		this.drawActiveElement =function(element) {
-			var circle = new THREE.Mesh(new THREE.CircleGeometry(1,40));
-			circle.geometry.mergeVertices();
 
-			circle.geometry.vertices.shift();
-			circle.position = element.position;
-			circle.scale.set(element.actionRadius,element.actionRadius,element.actionRadius);
-			THREE.GeometryUtils.merge(activeGeometry, circle);
-
-
-
-		}
 ///////////////////////////////////////////////////////////////////////////////
 		var setupComposer = function() {
 
@@ -379,7 +404,9 @@
 			socket.addListener(socketJSEvent, {bind : this, eventName:"jsEvent"});
 			
 			globalTick.addListener(world.onWindowResize, { bind:world, eventName :"resize" });
-			globalTick.addListener(clicked, {bind:this, eventName:"click"});
+			globalTick.addListener(mousedown, {bind:this, eventName:"mousedown"});
+			globalTick.addListener(mouseup, {bind:this, eventName:"mouseup"});
+			globalTick.addListener(mousemove, {bind:this, eventName:"mousemove"});
 //			globalTick.addListener(setupComposer, { bind:this, eventName :"resize" });
 			globalTick.addListener(calculateElements, { bind: this, eventName :"calculate"});
 			globalTick.addListener(updateElements, { bind: this, eventName :"update"});

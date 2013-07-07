@@ -45,56 +45,93 @@
 			else this.position.add(new THREE.Vector3(Math.random()*randomAreaX*2-randomAreaX,Math.random()*randomAreaY*2-randomAreaY,0));
 		}
 ///////////////////////////////////////////////////////////////////////////////
+		this.connectedToActive = function(){
+			return this.inboundElements.get(world.activeElement) || this.outboundElements.get(world.activeElement);
+		}
+///////////////////////////////////////////////////////////////////////////////
 		this.collision = function(object, hits, collisionDetection) {
-			if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) 
-				var actionRadius = this.radius+object.radius+(config.neuron.fE.pairDistance+config.neuron.fE.elementPadding)*2;
-			else
+			if(this.id === world.activeElement){
+				if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) return;
+			
 				var actionRadius = this.actionRadius+object.actionRadius;
-			var force = this.position.clone().sub(object.position);
-			var length = force.length();
+				var force = this.position.clone().sub(object.position);
+				var length = force.length();
 
-			if(length > actionRadius) return;
+				if(length > actionRadius) return;
 
-			force.setLength(mapEase( length, 0, actionRadius, config.neuron.fE.maxPushForce, config.neuron.fE.minPushForce, "easeNot"));
-			force.multiplyScalar(1-(0.3*(this.actionRadius/object.actionRadius+0.1))); // The larger the element the more force it has
-			force.multiplyScalar(0.5);
+				force.setLength(mapEase( length, 0, actionRadius, config.neuron.fE.maxActivePushForce, config.neuron.fE.minActivePushForce, "easeInQuad"));
+				//force.multiplyScalar(1-(0.3*(this.actionRadius/object.actionRadius+0.1))); // The larger the element the more force it has
+				force.multiplyScalar(5);
 
-			this.velocity.add(force);
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.hitBounds = function(top, right, bottom, left){
-			return;
-			if(top) this.velocity.add((new THREE.Vector3(0,-1,0)).multiplyScalar(config.neuron.boundForce));
-			if(right) this.velocity.add((new THREE.Vector3(-1,0,0)).multiplyScalar(config.neuron.boundForce));
-			if(bottom) this.velocity.add((new THREE.Vector3(0,1,0)).multiplyScalar(config.neuron.boundForce));
-			if(left) this.velocity.add((new THREE.Vector3(1,0,0)).multiplyScalar(config.neuron.boundForce));
-
-
-			// if(top) this.position.y = world.height/2-this.actionRadius;
-			// if(right) this.position.x = world.width/2-this.actionRadius;
-			// if(bottom) this.position.y = -world.height/2+this.actionRadius;
-			// if(left) this.position.x = -world.width/2+this.actionRadius;
-		}
-///////////////////////////////////////////////////////////////////////////////
-		this.calculateOutboundConnections = function() {
-			var storedElements = this.outboundElements.getAll();
-			var elements = storedElements.objects;
-			for(var i = 0; i<elements.length; i++) {
-				var distanceVector = elements[i].position.clone().sub(this.position);
-				var targetDistance = this.radius+elements[i].radius+config.neuron.fE.pairDistance;
-				var target = distanceVector.clone().setLength(targetDistance);
-				var force = target.clone().add(this.position).sub(elements[i].position);
-				var length=force.length();
-
-				//if(length < 5) return;
-
-				//force.setLength(mapEase( length, 0, 200, config.neuron.fE.minPullForce,config.neuron.fE.maxPullForce,  "easeInQuad"));
-				force.multiplyScalar(0.1);
-
-				elements[i].position.add(force.clone().add(this.velocity.clone().multiplyScalar(0.01)));
-				this.position.add(force.negate().add(elements[i].velocity.clone().multiplyScalar(0.01)));
+				object.velocity.add(force.negate());				
 
 			}
+			else if(object.id !== world.activeElement) {
+				if(this.outboundElements.get(object) !== false || this.inboundElements.get(object) !== false) 
+					var actionRadius = this.radius+object.radius+(config.neuron.fE.pairDistance+config.neuron.fE.elementPadding)*2;
+				else
+					var actionRadius = this.actionRadius+object.actionRadius;
+				var force = this.position.clone().sub(object.position);
+				var length = force.length();
+
+				if(length > actionRadius) return;
+
+				force.setLength(mapEase( length, 0, actionRadius, config.neuron.fE.maxPushForce, config.neuron.fE.minPushForce, "easeNot"));
+				force.multiplyScalar(1-(0.3*(this.actionRadius/object.actionRadius+0.1))); // The larger the element the more force it has
+				force.multiplyScalar(0.5);
+
+				this.velocity.add(force);
+			}
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.calculateConnections = function() {
+			var elements = this.outboundElements.getAllObjects();
+			if(world.activeElement === this.id)
+				elements = elements.concat(this.inboundElements.getAllObjects());
+
+			var connectedToActive = this.connectedToActive(world.activeElement);
+
+
+			var functionGap = 2*Math.PI/(elements.length);
+
+			for(var i = 0; i<elements.length; i++) 
+				if(world.activeElement === this.id ) {
+					
+					var targetDistance = this.actionRadius-config.neuron.fE.activeCirclePadding+elements[i].actionRadius+config.neuron.fE.pairDistance;
+					var groupCenter = this.position.clone().add(this.group.position).sub(this.position);
+				
+					var target = new THREE.Vector3( Math.cos( functionGap*i ), Math.sin( functionGap*i ), 0 );
+					target.setLength(targetDistance);
+					var force = target.clone().add(this.position).sub(elements[i].position);
+
+					force.multiplyScalar(0.3);
+		
+					elements[i].position.add(force);
+					elements[i].velocity.set(0,0,0);
+
+
+				}
+				else if(world.activeElement !== elements[i].id) {
+
+					var targetDistance = this.radius+elements[i].radius+config.neuron.fE.pairDistance;
+					var distanceVector = elements[i].position.clone().sub(this.position);
+					var target = distanceVector.clone().setLength(targetDistance);
+					var force = target.clone().add(this.position).sub(elements[i].position);
+					var length=force.length();
+
+					//if(length < 5) return;
+
+					//force.setLength(mapEase( length, 0, 200, config.neuron.fE.minPullForce,config.neuron.fE.maxPullForce,  "easeInQuad"));
+		
+					if(connectedToActive) force.multiplyScalar(0.01);
+					else force.multiplyScalar(0.2);
+
+
+
+					if(!elements[i].connectedToActive() ) elements[i].position.add(force.clone().add(this.velocity.clone().multiplyScalar(0.01)));
+					if(!connectedToActive ) this.position.add(force.negate().add(elements[i].velocity.clone().multiplyScalar(0.01)));
+
+				}
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateEvents = function(now){
@@ -118,7 +155,10 @@
 			// this.velocity.add(this.group.velocity);
 
 
-			if(world.activeElement === this.id) return;
+			if(world.activeElement === this.id || this.outboundElements.get(world.activeElement) || this.inboundElements.get(world.activeElement)) {
+				this.velocity.set(0,0,0);
+				return;
+			}
 
 			// Move towards Group center 
 			var force = this.group.position.clone().sub(this.position);
@@ -127,7 +167,6 @@
 				this.velocity.add(force.multiplyScalar(0.1));
 			else
 				this.velocity.add(force.multiplyScalar(0.01));
-
 			// Object Velocity
 			this.velocity.multiplyScalar(0.8);
 
@@ -139,7 +178,6 @@
 			this.speed= this.velocity.length();
 			if(this.speed <=1) this.speed=1;
 
-
 			// Make it 2D
 			this.position.z = 0;
 
@@ -147,7 +185,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 		this.updateRadius = function(radius){
 			// Active Radius
-			this.radius =	radius || mapEase(this.events.length, 0, 400, config.neuron.fE.minRadius, config.neuron.fE.maxRadius, "easeOutQuint");
+			this.radius =	radius || mapEase(this.events.length, 0, 200, config.neuron.fE.minRadius, config.neuron.fE.maxRadius, "easeOutQuint");
 			this.radius = Math.min(config.neuron.fE.maxRadius, this.radius);
 
 			//Add color Circle
@@ -162,33 +200,35 @@
 			this.shaderAttributes.outline= outline +(this.inboundCounts.total > this.outboundCounts.total ? 100:0);
 			this.shaderAttributes.radius= this.radius;
 
-				
-
-
-			this.actionRadius=this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
+			
+			if(world.activeElement !== this.id)  
+				this.actionRadius=this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.update = function(now){
 			this.updatePosition();
 			this.updateEvents(now);
+	
+			this.calculateConnections();
 
 
 			//shrink radius
 			this.radius*=0.9;
-			this.actionRadius*=0.9;
 			this.shaderAttributes.lerpAlpha*=0.9;
 			this.shaderAttributes.lerpAlpha = Math.max(this.shaderAttributes.lerpAlpha, config.neuron.fE.opacity);
 
 			if(this.radius<config.neuron.fE.minRadius+outline) this.radius = config.neuron.fE.minRadius+outline;
 			
-			this.actionRadius = this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
-	
 			this.shaderAttributes.radius = this.radius;
 
-			this.calculateOutboundConnections();
-
-			if(world.activeElement === this.id) this.actionRadius = 200;
-
+			
+			if(world.activeElement === this.id) {
+				var actionRadius = config.neuron.fE.activeRadius-this.actionRadius;
+				if(actionRadius <=1) this.actionRadius =  config.neuron.fE.activeRadius;
+				else this.actionRadius += actionRadius*config.neuron.fE.activeGrowEasing;
+			}
+			else 
+				this.actionRadius = this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
 
 
 		}
