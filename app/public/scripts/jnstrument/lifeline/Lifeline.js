@@ -141,7 +141,7 @@
 						getScreenPoints(actualPoint):
 						getScreenPoints(points[v]);
 
-					if(v-step <= 1)
+					if(v-step <= 0)
 						p2 = getScreenPoints(new THREE.Vector3(0,0,0));
 					else 
 						p2 = getScreenPoints(points[v-step]);
@@ -239,8 +239,6 @@
 				effectBlend2.uniforms[ 'tDiffuse1' ].value = composerActive.renderTarget2
 				effectBlend2.renderToScreen = true;
 			composer.addPass(effectVignette);
-			composer.addPass(effectBlend1);					
-			composer.addPass(effectBlend1);					
 			composer.addPass(effectBlend1);					
 			composer.addPass(effectBlend2);
 		}
