@@ -104,7 +104,7 @@
 					target.setLength(targetDistance);
 					var force = target.clone().add(this.position).sub(elements[i].position);
 
-					force.multiplyScalar(0.3);
+					force.multiplyScalar(0.1);
 		
 					elements[i].position.add(force);
 					elements[i].velocity.set(0,0,0);
@@ -183,26 +183,31 @@
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		this.updateRadius = function(radius){
-			// Active Radius
-			this.radius =	radius || mapEase(this.events.length, 0, 200, config.neuron.fE.minRadius, config.neuron.fE.maxRadius, "easeOutQuint");
-			this.radius = Math.min(config.neuron.fE.maxRadius, this.radius);
+		this.updateRadius = function(activate){
 
 			//Add color Circle
 			var div= Math.abs(this.inboundCounts.total - this.outboundCounts.total);
 			var sum = this.inboundCounts.total + this.outboundCounts.total;
-			outline =  config.neuron.fE.outlineMaxWidth * (div/sum);
+			
+			
+			if(world.activeElement === this.id) { 
+				outline =  config.neuron.fE.activeOutlineMaxWidth * (div/sum);
+			}
+			else { 
+				outline =  config.neuron.fE.outlineMaxWidth * (div/sum);
 
-			this.radius += outline;
+				this.actionRadius=this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
+				
+				this.radius =	mapEase(this.events.length, 0, 200, config.neuron.fE.minRadius, config.neuron.fE.maxRadius, "easeOutQuint");
+				this.radius = Math.min(config.neuron.fE.maxRadius, this.radius);
+				this.radius += outline;
+			}
 
-
-			this.shaderAttributes.lerpAlpha=config.neuron.fE.maxOpacity;
+			if(!activate) this.shaderAttributes.lerpAlpha=config.neuron.fE.maxOpacity;
 			this.shaderAttributes.outline= outline +(this.inboundCounts.total > this.outboundCounts.total ? 100:0);
 			this.shaderAttributes.radius= this.radius;
 
-			
-			if(world.activeElement !== this.id)  
-				this.actionRadius=this.radius+config.neuron.fE.elementMargin+config.neuron.fE.elementPadding;
+	
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		this.update = function(now){
@@ -212,17 +217,24 @@
 			this.calculateConnections();
 
 
-			//shrink radius
-			this.radius*=0.9;
 			this.shaderAttributes.lerpAlpha*=0.9;
 			this.shaderAttributes.lerpAlpha = Math.max(this.shaderAttributes.lerpAlpha, config.neuron.fE.opacity);
-
-			if(this.radius<config.neuron.fE.minRadius+outline) this.radius = config.neuron.fE.minRadius+outline;
-			
-			this.shaderAttributes.radius = this.radius;
-
-			
+		
+			// radius
 			if(world.activeElement === this.id) {
+				var radius = config.neuron.fE.activeElementRadius-this.radius;
+				if(radius <=1) this.radius =  config.neuron.fE.activeElementRadius;
+				else this.radius += radius*config.neuron.fE.activeGrowEasing;
+			}
+			else {
+				this.radius*=0.9;
+				if(this.radius<config.neuron.fE.minRadius+outline) this.radius = config.neuron.fE.minRadius+outline;
+			}
+			this.shaderAttributes.radius = this.radius;
+			
+			// actionRadius
+			if(world.activeElement === this.id) {
+
 				var actionRadius = config.neuron.fE.activeRadius-this.actionRadius;
 				if(actionRadius <=1) this.actionRadius =  config.neuron.fE.activeRadius;
 				else this.actionRadius += actionRadius*config.neuron.fE.activeGrowEasing;
@@ -232,6 +244,15 @@
 
 
 		}
+///////////////////////////////////////////////////////////////////////////////
+		this.activate= function(){
+			console.log("activate");
+			this.updateRadius(true);
+		}
+///////////////////////////////////////////////////////////////////////////////
+		this.deactivate= function(){
+			this.updateRadius(true);
+		}		
 ///////////////////////////////////////////////////////////////////////////////
 	}
 ///////////////////////////////////////////////////////////////////////////////

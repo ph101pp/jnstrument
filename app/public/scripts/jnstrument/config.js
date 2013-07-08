@@ -31,14 +31,19 @@ var config={
 			maxRadius: 60,
 
 			activeRadius: 300,
+			activeElementRadius: 60,
 			activeGrowEasing : 0.3,
 			activeCirclePadding : 90,
+			activeScalePadding :10,
 
 			outlineMaxWidth : 5,
+			activeOutlineMaxWidth: 10,
 
 			opacity: 0.5,
-			maxOpacity : 1.0
+			maxOpacity : 1.0,
 
+			arrowArmLength :8,
+			arrowArmAngle:20
 
 		},
 		gE : {

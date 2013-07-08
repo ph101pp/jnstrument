@@ -23,10 +23,13 @@
 			radius : {type:"f", value:[]}
 		};
 
+		var ArrowLeftArmQuaternation = new THREE.Quaternion(0,0,1, config.neuron.fE.arrowArmAngle*Math.PI/180);
+		var ArrowRightArmQuaternation = new THREE.Quaternion(0,0,1,-config.neuron.fE.arrowArmAngle*Math.PI/180);
+
 		var materialDot = new THREE.ShaderMaterial({ transparent:true, vertexShader: shaders.particle.vertexShader,fragmentShader: shaders.particle.fragmentShader, attributes:attributes, uniforms: shaders.particle.uniforms});
 		var material = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1, transparent:true, opacity:0.2});
 		var materialActiveDot = new THREE.MeshBasicMaterial({color:config.colors.activeDots,transparent:true, opacity:0.4});
-		var materialActive = new THREE.LineBasicMaterial({ color:config.colors.activeLines, linewidth:2,transparent:true, opacity:0.5});
+		var materialActive = new THREE.LineBasicMaterial({ color:config.colors.activeLines, linewidth:1,transparent:true, opacity:1});
 
 		var stageObject, stageGeometry;
 		var stageDotObject, stageDotGeometry;
@@ -36,9 +39,13 @@
 		var baseElementCircle = new THREE.Mesh(new THREE.CircleGeometry(1,16));
 		baseElementCircle.geometry.mergeVertices();
 
-		var activeCircle = new THREE.Mesh(new THREE.CircleGeometry(1,40));
+		var activeCircleRotation = 0;
+		var activeCircle = new THREE.Mesh(new THREE.CircleGeometry(1,80));
 		activeCircle.geometry.mergeVertices();
 		activeCircle.geometry.vertices.shift();
+
+		var activeDot = new THREE.Mesh(new THREE.CircleGeometry(1,64));
+		activeDot.geometry.mergeVertices();
 
 		var showDebugStuff=false;
 
@@ -77,11 +84,16 @@
 
 				collisionDetection.testElement(mouse);
 				if(mouse.minDistance === 9999) world.activeElement = undefined;
+
 			}
 
 			// Send active to other visualizations
-			if(activeElement !== world.activeElement) 
+			if(activeElement !== world.activeElement) {
 				socket.sendData("__pca__ActiveElement", {id:world.activeElement});
+
+				if(activeElement) elementData.get(activeElement).object.deactivate();
+				if(world.activeElement) elementData.get(world.activeElement).object.activate();
+			}	
 
 			/*
 			// Parse all the faces
@@ -208,7 +220,7 @@
 			var store = elementData.getAll();
 			var objects = store.objects;
 			var data = store.data;
-			var outboundElements;
+			var outboundElements, circle;
 			
 			stageGeometry = new THREE.Geometry();
 			stageDotGeometry = new THREE.Geometry();
@@ -225,28 +237,34 @@
 
 				// stageDotGeometry.vertices.push(objects[i].position);
 				// attributes.sizes.value.push(Math.pow(objects[i].radius,2)*Math.PI);				
-				baseElementCircle.position = objects[i].position;
-				baseElementCircle.scale.set(objects[i].radius,objects[i].radius,objects[i].radius);
-				THREE.GeometryUtils.merge(stageDotGeometry, baseElementCircle);
 
 
-
-				if(objects[i].id === world.activeElement) drawActiveElement(objects[i]);
-
+				if(objects[i].id === world.activeElement) {
+					drawActiveElement(objects[i]);
+					circle = activeDot;
+				}
+				else {
+					baseElementCircle.position = objects[i].position;
+					baseElementCircle.scale.set(objects[i].radius,objects[i].radius,objects[i].radius);
+					THREE.GeometryUtils.merge(stageDotGeometry, baseElementCircle);		
+					circle = baseElementCircle;
+				}
 
 				// add object attributes to Shader Attributes (per vertex).
-				for(var x=0; x<baseElementCircle.geometry.vertices.length; x++)
+				for(var x=0; x<circle.geometry.vertices.length; x++)
 					for(var attribute in attributes)
 						attributes[attribute].value.push(objects[i].shaderAttributes[attribute]);
 
 				// Add Lines
 				outboundElements = objects[i].outboundElements.getAllObjects(); 				
 				for(var k=0;  k<outboundElements.length; k++) {
-					stageGeometry.vertices.push(objects[i].position);
-					stageGeometry.vertices.push(outboundElements[k].position);
+					var distance = objects[i].position.clone().sub(outboundElements[k].position);
+					stageGeometry.vertices.push(objects[i].position.clone().add(distance.clone().negate().setLength(objects[i].radius)));
+					stageGeometry.vertices.push(outboundElements[k].position.clone().add(distance.setLength(outboundElements[k].radius)));
 
 
 					//Add arrows
+					if(objects[i].id === world.activeElement) continue;
 					var arrowLength=   objects[i].radius + config.neuron.fE.elementPadding * objects[i].outboundCounts[outboundElements[k].id] / objects[i].outboundCounts.total;
 					var arrow = outboundElements[k].position.clone().sub(objects[i].position);
 				
@@ -280,15 +298,90 @@
  		}
 ///////////////////////////////////////////////////////////////////////////////
 		var drawActiveElement =function(element) {
-
-
-			activeCircle.position = element.position;
-			activeCircle.rotation.z+=0.004;
 			var radius = element.actionRadius-config.neuron.fE.activeCirclePadding;
+
+			activeCircleRotation+=0.002;
+			activeCircle.position = element.position;
+			activeCircle.rotation.z=activeCircleRotation;
 			activeCircle.scale.set(radius,radius,radius);
 			THREE.GeometryUtils.merge(activeGeometry, activeCircle);
 
 
+			activeDot.position = element.position;
+			activeDot.scale.set(element.radius,element.radius,element.radius);
+			THREE.GeometryUtils.merge(stageDotGeometry, activeDot);
+
+
+			var outbounds = element.outboundElements.getAllObjects();
+			var inbounds = element.inboundElements.getAllObjects();
+
+			var total = Math.max(element.inboundCounts.total, element.outboundCounts.total);
+			var maxLength = radius-element.radius-config.neuron.fE.activeScalePadding*2;
+			var minScale = element.radius+config.neuron.fE.activeScalePadding;
+			var maxScale = radius-config.neuron.fE.activeScalePadding;
+
+
+			for(var v=1; v< activeDot.geometry.vertices.length; v++) {
+				var w = v-1 >= 1 ? v-1 : activeDot.geometry.vertices.length-1;
+				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[v].clone().setLength(minScale)) );
+				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[w].clone().setLength(minScale)) );
+			}
+			for(var v=1; v< activeDot.geometry.vertices.length; v++) {
+				var w = v-1 >= 1 ? v-1 : activeDot.geometry.vertices.length-1;
+				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[v].clone().setLength(minScale+((maxScale-minScale)*0.5))) );
+				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[w].clone().setLength(minScale+((maxScale-minScale)*0.5))) );
+			}
+			for(var v=1; v< activeDot.geometry.vertices.length; v++) {
+				var w = v-1 >= 1 ? v-1 : activeDot.geometry.vertices.length-1;
+				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[v].clone().setLength(maxScale)) );
+				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[w].clone().setLength(maxScale)) );
+			}
+
+			var arrowLength,arrow,arrowLeftArm,arrowRightArm;
+
+
+			for(var i=0; i<outbounds.length; i++) {
+				arrowLength=   maxLength * element.outboundCounts[outbounds[i].id] / element.outboundCounts.total;
+				arrow = outbounds[i].position.clone().sub(element.position);
+			
+				drawArrow(
+					element.position.clone().add(arrow.setLength(minScale)),
+					element.position.clone().add(arrow.setLength(minScale+arrowLength))
+				);
+			}
+
+			for(var k=0; k<inbounds.length; k++) {
+				arrowLength=   maxLength * element.inboundCounts[inbounds[k].id] / element.inboundCounts.total;
+				arrow = inbounds[k].position.clone().sub(element.position);
+
+				drawArrow(
+					element.position.clone().add(arrow.clone().setLength(maxScale)),
+					element.position.clone().add(arrow.clone().setLength(maxScale-arrowLength))
+				);
+
+			}
+
+		}
+///////////////////////////////////////////////////////////////////////////////
+		var drawArrow = function(from, to) {
+
+			var arrow = to.clone().sub(from);
+			var arrowLeftArm = arrow.clone().applyQuaternion( ArrowLeftArmQuaternation );
+			var arrowRightArm = arrow.clone().applyQuaternion( ArrowRightArmQuaternation );
+
+
+			activeGeometry.vertices.push(to.clone().add(arrowLeftArm.setLength(config.neuron.fE.arrowArmLength)));
+			activeGeometry.vertices.push(to);
+			activeGeometry.vertices.push(to.clone().add(arrowRightArm.setLength(config.neuron.fE.arrowArmLength)));
+			activeGeometry.vertices.push(to);
+
+			// activeGeometry.vertices.push(to.clone().add(arrowLeftArm.setLength(config.neuron.fE.arrowArmLength)));
+			// activeGeometry.vertices.push(to.clone().add(arrowRightArm.setLength(config.neuron.fE.arrowArmLength)));
+
+
+
+			activeGeometry.vertices.push(from); 
+			activeGeometry.vertices.push(to);
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
