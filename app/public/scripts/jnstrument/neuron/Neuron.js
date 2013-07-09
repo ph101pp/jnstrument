@@ -30,7 +30,15 @@
 		var material = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1, transparent:true, opacity:0.2});
 		var materialActiveDot = new THREE.MeshBasicMaterial({color:config.colors.activeDots,transparent:true, opacity:0.4});
 		var materialActive = new THREE.LineBasicMaterial({ color:config.colors.activeLines, linewidth:1,transparent:true, opacity:1});
+		var materialArrow = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1,transparent:true, opacity:1});
+		var materialOutboundArrow = new THREE.LineBasicMaterial({ color:config.colors.outputColor, linewidth:1,transparent:true, opacity:1});
+		var materialInboundArrow = new THREE.LineBasicMaterial({ color:config.colors.inputColor, linewidth:1,transparent:true, opacity:1});
 
+
+
+		var arrowOutboundObject, arrowOutboundGeometry;
+		var arrowInboundObject, arrowInboundGeometry;
+		var arrowObject, arrowGeometry;
 		var stageObject, stageGeometry;
 		var stageDotObject, stageDotGeometry;
 		var activeObject, activeGeometry;
@@ -69,7 +77,6 @@
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var mousedown = function(data, answer, now){
-
 			//showDebugStuff=!showDebugStuff;
 
 			mousePressed = true;
@@ -224,15 +231,19 @@
 			var data = store.data;
 			var outboundElements, circle;
 			
+
 			stageGeometry = new THREE.Geometry();
 			stageDotGeometry = new THREE.Geometry();
 			activeGeometry = new THREE.Geometry();
 			activeDotGeometry = new THREE.Geometry();
+			arrowGeometry = new THREE.Geometry();
+			arrowOutboundGeometry = new THREE.Geometry();
+			arrowInboundGeometry = new THREE.Geometry();
+
 			for(var attribute in attributes) {
 				attributes[attribute].value = []; 
 				attributes[attribute].needsUpdate = true;
 			}
-
 
 			// Update Data 
 			for(var i=0; i < objects.length; i++) {		
@@ -270,8 +281,8 @@
 					var arrowLength=   objects[i].radius + config.neuron.fE.elementPadding * objects[i].outboundCounts[outboundElements[k].id] / objects[i].outboundCounts.total;
 					var arrow = outboundElements[k].position.clone().sub(objects[i].position);
 				
-					activeGeometry.vertices.push(objects[i].position.clone().add(arrow.setLength(arrowLength)));
-					activeGeometry.vertices.push(objects[i].position.clone().add(arrow.setLength(objects[i].radius-1)));
+					arrowGeometry.vertices.push(objects[i].position.clone().add(arrow.setLength(arrowLength)));
+					arrowGeometry.vertices.push(objects[i].position.clone().add(arrow.setLength(objects[i].radius-1)));
 
 				}
 
@@ -339,7 +350,7 @@
 				stageGeometry.vertices.push( element.position.clone().add(activeDot.geometry.vertices[w].clone().setLength(maxScale)) );
 			}
 
-			var arrowLength,arrow,arrowLeftArm,arrowRightArm;
+			var arrowLength,arrow;
 
 
 			for(var i=0; i<outbounds.length; i++) {
@@ -348,7 +359,8 @@
 			
 				drawArrow(
 					element.position.clone().add(arrow.setLength(minScale)),
-					element.position.clone().add(arrow.setLength(minScale+arrowLength))
+					element.position.clone().add(arrow.setLength(minScale+arrowLength)),
+					arrowOutboundGeometry
 				);
 			}
 
@@ -358,32 +370,33 @@
 
 				drawArrow(
 					element.position.clone().add(arrow.clone().setLength(maxScale)),
-					element.position.clone().add(arrow.clone().setLength(maxScale-arrowLength))
+					element.position.clone().add(arrow.clone().setLength(maxScale-arrowLength)),
+					arrowInboundGeometry
 				);
 
 			}
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
-		var drawArrow = function(from, to) {
+		var drawArrow = function(from, to, geometry) {
 
 			var arrow = to.clone().sub(from);
 			var arrowLeftArm = arrow.clone().applyQuaternion( ArrowLeftArmQuaternation );
 			var arrowRightArm = arrow.clone().applyQuaternion( ArrowRightArmQuaternation );
 
 
-			activeGeometry.vertices.push(to.clone().add(arrowLeftArm.setLength(config.neuron.fE.arrowArmLength)));
-			activeGeometry.vertices.push(to);
-			activeGeometry.vertices.push(to.clone().add(arrowRightArm.setLength(config.neuron.fE.arrowArmLength)));
-			activeGeometry.vertices.push(to);
+			geometry.vertices.push(to.clone().add(arrowLeftArm.setLength(config.neuron.fE.arrowArmLength)));
+			geometry.vertices.push(to);
+			geometry.vertices.push(to.clone().add(arrowRightArm.setLength(config.neuron.fE.arrowArmLength)));
+			geometry.vertices.push(to);
 
 			// activeGeometry.vertices.push(to.clone().add(arrowLeftArm.setLength(config.neuron.fE.arrowArmLength)));
 			// activeGeometry.vertices.push(to.clone().add(arrowRightArm.setLength(config.neuron.fE.arrowArmLength)));
 
+			geometry.vertices.push(from); 
+			geometry.vertices.push(to);
 
 
-			activeGeometry.vertices.push(from); 
-			activeGeometry.vertices.push(to);
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
@@ -403,8 +416,33 @@
 			if(activeDotObject) {
 				world.activeScene.remove(activeDotObject);	
 				activeDotObject.geometry.dispose();
+			}			
+			if(arrowObject) {
+				world.scene.remove(arrowObject);	
+				arrowObject.geometry.dispose();
+			}
+			if(arrowOutboundObject) {
+				world.scene.remove(arrowOutboundObject);	
+				arrowOutboundObject.geometry.dispose();
+			}
+			if(arrowInboundObject) {
+				world.scene.remove(arrowInboundObject);	
+				arrowInboundObject.geometry.dispose();
 			}
 
+
+			if(arrowOutboundGeometry && arrowOutboundGeometry.vertices.length >0){
+				arrowOutboundObject = new THREE.Line(arrowOutboundGeometry, materialOutboundArrow, THREE.LinePieces);
+				world.scene.add(arrowOutboundObject);
+			}
+			if(arrowInboundGeometry && arrowInboundGeometry.vertices.length >0){
+				arrowInboundObject = new THREE.Line(arrowInboundGeometry, materialInboundArrow, THREE.LinePieces);
+				world.scene.add(arrowInboundObject);
+			}
+			if(arrowGeometry && arrowGeometry.vertices.length >0){
+				arrowObject = new THREE.Line(arrowGeometry, materialArrow, THREE.LinePieces);
+				world.scene.add(arrowObject);
+			}
 			if(stageGeometry && stageGeometry.vertices.length >0){
 				stageObject = new THREE.Line(stageGeometry, material, THREE.LinePieces);
 				world.scene.add(stageObject);

@@ -6,6 +6,37 @@
 
 	module.exports = {
 
+		arrow : {
+
+			uniforms: {},
+
+			vertexShader: [
+			// 	"attribute float arrowColor;",
+			// 	"varying float vType;",
+
+				"void main() {",
+					// "vType = arrowColor;",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+				// "varying float vType;",
+	
+				"vec4 inboundColor = vec4("+inputColor.r+","+inputColor.g+","+inputColor.b+",1.);",
+				"vec4 outboundColor = vec4("+outputColor.r+","+outputColor.g+","+outputColor.b+",1.);",
+				"vec4 color = vec4("+color.r+","+color.g+","+color.b+",1.);",
+
+				"void main() {",
+					// "if(vType == 3.) gl_FragColor = outboundColor;",
+					// "if(vType == 2.) gl_FragColor = inboundColor;",
+					"gl_FragColor = color;",
+				"}"
+
+			].join("\n")
+		},
 		particle : {
 
 			uniforms: {},
