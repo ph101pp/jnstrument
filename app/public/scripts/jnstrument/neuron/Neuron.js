@@ -91,8 +91,10 @@
 			if(activeElement !== world.activeElement) {
 				socket.sendData("__pca__ActiveElement", {id:world.activeElement});
 
-				if(activeElement) elementData.get(activeElement).object.deactivate();
-				if(world.activeElement) elementData.get(world.activeElement).object.activate();
+				activeElement = elementData.get(activeElement);
+				if(activeElement) activeElement.object.deactivate();
+				activeElement = elementData.get(world.activeElement);
+				if(activeElement) activeElement.object.activate();
 			}	
 
 			/*
