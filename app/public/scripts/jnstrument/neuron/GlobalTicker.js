@@ -25,7 +25,7 @@
 			this.emitEvent(undefined, undefined, "calculate");
 			this.emitEvent(undefined, undefined, "update");
 			this.emitEvent(undefined, undefined, "render");
-			showFrameRate(now);
+		//	showFrameRate(now);
 		}).bind(this);
 ///////////////////////////////////////////////////////////////////////////////
 		$(window).resize(function(e){
@@ -51,6 +51,12 @@
 			e.preventDefault();
 			this.emitEvent(e, undefined, "mousemove");
 		}.bind(this));
+///////////////////////////////////////////////////////////////////////////////
+		$(window).bind('mousewheel',function(e){
+			e.preventDefault();
+			this.emitEvent(e, undefined, "scroll");
+		}.bind(this));
+
 ///////////////////////////////////////////////////////////////////////////////
 	}
 ///////////////////////////////////////////////////////////////////////////////

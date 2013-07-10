@@ -100,9 +100,7 @@ module.exports = function() {
 	});
 
 	app.get(/\/|\/*/, /*proxy.middleware,*/ function (req, res) {
-		res.render('index', { 
-			title : 'Home'  
-		});
+		res.render('blank', {});
 	});
 
 	return app;

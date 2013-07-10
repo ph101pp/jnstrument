@@ -64,6 +64,8 @@
 
 		var mousePressed = false;
 
+		var frustum = new THREE.Frustum();
+
 ///////////////////////////////////////////////////////////////////////////////
 		var getMousePositionOnBG = function(data){
 			var vector = new THREE.Vector3( ( data.clientX / world.width ) * 2 - 1, - ( data.clientY / world.height ) * 2 + 1, 0.5 );
@@ -96,7 +98,7 @@
 
 			// Send active to other visualizations
 			if(activeElement !== world.activeElement) {
-				socket.sendData("__pca__ActiveElement", {id:world.activeElement});
+				socket.sendData("__pca__ActiveElement", {id:world.activeElement, type:"activeElement"});
 
 				activeElement = elementData.get(activeElement);
 				if(activeElement) activeElement.object.deactivate();
@@ -104,22 +106,40 @@
 				if(activeElement) activeElement.object.activate();
 			}	
 
-			/*
-			// Parse all the faces
-			for ( var i in intersects ) {
+		}
+///////////////////////////////////////////////////////////////////////////////
+		var scrolling = function(data, answer, now){
 
-				intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+			if(data.originalEvent.wheelDeltaY > 0) {
+ 				
+ 				world.camera.fov-=0.5;
+
+				if(world.camera.fov <= 45) world.camera.fov=45;
+			}
+			else if(world.camera.fov <60) {
+				world.camera.fov+=0.5;
+			} 
+			else if(stageObject) {
+				frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( world.camera.projectionMatrix, world.camera.matrixWorldInverse ) );
+				stageObject.geometry.computeBoundingBox();
+
+				if(!frustum.containsPoint( stageObject.geometry.boundingBox.min ) || !frustum.containsPoint( stageObject.geometry.boundingBox.max ) ) {
+
+					world.camera.fov+=0.5;
+
+				}
+
 
 			}
-			*/
 
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var mousemove = function(data, answer, now){
+			var mousePosition = getMousePositionOnBG(data);
+
 			if(!mousePressed) return;
 
 			var activeElement = elementData.get(world.activeElement);
-			var mousePosition = getMousePositionOnBG(data);
 
 			if(!activeElement || !mousePosition) return;
 			activeElement.object.position = mousePosition;
@@ -129,16 +149,14 @@
 		var mouseup = function(data, answer, now){
 			mousePressed = false;
 		}
+
+
 ///////////////////////////////////////////////////////////////////////////////
  		var socketJSEvent= function(data, answer, now){
  			// Remove everything if new SenderId received
 			if(data.sender.id !== senderId) {
-				elementGroups.removeAll();
-				elementData.removeAll();
-				groupCollisionDetection.clearElements();
-				functionCollisionDetection.clearElements();
+				resetVisualization();
 				senderId = data.sender.id;
-				//groupCollisionDetection.addElement(mouse);
 			}
 
 			// get caller and element
@@ -206,6 +224,32 @@
 			var groupElements = elementGroups.getAllObjects();
 			var functionElements = elementData.getAllObjects();
 
+			if(stageObject && false) {
+				// Camera
+				// world.camera.updateMatrix(); // make sure camera's local matrix is updated
+				// world.camera.updateMatrixWorld(); // make sure camera's world matrix is updated
+				// world.camera.matrixWorldInverse.getInverse( world.camera.matrixWorld );
+				// stageObject.updateMatrix(); // make sure plane's local matrix is updated
+				// stageObject.updateMatrixWorld();
+				frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( world.camera.projectionMatrix, world.camera.matrixWorldInverse ) );
+				stageObject.geometry.computeBoundingBox();
+
+				if(!frustum.containsPoint( stageObject.geometry.boundingBox.min ) || !frustum.containsPoint( stageObject.geometry.boundingBox.max ) ) {
+					world.camera.fov+=1;
+				}
+				else if(world.camera.fov > 60) {
+					world.camera.fov-=1;
+				}
+				else world.camera.fov = 60
+
+				world.camera.updateProjectionMatrix();
+				world.camera.updateMatrix(); // make sure camera's local matrix is updated
+				world.camera.updateMatrixWorld(); // make sure camera's world matrix is updated
+				world.camera.matrixWorldInverse.getInverse( world.camera.matrixWorld );
+				console.log(world.camera.fov);
+
+			}
+
 			// Update collision detections
 			functionCollisionDetection.reMap();
 			groupCollisionDetection.reMap();
@@ -221,8 +265,10 @@
  				groupElements[i].updateActionRadius();
  			}
 			// Update functionElement Positions
- 			for(var i=0; i<functionElements.length; i++) 
+ 			for(var i=0; i<functionElements.length; i++) {
  				functionElements[i].update(now);
+
+ 			}
  		}
 ///////////////////////////////////////////////////////////////////////////////
  		var updateElements = function(data, answer, now){
@@ -308,6 +354,14 @@
 			}
 			functionCollisionDetection.drawGrids(world, showDebugStuff);
 			updateScenes();
+ 		}
+ ///////////////////////////////////////////////////////////////////////////////
+ 		var resetVisualization =function() {
+			elementGroups.removeAll();
+			elementData.removeAll();
+			groupCollisionDetection.clearElements();
+			functionCollisionDetection.clearElements();
+			//groupCollisionDetection.addElement(mouse);
  		}
 ///////////////////////////////////////////////////////////////////////////////
 		var drawActiveElement =function(element) {
@@ -430,6 +484,9 @@
 				arrowInboundObject.geometry.dispose();
 			}
 
+			// stop button 
+			if(data && data.action === "remove") return;
+
 
 			if(arrowOutboundGeometry && arrowOutboundGeometry.vertices.length >0){
 				arrowOutboundObject = new THREE.Line(arrowOutboundGeometry, materialOutboundArrow, THREE.LinePieces);
@@ -499,12 +556,14 @@
 			var effectBlend2 = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse2" );
 				effectBlend2.uniforms[ 'tDiffuse1' ].value = composerActive.renderTarget2
 				effectBlend2.renderToScreen = true;
-			composer.addPass(effectVignette);
+			//composer.addPass(effectVignette);
 			composer.addPass(effectBlend1);					
 			composer.addPass(effectBlend2);
 		}
 ///////////////////////////////////////////////////////////////////////////////
 		var render = function(){
+			world.camera.updateProjectionMatrix();
+
 			composerBlur.render();
 			composerActive.render();
 			composer.render();
@@ -527,6 +586,35 @@
 			// groupCollisionDetection.addElement(mouse);
 			// globalTick.addListener(mouse.update, { bind: mouse, eventName :"update"});
 
+			// Key Events
+			$(window).bind('keydown',function(e){
+				switch(e.keyCode){
+					case 32: //space
+
+						if(loop.isActive()) {
+							loop.deactivate();						
+
+							setTimeout(function(){
+								resetVisualization();
+								updateScenes({action:"remove"})
+								render();
+							}, 100);
+
+							socket.sendData("__pca__ActiveElement", {type:"stop"});
+
+						}
+						else {
+							resetVisualization();
+							loop.activate();		
+							socket.sendData("__pca__ActiveElement", {type:"start"});
+						}
+
+					break;
+					case 83://s
+					break;
+				}
+			}.bind(this));
+
 			//Background
 			background = new THREE.Mesh(new THREE.PlaneGeometry(999999, 999999, 1,1), new THREE.MeshBasicMaterial({color:config.colors.background}));
 			world.scene.add(background);
@@ -540,7 +628,7 @@
 			globalTick.addListener(mousedown, {bind:this, eventName:"mousedown"});
 			globalTick.addListener(mouseup, {bind:this, eventName:"mouseup"});
 			globalTick.addListener(mousemove, {bind:this, eventName:"mousemove"});
-//			globalTick.addListener(setupComposer, { bind:this, eventName :"resize" });
+			globalTick.addListener(scrolling, { bind:this, eventName :"scroll" });
 			globalTick.addListener(calculateElements, { bind: this, eventName :"calculate"});
 			globalTick.addListener(updateElements, { bind: this, eventName :"update"});
 			//globalTick.addListener(updateScenes, {bind: this, eventName :"update"});			
@@ -552,6 +640,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
+
 		this.remove = function() {
 			loop.removeListener(globalTick.tick);
 			loop.removeListener(env.render);

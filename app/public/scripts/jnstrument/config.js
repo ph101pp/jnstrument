@@ -2,7 +2,7 @@ var config={
 	socketAdress : "127.0.0.1:8000",
 
 	colors : {
-		background : 0x000026,//0x1D1D26,
+		background : 0x000015, // 0x000026,//
 		normalDots : 0xFFFFFF,
 		normalLines : 0xCCCCCC,
 		activeDots : 0xFF0000,
@@ -18,7 +18,7 @@ var config={
 		fE : {
 			maxPushForce : 80,
 			minPushForce : 0,
-			maxActivePushForce : 50,
+			maxActivePushForce : 70,
 			minActivePushForce : 0,
 			maxPullForce : 100,
 			minPullForce : 0,

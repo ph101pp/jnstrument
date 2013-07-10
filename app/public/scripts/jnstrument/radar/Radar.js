@@ -124,6 +124,9 @@
 				activeDotGeometry.dispose();
 			}
 
+			//stop button
+			if(data && data.action === "remove") return;
+
 			stageGeometry = new THREE.Geometry();
 			stageDotGeometry = new THREE.Geometry();
 			for(var i=0; i < objects.length; i++) 
@@ -180,9 +183,9 @@
 			var effectBlend2 = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse2" );
 				effectBlend2.uniforms[ 'tDiffuse1' ].value = composerActive.renderTarget2
 				effectBlend2.renderToScreen = true;
-			composer.addPass(effectVignette);
-			composer.addPass(effectBlend1);					
-			composer.addPass(effectBlend1);					
+//			composer.addPass(effectVignette);
+			// composer.addPass(effectBlend1);					
+			// composer.addPass(effectBlend1);					
 			composer.addPass(effectBlend1);					
 			composer.addPass(effectBlend2);
 		}
@@ -213,9 +216,22 @@
 
 			socket.addListener(socketJSEvent, {bind : this, eventName:"jsEvent"});
 			
-
 			socket.addListener(function(data){
-				activeId = data.id;
+				if(data.type == "activeElement"){
+					activeId = data.id;
+				}
+				if(data.type == "start") {
+					elementData.removeAll();
+					loop.activate();
+				}
+				if(data.type == "stop") {
+					loop.deactivate();
+					setTimeout(function(){
+						elementData.removeAll();
+						updateElements({action:"remove"});
+						render();
+					}, 100);
+				}
 			}, {bind : this, eventName:"activeElement"});
 
 			

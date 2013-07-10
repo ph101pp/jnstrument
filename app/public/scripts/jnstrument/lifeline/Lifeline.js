@@ -31,13 +31,18 @@
 		var activeObject, activeGeometry;
 		var activeDotObject, activeDotGeometry;
 
+
+///////////////////////////////////////////////////////////////////////////////
+		var resetVisualization = function(){
+			elementData.removeAll();
+			maxEventsOverTime=10;
+			maxEventsOverAll=50;
+		}
 ///////////////////////////////////////////////////////////////////////////////
  		var socketJSEvent= function(data, answer, now){
 			if(data.sender.id !== senderId) {
-				elementData.removeAll();
+				resetVisualization();
 				senderId = data.sender.id;
-				maxEventsOverTime=10;
-				maxEventsOverAll=50;
 			}
 			var element = elementData.get(data.id) || {object:[], data: {id:null, eventCount:0, history:[new THREE.Vector3(0,0,0)], position: new THREE.Vector3(0,0,0)}};
 			element.data.id=data.id
@@ -160,7 +165,6 @@
 					if(data[i].id === activeId) step = 1;
 					else {
 						step = w-v>100 ? largeStep : 1;
-						console.log(step);
 							
 					}
 
@@ -191,6 +195,11 @@
 				activeObject.geometry.dispose();								
 				activeDotObject.geometry.dispose();
 			}
+
+			//stop button
+			if(data && data.action === "remove") return;
+
+
 			stageObject = new THREE.Line(stageGeometry, material, THREE.LinePieces);
 			stageDotObject = new THREE.Mesh(stageDotGeometry, materialDot);
 			stageDotObject.position.set(0,0,1);
@@ -238,7 +247,7 @@
 			var effectBlend2 = new THREE.ShaderPass( shaders.additiveBlend, "tDiffuse2" );
 				effectBlend2.uniforms[ 'tDiffuse1' ].value = composerActive.renderTarget2
 				effectBlend2.renderToScreen = true;
-			composer.addPass(effectVignette);
+//			composer.addPass(effectVignette);
 			composer.addPass(effectBlend1);					
 			composer.addPass(effectBlend2);
 		}
@@ -270,7 +279,22 @@
 			socket.addListener(socketJSEvent, {bind : this, eventName:"jsEvent"});
 		
 			socket.addListener(function(data){
-				activeId = data.id;
+				if(data.type == "activeElement"){
+					activeId = data.id;
+				}
+				if(data.type == "start") {
+					resetVisualization();
+					loop.activate();
+				}
+				if(data.type == "stop") {
+					loop.deactivate();
+					setTimeout(function(){
+						resetVisualization();
+						updateScenes({action:"remove"});
+						render();
+					}, 100);
+				}
+
 			}, {bind : this, eventName:"activeElement"});
 		
 			globalTick.addListener(world.onWindowResize, { bind:world, eventName :"resize" });
