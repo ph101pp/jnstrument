@@ -1,5 +1,5 @@
 var config={
-	socketAdress : "127.0.0.1:8000",
+	socketAdress : "10.162.66.20:8000",
 
 	colors : {
 		background : 0x000026,//0x1D1D26,
