@@ -1,12 +1,13 @@
 var config={
 	socketAdress : "10.162.66.20:8000",
+//	socketAdress : "127.0.0.1:8000",
 
 	colors : {
 		background : 0x000015, // 0x000026,//
-		normalDots : 0xFFFFFF,
-		normalLines : 0xCCCCCC,
-		activeDots : 0xFF0000,
-		activeLines : 0xFFFFFF,
+		normalDots : 0xCCCCCC,
+		normalLines : 0xBBBBBB,
+		activeDots : 0xdddddd,
+		activeLines : 0xdddddd,
 		activeGlow : 0x76BDE5,
 
 		outputColor : 0x0071BC,
@@ -40,7 +41,7 @@ var config={
 			activeOutlineMaxWidth: 10,
 
 			opacity: 0.5,
-			maxOpacity : 1.0,
+			maxOpacity : 0.9,
 
 			arrowArmLength :8,
 			arrowArmAngle:20

@@ -65,7 +65,7 @@
 
 
 			// Gravity
-			var gravity = this.position.clone().negate().multiplyScalar(this.actionRadius/5000);
+			var gravity = this.position.clone().negate().multiplyScalar(this.actionRadius/3000);
 			if(gravity.length() > config.neuron.gE.maxGravity) gravity.setLength(config.neuron.gE.maxGravity);
 			this.velocity.add(gravity);
 
