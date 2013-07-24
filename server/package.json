@@ -14,6 +14,7 @@
     "preinstall": "npm i -g forever"
   },
   "dependencies": {
+    "superClass": "1.0.x",
     "http-proxy": "0.10.x",
     "socket.io": "0.9.x",
     "express": "3.2.x",
