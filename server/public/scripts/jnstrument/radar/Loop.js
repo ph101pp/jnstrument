@@ -19,5 +19,5 @@
 		}
 	}
 ///////////////////////////////////////////////////////////////////////////////
-	module.exports = require("./eventEmitter.js").extend(Loop);
+	module.exports = require("./EventEmitter.js").extend(Loop);
 })(jQuery, THREE, window, document)

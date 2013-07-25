@@ -1,20 +1,16 @@
 {
-  "name": "BA-Thesis",
-  "version": "0.1.0-16",
+  "name": "jnstrument",
+  "version": "0.1.0-20",
   "author": "Philipp Adrian <hello@philippadrian.com>",
-  "description": "Bachelor Thesis",
+  "description": "A glance behind the curtains of a web browser.",
   "scripts": {
     "start": "./server.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/greenish/BA-Thesis.git"
-  },
-  "scripts": {
-    "preinstall": "npm i -g forever"
+    "url": "https://github.com/greenish/jnstrument.git"
   },
   "dependencies": {
-    "superClass": "1.0.x",
     "http-proxy": "0.10.x",
     "socket.io": "0.9.x",
     "express": "3.2.x",
@@ -30,5 +26,11 @@
   "engines": {
     "node": "0.8.x"
   },
-  "subdomain": "greenish"
+  "subdomain": "jnstrument",
+  "domains": [
+    "jnstrument.com",
+    "www.jnstrument.com",
+    "jnstrument.ch",
+    "www.jnstrument.ch"
+  ]
 }

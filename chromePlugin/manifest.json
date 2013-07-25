@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "PCA Instrumentation Inject",
-  "description": "Injects my instrumentation script.",
+  "name": "jnstrument",
+  "description": "A glance behind the curtains of a web browser",
   "version": "0.1",
   "background": {
      "persistent": true,
