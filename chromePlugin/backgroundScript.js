@@ -56,6 +56,7 @@ new (function jnstrument(){
 	});
 /////////////////////////////////////////////////////////////
 	var activateTab = function(tabId){
+		// User Debugger to inject Script
 		// try{
 		// 	chrome.debugger.detach({tabId:tabId});
 		// } catch(e){};		

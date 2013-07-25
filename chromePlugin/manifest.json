@@ -7,13 +7,13 @@
   "background": {
      "persistent": true,
      "scripts": [
-       "jnstrument.js"
-//        "popup.js"
+        "backgroundScript.js"
+        // "debugPopup.js"
       ]
   },
   "content_scripts" : [
     {
-      "js": ["inject.js"],
+      "js": ["contentScript.js"],
       "run_at" : "document_end",
       "matches" : ["http://*/*", "file://*/*", "https://*/*"]
     }
@@ -29,8 +29,8 @@
     "pca__ProxyInstrumentES5chrome.js"
   ],
   "browser_action": {
-    "default_icon": "inactive.png"
-//    "debugPopu": "debugPopup.html"
-
+    "default_icon": "inactive.png",
+    "default_popup": "popup.html",
+    "default_title": "jnstrument"
   }
 }

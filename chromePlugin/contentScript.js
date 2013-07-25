@@ -11,7 +11,6 @@
 	});
 
 	var updateScript = function (action, guid){
-		console.log(action, "jnstrument");
 		var script;
 		if(action != "disable") {
 			if(!injected) {
@@ -29,17 +28,3 @@
 	}
 
 })(window, document);
-
-
-	// var xhr = new XMLHttpRequest();
-	// xhr.open("GET", "http://greenish.eu01.aws.af.cm/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime(), true);
-	// xhr.onreadystatechange = function() {
-	//   if (xhr.readyState == 4) {
-	//   //	console.log(xhr.responseText);
-	//   	var str = (xhr.responseText + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/,'\\0').replace(/\u2029/,'\\0').replace(/\u2028/,'\\0').replace(/\�/,'\\ufffd');
-
-	//   	console.log(str);
-	//     //document.body.appendChild(document.createElement('script')).innerHTML=str;
-	//   }
-	// }
-	// xhr.send();
