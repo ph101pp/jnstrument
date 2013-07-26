@@ -3,12 +3,11 @@
 
   "name": "jnstrument",
   "description": "A glance behind the curtains of a web browser",
-  "version": "0.1",
+  "version": "0.1.1",
   "background": {
      "persistent": true,
      "scripts": [
         "backgroundScript.js"
-        // "debugPopup.js"
       ]
   },
   "content_scripts" : [
@@ -21,12 +20,8 @@
   "permissions": [
     "tabs",
     "debugger",
-    "file://*/*",   
     "http://*/*",
     "https://*/*"
-  ],
-  "web_accessible_resources" : [
-    "pca__ProxyInstrumentES5chrome.js"
   ],
   "browser_action": {
     "default_icon": "inactive.png",

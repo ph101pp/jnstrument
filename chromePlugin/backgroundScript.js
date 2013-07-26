@@ -1,4 +1,4 @@
-new (function jnstrument(){
+jnstrument = new (function (){
 /////////////////////////////////////////////////////////////
 	var tabs = {};
 	var debugging = false;
@@ -8,11 +8,15 @@ new (function jnstrument(){
 				deactivateTab(tabs[i].id);
 	}
 /////////////////////////////////////////////////////////////
-	chrome.browserAction.onClicked.addListener(function(tab) {
+	this.activate = function(tab) {
 		installation(tab);
 		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab.id);
 		else activateTab(tab.id);
-	});
+	};
+/////////////////////////////////////////////////////////////
+	this.tabStatus = function(tab){
+		return tabs[tab.id];
+	}
 /////////////////////////////////////////////////////////////
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		if(tabs[sender.tab.id] && tabs[sender.tab.id].status) sendResponse({
