@@ -1,7 +1,7 @@
 !!!5
 html
 	head
-		title #{title} - Bachelor Thesis
+		title jnstrument - #{title}
 		link(rel='stylesheet', href='/stylesheets/guitarHero.css')
 		script(src='/scripts/libs/jquery-2.0.2.min.js')
 		script(src='/scripts/libs/three.js/three.js')
@@ -13,8 +13,10 @@ html
 
 		script(src='/scripts/libs/three.js/postprocessing/BloomPass.js')
 
+		script(src='/scripts/#{show}/index.js')
 
-		script(src='/scripts/neuron/index.js')
+		script()
+			var GUID = "#{guid}";
 
 	body
 		#scene

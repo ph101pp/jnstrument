@@ -14,8 +14,8 @@
 			var connection = require("socket.io-client").connect(entryPoint);
 			var urlObj = require("url").parse(window.location);
 ///////////////////////////////////////////////////////////////////////////////
-			connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.match(/.*\/(.*)/)[1]}, function(data){
-				console.log("Connected", data);
+			connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.match(/\/(.*)\/.*/)[1]}, function(data){
+				console.log("Connected", data, urlObj.pathname.match(/\/(.*)\/.*/)[1]);
 				if(data.status != 200) connection.disconnect();
 			});
 ///////////////////////////////////////////////////////////////////////////////

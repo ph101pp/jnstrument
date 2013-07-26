@@ -17,8 +17,8 @@
 				// document.body.appendChild(document.createElement('script')).src="http://greenish.eu01.aws.af.cm/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime();
 				// document.body.appendChild(document.createElement('script')).src="http://greenish.jit.su/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime();
 				// document.body.appendChild(document.createElement('script')).src=chrome.extension.getURL("pca__ProxyInstrumentES5chrome.js")+"?"+new Date().getTime();
-				// document.body.appendChild(document.createElement('script')).src="http://localhost:8000/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime();
-				document.body.appendChild(document.createElement('script')).src="http://jnstrument.com/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime();
+				 document.body.appendChild(document.createElement('script')).src="http://localhost:8000/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime();
+				//document.body.appendChild(document.createElement('script')).src="http://jnstrument.com/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime();
 				injected = true;
 			}
 			script = "__pca__.enable('"+guid+"')";

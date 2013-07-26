@@ -45,7 +45,7 @@
 			functionElement.eventElement.remove(this.element);
 			this.ticker.removeTick(this);
 			functionElement = null;
-			setTimeout(function(){this.setAvailable()}, 10);
+			setTimeout(function(){this.setAvailable()}.bind(this), 10);
 		}
 ///////////////////////////////////////////////////////////////////////////////		
 		this.construct = function(_env){

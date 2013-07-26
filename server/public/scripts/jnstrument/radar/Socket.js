@@ -13,7 +13,7 @@
 				this.emitEvent(data, answer, "activeElement");
 			}.bind(this);
 ///////////////////////////////////////////////////////////////////////////////
-			connection.emit("__pca__Connect_Receiver",{guid:urlObj.pathname.match(/.*\/(.*)/)[1]}, function(data){
+			connection.emit("__pca__Connect_Receiver",{guid:GUID}, function(data){
 				console.log("Connected", data);
 				if(data.status != 200) connection.disconnect();
 			});

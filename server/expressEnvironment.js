@@ -5,6 +5,7 @@ module.exports = function() {
 	var stylus = require('stylus');
 	var jadeify2 = require('jadeify2')
 	var browserify = require("browserify-middleware").settings({ transform: ['jadeify2'] });
+	var url = require('url');
 	var proxy = require("./proxyRequest.js");
 
 	var app = express();
@@ -39,73 +40,56 @@ module.exports = function() {
 	//     proxy.url(req, res);
 	// })
 
-	app.get(/\/d3\/........-....-4...-....-p....c.....a|\/d3\/installation/, function (req, res) {
-		res.render('d3Visuals', { 
-			title : 'Visual'  
-		});
-	});
 
-	app.get(/\/gH\/........-....-4...-....-p....c.....a|\/gH\/installation/, function (req, res) {
-		res.render('guitarHero', { 
-			title : 'Guitar Hero'  
-		});
-	});
-
-	app.get(/\/atom\/........-....-4...-....-p....c.....a|\/atom\/installation/, function (req, res) {
+	app.get(/\/........-....-4...-....-p....c.....a\/atom|\/installation\/atom/, function (req, res) {
 		res.render('atom', { 
 			title : 'atom'  
 		});
 	});
 
-	app.get(/\/base\/........-....-4...-....-p....c.....a|\/base\/installation/, function (req, res) {
-		res.render('base', { 
-			title : 'Base'  
-		});
-	});
-
-	app.get(/\/curtain\/........-....-4...-....-p....c.....a|\/curtain\/installation/, function (req, res) {
+	app.get(/\/........-....-4...-....-p....c.....a\/curtain|\/installation\/curtain/, function (req, res) {
 		res.render('curtain', { 
 			title : 'curtain'  
 		});
 	});
 
-	app.get(/\/drop\/........-....-4...-....-p....c.....a|\/drop\/installation/, function (req, res) {
+	app.get(/\/........-....-4...-....-p....c.....a\/drop|\/installation\/drop/, function (req, res) {
 		res.render('drop', { 
 			title : 'drop'  
 		});
 	});
 
-	app.get(/\/radar\/........-....-4...-....-p....c.....a|\/radar\/installation/, function (req, res) {
-		res.render('radar', { 
-			title : 'Radar'  
-		});
-	});
-
-	app.get(/\/lifeline\/........-....-4...-....-p....c.....a|\/lifeline\/installation/, function (req, res) {
-		res.render('lifeline', { 
-			title : 'Lifeline'  
-		});
-	});
-
-	app.get(/\/neuron\/........-....-4...-....-p....c.....a|\/neuron\/installation/, function (req, res) {
-		res.render('neuron', { 
-			title : 'Neuron'  
-		});
-	});	
-	app.get(/\/proto\/........-....-4...-....-p....c.....a|\/proto\/installation/, function (req, res) {
+	app.get(/\/........-....-4...-....-p....c.....a\/proto|\/installation\/proto/, function (req, res) {
 		res.render('proto', { 
 			title : 'prototypes'  
 		});
-	});
+	});	
 
-	app.get(/\/test\/........-....-4...-....-p....c.....a|\/test\/installation/, function (req, res) {
-		res.render('test', { 
-			title : 'test'  
+
+// NEW
+
+	// D3.js
+	app.get(/\/........-....-4...-....-p....c.....a\/d3|\/installation\/d3/, function (req, res) {
+		res.render('D3Visuals', { 
+			title : 'First Visual'  
 		});
 	});
 
+	// THREE.js
+	app.get(/\/(........-....-4...-....-p....c.....a|installation)\/(neuron|radar|lifeline|guitarHero)/, function (req, res) {
+
+		var data = url.parse(req.url).pathname.match(/\/(........-....-4...-....-p....c.....a|installation)\/(neuron|radar|lifeline|guitarHero)/);
+
+		res.render("THREEVisuals", { 
+			title : data[2].charAt(0).toUpperCase() + data[2].slice(1),
+			show : data[2],
+			guid : data[1]
+		});
+	});
+
+	// jnstrument.com
 	app.get(/\/|\/*/, /*proxy.middleware,*/ function (req, res) {
-		res.render('blank', {});
+		res.render('index', {});
 	});
 
 	return app;
