@@ -20,13 +20,18 @@ module.exports = function() {
 		  return stylus(str).set('filename', path).use(require('nib')());
 		}
 	}))
-	app.use('/scripts', browserify("./public/scripts/jnstrument"));
+
 	// app.use(function(req, res, next){
 	// 	res.setHeader('Access-Control-Allow-Origin', '*');
 	// 	next();
 	// });
 
 	app.use(express.static(__dirname + '/public'))
+	
+	app.use('/scripts', browserify("./public/scripts/jnstrument"));
+
+	// jnstrument.com google verifiation
+	app.use('/googlef0f547244e0ab5b4.html',"./public/googlef0f547244e0ab5b4.html");
 
 
 	// Routes
