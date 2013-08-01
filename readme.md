@@ -15,7 +15,5 @@ For more information have a look at [jnstrument.com](jnstrument.com) or at the [
 
 
 #### Technologies:
-
-A __Google Chrome Extension__, that injects Javascript on the website that will be visualized
-
-and a __NodeJS Server__, that serves the visualizations and forwards events from the webseite to the visualization.
+* A __Google Chrome Extension__, that injects Javascript on the website that will be visualized
+* and a __NodeJS Server__, that serves the visualizations and forwards events from the webseite to the visualization.
