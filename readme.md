@@ -16,6 +16,5 @@ For more information have a look at the [project on Behance](http://www.behance.
 
 jnstrument consists of two main parts:
 
-A google chrome extension, that injects Javascript on the website
-that will be visualized and a nodejs server, that serves the 
-visualizations and forwards events from the webseite to the visualization.
+A [__Google Chrome Extension__](http://www.behance.net/gre_nish), that injects Javascript on the website that will be visualized
+and a __NodeJS Server__, that serves the visualizations and forwards events from the webseite to the visualization.
