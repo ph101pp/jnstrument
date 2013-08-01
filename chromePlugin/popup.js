@@ -2,26 +2,36 @@ chrome.tabs.query({currentWindow:true, active:true}, function(result){
 	var tab=result[0];
 	var bgPage=chrome.extension.getBackgroundPage();
 	var activateLink=document.getElementById("activate");
-	var gotoLink=document.getElementById("goto");
-
-	var checkGoToLink = function(){
+	var deactivateLink=document.getElementById("deactivate");
+	var gotoLink=document.getElementById("open");
+	var checkLink = function(){
+		if(!window.Proxy) {
+			document.body.setAttribute("class", "flags");
+			return;
+		}
 		var status = bgPage.jnstrument.tabStatus(tab);
-		if(status &&status.status) gotoLink.style.display="block";
-		else gotoLink.style.display="none";
+		if(status && status.status) {
+			document.body.setAttribute("class", "active");
+		}
+		else {
+			document.body.setAttribute("class", "deactive");
+		}
 	}
-	checkGoToLink();
-
 	var openVisualization = function(){
 		var status = bgPage.jnstrument.tabStatus(tab);
 		if(!status || !status.status) return;
-		window.open("http://jnstrument.com/neuron/"+status.guid,"_blank");
+		window.open("http://jnstrument.com/"+status.guid+"/neuron","_blank");
+	}
+	var activate = function(){
+		bgPage.jnstrument.activate(tab);
+		checkLink();
+		openVisualization();
 	}
 
-	activateLink.addEventListener("click", function(){
-		bgPage.jnstrument.activate(tab);
-		checkGoToLink();
-		openVisualization();
-	});
+	checkLink();
+
+	activateLink.addEventListener("click", activate);
+	deactivateLink.addEventListener("click", activate);
 
 	gotoLink.addEventListener("click", function(){
 		openVisualization();

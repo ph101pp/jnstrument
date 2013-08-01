@@ -1,16 +1,28 @@
 !!!5
 html
 	head
-		title #{title} - My Site
-		link(rel='stylesheet', href='/stylesheets/style.css')
-		script(src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
-	body
-		header
-			h1 Code Visualization
-		.container
-			.main-content
-				block content
-			.sidebar
-				block sidebar
-		footer
-			p Running on node with Express, Jade and Stylus
+		title jnstrument - A look behind the curtains of a web browser
+		link(rel='stylesheet', href='/scripts/libs/jquery-cover/jquery.cover.css')
+		link(rel='stylesheet', href='/stylesheets/jnstrument.css')
+		link(type="text/css", rel="stylesheet", href="http://fast.fonts.net/cssapi/adf630e3-dcd0-4b7f-a849-9db6989461b8.css")
+
+	body(class="#{show}")
+		div(class="titleBar")
+			a(class="ir jnstrumentTitle", href="/")
+				h1 jnstrument
+			div(class="ir jnstrumentSubtitle")
+				h2 A look behind the curtains of a web browser
+
+			ul(class="visualsNavigation")
+				li(class="#{guid === 'none' || show === 'neuron' ? 'active' : ''}")
+					a(href="#{guid !== 'none' && show !== 'neuron' ? 'http://'+socketAdress+'/'+guid+'/neuron' : '#'}", class='ir neuronIcon') Neuron
+			
+				li(class="#{guid === 'none' || show === 'lifeline' ? 'active' : ''}")
+					a(href="#{guid !== 'none' && show !== 'lifeline' ? 'http://'+socketAdress+'/'+guid+'/lifeline' : '#'}", class='ir lifelineIcon') Lifeline
+			
+				li(class="#{guid === 'none' || show === 'radar' ? 'active' : ''}")
+					a(href="#{guid !== 'none' && show !== 'radar' ? 'http://'+socketAdress+'/'+guid+'/radar' : '#'}", class='ir radarIcon') Radar
+
+		block content
+
+		block scripts

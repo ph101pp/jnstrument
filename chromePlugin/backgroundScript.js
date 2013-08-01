@@ -34,30 +34,30 @@ jnstrument = new (function (){
 			tabId:tabId
 		});
 	});
-/////////////////////////////////////////////////////////////
-	chrome.debugger.onDetach.addListener(function(debuggee){
-		deactivateTab(debuggee.tabId);
-	});
-/////////////////////////////////////////////////////////////
-	chrome.debugger.onEvent.addListener(function(debuggee, method, data){
-		if(method !=="Debugger.scriptParsed") return;
+// /////////////////////////////////////////////////////////////
+// 	chrome.debugger.onDetach.addListener(function(debuggee){
+// 		deactivateTab(debuggee.tabId);
+// 	});
+// /////////////////////////////////////////////////////////////
+// 	chrome.debugger.onEvent.addListener(function(debuggee, method, data){
+// 		if(method !=="Debugger.scriptParsed") return;
 
-		if(data.url.search("^(http://|https://|file://|localhost:).*")<0) return; // only instrument scripts from the website.. not from scripts sent from chrome.
-		if(data.url.search(/pca__ProxyInstrumentES5\.js/) >= 0) return;
+// 		if(data.url.search("^(http://|https://|file://|localhost:).*")<0) return; // only instrument scripts from the website.. not from scripts sent from chrome.
+// 		if(data.url.search(/pca__ProxyInstrumentES5\.js/) >= 0) return;
 		
-		var instrument="if(window.__pca__) __pca__.liner(this, arguments);";
+// 		var instrument="if(window.__pca__) __pca__.liner(this, arguments);";
 
-		chrome.debugger.sendCommand(debuggee, "Debugger.getScriptSource",{scriptId: data.scriptId }, function(result){
-			if(result.scriptSource.search(/__pca__/)>=0) return;
-			console.log(data.url, result);
-			var instrumentedScript=result.scriptSource.replace(
-					/(function([\s\n\r\t]||(\/\*.*\*\/))*([$A-Za-z_][A-Za-z_0-9$]*)?([\s\n\r\t]||(\/\*.*\*\/))*\(((([\s\n\r\t]||(\/\*.*\*\/))*([$A-Za-z_][A-Za-z_0-9$]*)([\s\n\r\t]||(\/\*.*\*\/))*,)*(([\s\n\r\t]||(\/\*.*\*\/))*([$A-Za-z_][A-Za-z_0-9$]*)([\s\n\r\t]||(\/\*.*\*\/))*))?\)([\s\n\r\t]||(\/\*.*\*\/))*\{)/g,
-					"$1 "+instrument);
+// 		chrome.debugger.sendCommand(debuggee, "Debugger.getScriptSource",{scriptId: data.scriptId }, function(result){
+// 			if(result.scriptSource.search(/__pca__/)>=0) return;
+// 			console.log(data.url, result);
+// 			var instrumentedScript=result.scriptSource.replace(
+// 					/(function([\s\n\r\t]||(\/\*.*\*\/))*([$A-Za-z_][A-Za-z_0-9$]*)?([\s\n\r\t]||(\/\*.*\*\/))*\(((([\s\n\r\t]||(\/\*.*\*\/))*([$A-Za-z_][A-Za-z_0-9$]*)([\s\n\r\t]||(\/\*.*\*\/))*,)*(([\s\n\r\t]||(\/\*.*\*\/))*([$A-Za-z_][A-Za-z_0-9$]*)([\s\n\r\t]||(\/\*.*\*\/))*))?\)([\s\n\r\t]||(\/\*.*\*\/))*\{)/g,
+// 					"$1 "+instrument);
 
-			//chrome.tabs.executeScript(priv.debuggee.tabId, {code:niceScript},function(response){console.log(response)});
-			chrome.debugger.sendCommand(debuggee,"Runtime.evaluate",{expression:instrumentedScript},function(response){if(response.thrown)console.log(response)});
-		});
-	});
+// 			//chrome.tabs.executeScript(priv.debuggee.tabId, {code:niceScript},function(response){console.log(response)});
+// 			chrome.debugger.sendCommand(debuggee,"Runtime.evaluate",{expression:instrumentedScript},function(response){if(response.thrown)console.log(response)});
+// 		});
+// 	});
 /////////////////////////////////////////////////////////////
 	var activateTab = function(tabId){
 		// User Debugger to inject Script

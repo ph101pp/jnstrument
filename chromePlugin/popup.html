@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel='stylesheet' href='popup.css'>
 	</head>
-	<body>
-		<a href="#" id="activate">Activate</a><br>
-
-		<a href="#" id="goto">Go to Visualizatin</a>
-
-
+	<body class="deactive">
+		<a class="ir jnstrumentTitle" href="http://www.jnstrument.com">
+			<h1>jnstrument</h1>
+		</a>
+		<div class="ir jnstrumentSubtitle">
+			<h2>Realtime JavaScript Visualization</h2>
+		</div>
+		<a id="activate" class="ir activate" href="#">start visualization</a>
+		<a id="open" class="ir open" href="#">open visualization</a>
+		<a id="deactivate" class="ir deactivate" href="#">deactivate</a>
+		<a class="ir flags"></a>
+		<a class="link flags">chrome://flags</a>
 
 		<script type="text/javascript" src="popup.js"></script>
 

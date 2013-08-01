@@ -1,10 +1,51 @@
 extend layout
+
 block content
-	form(method = "GET", action= "http://localhost:8000/proxy") 
-		span http
-		input(type="text", name="url")
-block sidebar
-	.widget
-		h1 Bookmarklet
-		p
-			a(href = "javascript:(function(window, document, undefined){document.body.appendChild(document.createElement('script')).src='http://localhost:8000/scripts/pca__ProxyInstrumentES5.js?"+new Date().getTime()+"';})(window,document)") jnstrument
+	img(src="/img/bgPool/#{bgImage}.png", class="background")
+
+	div(class="content")
+		div(class="background")
+		div(class="ir title") 
+			h3 Realtime javascript visualization in the web browser
+		p 
+			|The project aims to give poeple who do 
+			br
+			|not programm themselves, an idea and an
+			br 
+			|image of what happens behind the user 
+			br 
+			|interface of a website. The goal is to let the 
+			br 
+			|user experience rather than explain to 
+			br 
+			|him/her what happens when for example a
+			br 
+			|button is clicked or a page is scrolled.
+		p 
+			|Three visualizations show different aspects 
+			br 
+			|of the javascript function-network that is 
+			br 
+			|build by the developers and executed when 
+			br 
+			|the user interacts with the website.
+		p 
+			| Created by 
+			a(href="http://www.philippadrian.com") Philipp Adrian
+			| , Basel, 2013.
+			br
+			|Learn more on 
+			a(href="http://www.philippadrian.com", target="_blank") Behance
+			|  and 
+			a(href="http://www.github.com/greenish/jnstrument", target="_blank") Github
+			| .
+		div(class="ir getStarted") 
+			h3 Get started
+		a(class="ir download", href="https://chrome.google.com/webstore/detail/jnstrument/gbjnclchhndmknimdhimlafmakojpkge", target="_blank") 
+			h4 Download jnstrument from chrome web store
+
+
+block scripts
+	script(src='/scripts/libs/jquery-2.0.2.min.js')
+	script(src="/scripts/libs/jquery-cover/jquery.cover.js")
+	script(src="/scripts/client.js")

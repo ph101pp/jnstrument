@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "jnstrument",
-  "description": "A glance behind the curtains of a web browser",
-  "version": "0.1.1",
+  "description": "Realtime JavaScript Visualization",
+  "version": "0.1.2",
   "background": {
      "persistent": true,
      "scripts": [
@@ -14,18 +14,24 @@
     {
       "js": ["contentScript.js"],
       "run_at" : "document_end",
-      "matches" : ["http://*/*", "file://*/*", "https://*/*"]
+      "matches" : ["http://*/*", "file://*/*"]
     }
   ],
   "permissions": [
     "tabs",
-    "debugger",
-    "http://*/*",
-    "https://*/*"
+    "http://*/*"
   ],
   "browser_action": {
     "default_icon": "inactive.png",
     "default_popup": "popup.html",
     "default_title": "jnstrument"
-  }
+  },
+
+  "requirements": {
+    "3D": {
+      "features": ["webgl"]
+    }
+  },
+
+  "minimum_chrome_version" : "28"
 }
