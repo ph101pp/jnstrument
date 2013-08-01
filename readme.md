@@ -11,7 +11,7 @@ Three visualizations show different aspects of the javascript
 function-network that is build by the developers and executed when 
 the user interacts with the website.
 
-For more information have a look at the [project on Behance](http://www.behance.net/gre_nish)
+For more information have a look at [jnstrument.com](jnstrument.com) or at the [project on Behance](http://www.behance.net/gre_nish)
 
 
 ###jnstrument consists of two main parts:
