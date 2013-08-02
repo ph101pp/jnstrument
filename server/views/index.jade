@@ -1,51 +1,95 @@
 extend layout
+block head
+	link(rel='stylesheet', href='/scripts/libs/fancyBox/source/jquery.fancybox.css')
 
 block content
 	img(src="/img/bgPool/#{bgImage}.png", class="background")
 
 	div(class="content")
 		div(class="background")
-		div(class="ir title") 
-			h3 Realtime javascript visualization in the web browser
-		p 
-			|The project aims to give poeple who do 
-			br
-			|not programm themselves, an idea and an
-			br 
-			|image of what happens behind the user 
-			br 
-			|interface of a website. The goal is to let the 
-			br 
-			|user experience rather than explain to 
-			br 
-			|him/her what happens when for example a
-			br 
-			|button is clicked or a page is scrolled.
-		p 
-			|Three visualizations show different aspects 
-			br 
-			|of the javascript function-network that is 
-			br 
-			|build by the developers and executed when 
-			br 
-			|the user interacts with the website.
-		p 
-			| Created by 
-			a(href="http://www.philippadrian.com") Philipp Adrian
-			| , Basel, 2013.
-			br
-			|Learn more on 
-			a(href="http://www.philippadrian.com", target="_blank") Behance
-			|  and 
-			a(href="http://www.github.com/greenish/jnstrument", target="_blank") Github
-			| .
-		div(class="ir getStarted") 
-			h3 Get started
-		a(class="ir download", href="https://chrome.google.com/webstore/detail/jnstrument/gbjnclchhndmknimdhimlafmakojpkge", target="_blank") 
-			h4 Download jnstrument from chrome web store
+		ul(class="slides")
+			li
+				div(class="ir title") 
+					h3 Realtime javascript visualization in the web browser
+				p 
+					|The project aims to give poeple who do 
+					br
+					|not programm themselves, an idea and an
+					br 
+					|image of what happens behind the user 
+					br 
+					|interface of a website. The goal is to let the 
+					br 
+					|user experience rather than explain to 
+					br 
+					|him/her what happens when for example a
+					br 
+					|button is clicked or a page is scrolled.
+				p 
+					|Three visualizations show different aspects 
+					br 
+					|of the javascript function-network that is 
+					br 
+					|build by the developers and executed when 
+					br 
+					|the user interacts with the website.
+				p 
+					| Created by 
+					a(href="http://www.philippadrian.com") Philipp Adrian
+					| , Basel, 2013.
+					br
+					strong Learn more on 
+					a(href="http://www.philippadrian.com", target="_blank") Behance
+					strong  and 
+					a(href="http://www.github.com/greenish/jnstrument", target="_blank") Github
+					strong .
+			li
+				div(class="ir screenshots") 
+					h3 Screenshots
+				ul(class="gallery")
+					li
+						a(href="img/bgPool/neuron1.png", rel="screenshots", class="fancy")
+							img(src="img/thumbs/neuron1.png", alt="Screenshot")
+					li
+						a(href="img/bgPool/neuron.png", rel="screenshots", class="fancy")
+							img(src="img/thumbs/neuron.png", alt="Screenshot")
+					li
+						a(href="img/bgPool/lifeline1.png", rel="screenshots", class="fancy")
+							img(src="img/thumbs/lifeline1.png", alt="Screenshot")
+					li
+						a(href="img/bgPool/lifeline.png", rel="screenshots", class="fancy")
+							img(src="img/thumbs/lifeline.png", alt="Screenshot")
+					li
+						a(href="img/bgPool/radar1.png", rel="screenshots", class="fancy")
+							img(src="img/thumbs/radar1.png", alt="Screenshot")
+					li
+						a(href="img/bgPool/radar2.png", rel="screenshots", class="fancy")
+							img(src="img/thumbs/radar2.png", alt="Screenshot")
+			
+			li
+				div(class="ir getStarted") 
+					h3 Get started
+				a(class="ir download", href="https://chrome.google.com/webstore/detail/jnstrument/gbjnclchhndmknimdhimlafmakojpkge", target="_blank") 
+					h4 Download jnstrument from chrome web store
+				p 
+					strong For a working example visualize:
+					br
+					a(href="www.google.com") www.google.com
+				p
+					strong EXPERIMENTAL
+					br
+					| jnstrument is an experiment and still 
+					br
+					| work in progress. So it doesn't work perfectly on every website.. yet. 
+				p
+					| To follow the current development, submit issues or offer help visit 
+					a(href="https://github.com/greenish/jnstrument/issues") Github 
+
 
 
 block scripts
 	script(src='/scripts/libs/jquery-2.0.2.min.js')
 	script(src="/scripts/libs/jquery-cover/jquery.cover.js")
+	script(src="/scripts/libs/jquery-slides/jquery.slides.js")	
+	script(src="/scripts/libs/fancyBox/source/jquery.fancybox.js")
 	script(src="/scripts/client.js")

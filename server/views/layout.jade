@@ -3,8 +3,11 @@ html
 	head
 		title jnstrument - A look behind the curtains of a web browser
 		link(rel='stylesheet', href='/scripts/libs/jquery-cover/jquery.cover.css')
-		link(rel='stylesheet', href='/stylesheets/jnstrument.css')
 		link(type="text/css", rel="stylesheet", href="http://fast.fonts.net/cssapi/adf630e3-dcd0-4b7f-a849-9db6989461b8.css")
+
+		block head
+
+		link(rel='stylesheet', href='/stylesheets/jnstrument.css')
 
 	body(class="#{show}")
 		div(class="hoverArea")

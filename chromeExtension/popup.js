@@ -20,7 +20,7 @@ chrome.tabs.query({currentWindow:true, active:true}, function(result){
 	var openVisualization = function(){
 		var status = bgPage.jnstrument.tabStatus(tab);
 		if(!status || !status.status) return;
-		chrome.windows.create({'url': "http://jnstrument.com/"+status.guid+"/neuron", 'type': 'popup'});
+		chrome.windows.create({'url': "http://jnstrument.com/"+status.guid+"/neuron"});
 	}
 	var activate = function(){
 		bgPage.jnstrument.activate(tab);

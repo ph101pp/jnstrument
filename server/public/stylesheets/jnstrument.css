@@ -100,6 +100,9 @@ body {
   line-height: 23px;
   font-family: 'Palatino LT W01 Roman';
 }
+strong {
+  font-family: 'Palatino LT W01 Bold';
+}
 a,
 a:active,
 a:hover,
@@ -196,7 +199,14 @@ a:hover {
   background-position: -112px -48px;
   width: 300px;
   height: 32px;
-  margin: 35px 30px 10px 30px;
+  margin: 35px 30px 30px 30px;
+}
+.ir.screenshots {
+  position: relative;
+  background-position: 0 -272px;
+  width: 300px;
+  height: 32px;
+  margin: 35px 30px 30px 30px;
 }
 .ir.download {
   position: relative;
@@ -336,6 +346,17 @@ li.active a {
   position: fixed;
   z-index: -1;
 }
+.slides {
+  position: relative;
+  width: 100%;
+  height: 636px;
+  left: 0;
+  top: 0;
+  margin-bottom: 40px;
+}
+.slides .ir {
+  cursor: pointer;
+}
 .content {
   position: absolute;
   top: 130px;
@@ -357,6 +378,27 @@ li.active a {
   opacity: 0.8;
   filter: alpha(opacity=80);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+}
+.gallery {
+  margin: 0px 20px;
+}
+.gallery li {
+  position: relative;
+  margin: 10px 10px;
+  width: 140px;
+  height: 95px;
+  float: left;
+  background-color: #b5cbe9;
+}
+.gallery a,
+.gallery img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.fancybox-skin {
+  background-color: #b5cbe9;
 }
 /*THREEVISUALS.jade///////////////////////////////////////////////*/
 #scene {
