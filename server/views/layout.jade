@@ -7,22 +7,32 @@ html
 		link(type="text/css", rel="stylesheet", href="http://fast.fonts.net/cssapi/adf630e3-dcd0-4b7f-a849-9db6989461b8.css")
 
 	body(class="#{show}")
-		div(class="titleBar")
-			a(class="ir jnstrumentTitle", href="/")
-				h1 jnstrument
-			div(class="ir jnstrumentSubtitle")
-				h2 A look behind the curtains of a web browser
+		div(class="hoverArea")
+			div(class="titleBar")
+				a(class="ir jnstrumentTitle", href="#{guid !== 'none' && show !== 'index' ? 'http://'+socketAdress+'/'+guid+'/index' : '/'}")
+					h1 jnstrument
+				div(class="ir jnstrumentSubtitle")
+					h2 A look behind the curtains of a web browser
 
-			ul(class="visualsNavigation")
-				li(class="#{guid === 'none' || show === 'neuron' ? 'active' : ''}")
-					a(href="#{guid !== 'none' && show !== 'neuron' ? 'http://'+socketAdress+'/'+guid+'/neuron' : '#'}", class='ir neuronIcon') Neuron
-			
-				li(class="#{guid === 'none' || show === 'lifeline' ? 'active' : ''}")
-					a(href="#{guid !== 'none' && show !== 'lifeline' ? 'http://'+socketAdress+'/'+guid+'/lifeline' : '#'}", class='ir lifelineIcon') Lifeline
-			
-				li(class="#{guid === 'none' || show === 'radar' ? 'active' : ''}")
-					a(href="#{guid !== 'none' && show !== 'radar' ? 'http://'+socketAdress+'/'+guid+'/radar' : '#'}", class='ir radarIcon') Radar
+				ul(class="visualsNavigation")
+					li(class="#{guid === 'none' || show === 'neuron' ? 'active' : ''}")
+						a(href="#{guid !== 'none' && show !== 'neuron' ? 'http://'+socketAdress+'/'+guid+'/neuron' : '#'}", class='ir neuronIcon') Neuron
+				
+					li(class="#{guid === 'none' || show === 'lifeline' ? 'active' : ''}")
+						a(href="#{guid !== 'none' && show !== 'lifeline' ? 'http://'+socketAdress+'/'+guid+'/lifeline' : '#'}", class='ir lifelineIcon') Lifeline
+				
+					li(class="#{guid === 'none' || show === 'radar' ? 'active' : ''}")
+						a(href="#{guid !== 'none' && show !== 'radar' ? 'http://'+socketAdress+'/'+guid+'/radar' : '#'}", class='ir radarIcon') Radar
 
 		block content
 
 		block scripts
+
+		script.
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-11818094-8', 'jnstrument.com');
+			ga('send', 'pageview');

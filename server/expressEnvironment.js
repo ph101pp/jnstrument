@@ -11,7 +11,8 @@ module.exports = function() {
 	var app = express();
 
 	var bgImage=0;
-
+	var bgImages = ["lifeline", "lifeline1", "lifeline2", "lifeline3", "neuron", "neuron1", "neuron2", "neuron3", "neuron4", "radar", "radar1", "radar2"];
+	
 	// Configuration
 	app.set('views', __dirname + '/views')
 	app.set('view engine', 'jade')
@@ -74,21 +75,24 @@ module.exports = function() {
 	});
 
 	// THREE.js
-	app.get(/\/(........-....-4...-....-p....c.....a|installation)\/(neuron|radar|lifeline|guitarHero)/, function (req, res) {
-		res.render("THREEVisuals", { 
+	app.get(/\/(........-....-4...-....-p....c.....a|installation)\/(neuron|radar|lifeline|guitarHero|index)/, function (req, res) {
+		var template = req.params[1] === "index" ? "index" : "THREEVisuals";
+		var i = bgImage++;
+		if(bgImage >= bgImages.length) bgImage=0;
+
+		res.render(template, { 
 			socketAdress : config.socketAdress,
 			title : req.params[1].charAt(0).toUpperCase() + req.params[1].slice(1),
 			show : req.params[1],
-			guid : req.params[0]
+			guid : req.params[0],
+			bgImage : bgImages[i]
 		});
 	});
 
 	// jnstrument.com
 	app.get(/\/|\/*/, /*proxy.middleware,*/ function (req, res) {
-		var bgImages = ["lifeline", "lifeline1", "lifeline2", "lifeline3", "neuron", "neuron1", "neuron2", "neuron3", "neuron4", "radar", "radar1", "radar2"];
-		
 		var i = bgImage++;
-		if(bgImage >= bgImages.length) bgImage=0;
+		if(bgImage >= bgImages.length) bgImage=0;	
 
 		res.render('index', {
 			socketAdress : config.socketAdress,

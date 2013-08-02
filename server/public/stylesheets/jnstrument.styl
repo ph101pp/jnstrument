@@ -63,10 +63,6 @@ a:hover {
 	opacity:0.2;
 }
 
-.ir.jnstrumentTitle:hover {
-	opacity:1;
-}
-
 .ir.jnstrumentSubtitle {
 	position:absolute;
 	background-position:  0 -240px ;
@@ -77,10 +73,6 @@ a:hover {
 
 	left:253px;
 }
-.ir.jnstrumentSubtitle:hover {
-	opacity:1;
-}
-
 
 .ir.neuronIcon {
 	background-position:  0 -48px ;
@@ -133,12 +125,23 @@ a:hover {
 	opacity:0.25;
 }
 
+.index .ir,
 .none .ir {
 	opacity:1;
 }
 
 /*.ir*/
 
+
+
+.hoverArea {
+	position:fixed;
+	margin:0;
+	top:0px;	
+	left:0px;
+	height:30px;
+	width:100%;	
+}
 
 .titleBar {
 	position:fixed;
@@ -160,6 +163,7 @@ a:hover {
 
 }
 
+.hoverArea:hover .titleBar,
 .titleBar:hover {
 	clip:rect(0,3000px,72px,0);
   -webkit-transition-delay: 0s; /* Safari */
@@ -175,6 +179,7 @@ a:hover {
 }
 
 
+.index .titleBar,
 .none .titleBar {
 	position:fixed;
 	width:100%;
