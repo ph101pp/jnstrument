@@ -115,7 +115,7 @@ a:hover {
 	width:300px;
 	height:32px;
 
-	margin:35px 30px 30px 30px;
+	margin:35px 30px 20px 30px;
 }
 
 .ir.download {
@@ -238,6 +238,17 @@ li.active a{
 
 /*INDEX.jade///////////////////////////////////////////////*/
 
+.share {
+	padding:0px 0px;
+	position:absolute;
+	top:-4px;
+	left:-26px;
+}
+
+.share span {
+	display:block;
+}
+
 .greenishCover {
 	position:fixed;
 	z-index:-1;
@@ -249,6 +260,7 @@ li.active a{
 	height:636px;
 	left:0;
 	top:0;
+	overflow:hidden;
 	margin-bottom:40px;
 }
 
@@ -257,13 +269,26 @@ li.active a{
 }
 
 
+
+.gsSlide {
+	position:relative;
+	height:62px;
+	padding:0;
+	margin:0;
+	width:100%;
+	display:block;
+	overflow:hidden;
+}
+.gsSlide.gsActive {
+	height:512px;
+}
+
 .content {
 	position:absolute;
 
 	top:130px;
 	left:40px;
 	width:360px;
-
 	margin-bottom:40px;
 }
 

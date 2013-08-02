@@ -7,8 +7,15 @@ block content
 
 	div(class="content")
 		div(class="background")
+		div(class="share")
+			span(class='st_facebook', st_url="http://jnstrument.com", st_image="http://jnstrument.com/img/bgPool/neuron.png")
+			span(class='st_googleplus', st_url="http://jnstrument.com", st_image="http://jnstrument.com/img/bgPool/neuron.png")
+			span(class='st_twitter', st_url="http://jnstrument.com", st_image="http://jnstrument.com/img/bgPool/neuron.png")
+			span(class='st_tumblr', st_url="http://jnstrument.com", st_image="http://jnstrument.com/img/bgPool/neuron.png")
+			span(class='st_sharethis', st_url="http://jnstrument.com", st_image="http://jnstrument.com/img/bgPool/neuron.png")
+		
 		ul(class="slides")
-			li
+			li(class="gsSlide gsActive")
 				div(class="ir title") 
 					h3 Realtime javascript visualization in the web browser
 				p 
@@ -43,7 +50,7 @@ block content
 					strong  and 
 					a(href="http://www.github.com/greenish/jnstrument", target="_blank") Github
 					strong .
-			li
+			li(class="gsSlide")
 				div(class="ir screenshots") 
 					h3 Screenshots
 				ul(class="gallery")
@@ -66,7 +73,7 @@ block content
 						a(href="img/bgPool/radar2.png", rel="screenshots", class="fancy")
 							img(src="img/thumbs/radar2.png", alt="Screenshot")
 			
-			li
+			li(class="gsSlide")
 				div(class="ir getStarted") 
 					h3 Get started
 				a(class="ir download", href="https://chrome.google.com/webstore/detail/jnstrument/gbjnclchhndmknimdhimlafmakojpkge", target="_blank") 
@@ -93,3 +100,7 @@ block scripts
 	script(src="/scripts/libs/jquery-slides/jquery.slides.js")	
 	script(src="/scripts/libs/fancyBox/source/jquery.fancybox.js")
 	script(src="/scripts/client.js")
+	script var switchTo5x=true;
+	script(src="http://w.sharethis.com/button/buttons.js")
+	script stLight.options({publisher: "ca43bab3-ef19-423a-95e1-e538dc9c667c", doNotHash: false, doNotCopy: false, hashAddressBar: false});
+
