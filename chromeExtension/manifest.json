@@ -3,12 +3,15 @@
 
   "name": "jnstrument",
   "description": "A look behind the curtains of a web browser",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "background": {
      "persistent": true,
      "scripts": [
         "backgroundScript.js"
       ]
+  },
+  "icons":{
+    "128":"icon128.png"
   },
   "content_scripts" : [
     {

@@ -82,6 +82,21 @@ a {
 }
 
 
+.ir.https {
+	position:absolute;
+	background-position:  17px -315px;
+	background-color:#B5CBE9;
+
+	height:90px;
+	left:20px;
+	top:150px;
+	width:320px;
+
+	border:0;
+	outline:0;
+}
+
+
 .ir.activate,
 .ir.open {
 	display:block;
@@ -114,9 +129,16 @@ a {
 .deactive .deactivate,
 .deactive .open,
 .deactive .flags,
+.deactive .https,
 .flags .deactivate,
 .flags .open,
 .flags .activate,
+.flags .https,
+.https .deactivate,
+.https .open,
+.https .activate,
+.https .flags,
+.active .https,
 .active .activate,
 .active .flags {
 	display:none;
@@ -125,7 +147,8 @@ a {
 .deactive .activate,
 .flags .flags,
 .active .deactivate,
-.active .open {
+.active .open,
+.https .https {
 	display:block;
 }
 

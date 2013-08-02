@@ -4,9 +4,14 @@ chrome.tabs.query({currentWindow:true, active:true}, function(result){
 	var activateLink=document.getElementById("activate");
 	var deactivateLink=document.getElementById("deactivate");
 	var gotoLink=document.getElementById("open");
+	var https;
 	var checkLink = function(){
 		if(!window.Proxy) {
 			document.body.setAttribute("class", "flags");
+			return;
+		}
+		else if(tab.url.match(/^https/)) {
+			document.body.setAttribute("class", "https");
 			return;
 		}
 		var status = bgPage.jnstrument.tabStatus(tab);
