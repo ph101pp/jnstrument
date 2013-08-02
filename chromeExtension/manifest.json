@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "jnstrument",
-  "description": "Realtime JavaScript Visualization",
-  "version": "0.1.2",
+  "description": "A look behind the curtains of a web browser",
+  "version": "0.1.3",
   "background": {
      "persistent": true,
      "scripts": [
