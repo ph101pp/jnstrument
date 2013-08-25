@@ -3,7 +3,7 @@
 
   "name": "jnstrument",
   "description": "A look behind the curtains of a web browser",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "background": {
      "persistent": true,
      "scripts": [

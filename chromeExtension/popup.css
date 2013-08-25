@@ -14,6 +14,11 @@ body.flags {
 	height:250px;
 }
 
+body.deactive,
+body.active {
+	height:465px;
+}
+
 a {		
 	border:0;
 	outline:0;
@@ -61,8 +66,8 @@ a {
 	background-position:  -6px -206px;
 
 	height:16px;
-	left:40px;
-	bottom:15px;
+	right:40px;
+	top:240px;
 	width:80px;
 
 }
@@ -149,7 +154,7 @@ a {
 .active .deactivate,
 .active .open,
 .https .https {
-	display:block;
+	display:block !important;
 }
 
 .flags.link {
@@ -162,6 +167,82 @@ a {
 	font-size:13px;
 	color:#000015;
 
-
 }
+
+.ir.experimental {
+	position:absolute;
+	background-position:  14px -400px;
+	background-color:transparent !important;
+	height:210px;
+	left:20px;
+	top:256px;
+	width:320px;
+
+	border:0;
+	outline:0;
+}
+
+.ir.experimental {
+	position:absolute;
+	background-position:  14px -400px;
+	background-color:transparent !important;
+	height:210px;
+	left:20px;
+	top:256px;
+	width:320px;
+
+	border:0;
+	outline:0;
+}
+
+#visualizeGoogle {
+	position:absolute;
+	display:block;
+	background-color:transparent !important;
+	height:16px;
+	width:120px;
+
+	left:56px;
+	top:408px;
+
+	border:0;
+	outline:0;
+}
+
+
+#visualizeDaum {
+	position:absolute;
+	display:block;
+	background-color:transparent !important;
+	height:16px;
+	width:120px;
+
+	left:56px;
+	top:428px;
+
+	border:0;
+	outline:0;
+}
+
+#visualizeNaver {
+	position:absolute;
+	display:block;
+	background-color:transparent !important;
+	height:16px;
+	width:120px;
+
+	left:56px;
+	top:449px;
+
+	border:0;
+	outline:0;
+}
+
+
+
+
+
+
+
+
 
