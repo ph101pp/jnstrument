@@ -30,9 +30,9 @@
 		var material = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1, transparent:true, opacity:0.2});
 		var materialActiveDot = new THREE.MeshBasicMaterial({color:config.colors.activeDots,transparent:true, opacity:0.4});
 		var materialActive = new THREE.LineBasicMaterial({ color:config.colors.activeLines, linewidth:1,transparent:true, opacity:0.9});
-		var materialArrow = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1,transparent:true, opacity:0.9});
-		var materialOutboundArrow = new THREE.LineBasicMaterial({ color:config.colors.outputColor, linewidth:1,transparent:true, opacity:1});
-		var materialInboundArrow = new THREE.LineBasicMaterial({ color:config.colors.inputColor, linewidth:1,transparent:true, opacity:1});
+		var materialArrow = new THREE.LineBasicMaterial({ color:config.colors.normalLines, linewidth:1,transparent:true, opacity:0.8});
+		var materialOutboundArrow = new THREE.LineBasicMaterial({ color:config.colors.outputColor, linewidth:1,transparent:true, opacity:0.8});
+		var materialInboundArrow = new THREE.LineBasicMaterial({ color:config.colors.inputColor, linewidth:1,transparent:true, opacity:0.8});
 
 
 
