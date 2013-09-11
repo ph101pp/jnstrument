@@ -13,10 +13,10 @@ chrome.tabs.query({currentWindow:true, active:true}, function(result){
 				document.body.setAttribute("class", "flags");
 				return;
 			}
-			else if(tab.url.match(/^https/)) {
-				document.body.setAttribute("class", "https");
-				return;
-			}
+			// else if(tab.url.match(/^https/)) {
+			// 	document.body.setAttribute("class", "https");
+			// 	return;
+			// }
 			var status = bgPage.jnstrument.tabStatus(tab);
 			if(status && status.status) {
 				document.body.setAttribute("class", "active");

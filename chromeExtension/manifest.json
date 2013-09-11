@@ -17,7 +17,7 @@
     {
       "js": ["contentScript.js"],
       "run_at" : "document_end",
-      "matches" : ["http://*/*", "file://*/*"]
+      "matches" : ["http://*/*","https://*/*", "file://*/*"]
     }
   ],
   "permissions": [
@@ -29,12 +29,13 @@
     "default_popup": "popup.html",
     "default_title": "jnstrument"
   },
-
   "requirements": {
     "3D": {
       "features": ["webgl"]
     }
   },
-
+  "web_accessible_resources": [
+    "pca__ProxyInstrumentES5.js"
+  ],
   "minimum_chrome_version" : "28"
 }
