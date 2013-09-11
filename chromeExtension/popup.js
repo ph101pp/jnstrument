@@ -28,8 +28,8 @@ chrome.tabs.query({currentWindow:true, active:true}, function(result){
 		openVisualization = function(){
 			var status = bgPage.jnstrument.tabStatus(tab);
 			if(!status || !status.status) return;
-			chrome.windows.create({'url': "http://jnstrument.com/"+status.guid+"/neuron"});
-			// chrome.windows.create({'url': "http://127.0.0.1:8000/"+status.guid+"/neuron"});
+			// chrome.windows.create({'url': "http://jnstrument.com/"+status.guid+"/neuron"});
+			chrome.windows.create({'url': "http://localhost:8000/"+status.guid+"/neuron"});
 		},
 		activate = function(){
 			bgPage.jnstrument.activate(tab);
