@@ -7,8 +7,6 @@ var proxy = new httpProxy.RoutingProxy();
 
 var proxyRequest = function(req, res, urlObj) {
 
-	console.log(req.connection);
-
 	req.headers.host  = urlObj.host;
 	req.url           = urlObj.path;
 	

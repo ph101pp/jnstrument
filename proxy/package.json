@@ -1,21 +1,25 @@
 {
-  "name": "jnstrument-Proxy",
+  "name": "proxy.jnstrument",
   "version": "0.1.0",
   "author": "Philipp Adrian <hello@philippadrian.com>",
-  "description": "Bachelor Thesis",
+  "description": "Proxy Server to inject jnstrument code.",
   "scripts": {
     "start": "./server.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/greenish/BA-Thesis.git"
+    "url": "https://github.com/greenish/jnstrument.git"
   },
   "dependencies": {
-    "http-proxy": "0.10.x",
-    "express": "3.2.x"
+    "http-proxy": "0.10.x"
   },
   "devDependencies": {},
   "engines": {
     "node": "0.8.x"
-  }
+  },
+  "subdomain": "proxy-jnstrument",
+  "domains": [
+    "proxy.jnstrument.com",
+    "proxy.jnstrument.ch"
+  ]
 }

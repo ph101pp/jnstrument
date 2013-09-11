@@ -10,6 +10,9 @@
 		var objInfo = [];
 		var objStrings = [];
 		var maxDepth=4;
+		var output = [];
+		var sent = 0;
+		var sendEveryMs = 30;
 		var connection;
 		var guid;
 		var enabled=false;
@@ -58,9 +61,17 @@
 			 // if(data.calledBy <0) console.log(args.callee.caller, args.callee);
 			// console.log('__pca__Event', data);
 
-			connection.emit('__pca__Event', data, function(data){
-				//console.log(data);
-			});
+
+			output.push(data);
+
+			var now = new Date().getTime();
+			if(now - sent > sendEveryMs) {
+				connection.emit('__pca__Event', output, function(data){
+					//console.log(data);
+				});
+				output=[];
+				sent=now;
+			}
 			wait(__pca__.wait);
 		}
 ///////////////////////////////////////////////////////////////////////////////

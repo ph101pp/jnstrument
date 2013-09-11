@@ -1,6 +1,6 @@
 {
   "name": "jnstrument",
-  "version": "0.1.0-36",
+  "version": "0.1.0-37",
   "author": "Philipp Adrian <hello@philippadrian.com>",
   "description": "A glance behind the curtains of a web browser.",
   "scripts": {
