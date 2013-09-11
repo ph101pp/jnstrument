@@ -63,7 +63,6 @@ module.exports = function(server){
 ///////////////////////////////////////////////////////////////
 		socket.on('__pca__Event', function (data, answer) {	
 			var emit = {
-				id: data.id,
 				data : data,
 				sender : {
 					id:socket.id,

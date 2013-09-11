@@ -19,7 +19,10 @@
 
 		}
 		var receiveData = function(data, answer){
-			this.emitEvent(data, answer, "jsEvent");
+			console.log(data.data.length);
+			for(var i=0; i<data.data.length; i++) {
+				this.emitEvent({id:data.data[i].id, data:data.data[i], sender:data.sender}, answer, "jsEvent");
+			}
 		}.bind(this);			
 
 		var receiveActive = function(data, answer){
