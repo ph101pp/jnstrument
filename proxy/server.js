@@ -1,14 +1,20 @@
 var http = require("http");
+var https = require("https");
 var proxy = require("./proxyRequest.js");
-var express = require('express')
-var app = express();
+var fs = require('fs');
+var options = {
+		key: fs.readFileSync('key.pem'),
+		cert: fs.readFileSync('cert.pem')
+    };
 
-app.use(express.logger('dev'))
 
-app.get("/|/*", /*proxy.middleware,*/ function (req, res) {
+var httpServer = http.createServer(function(req, res){
 	proxy.go(req, res);
+}).listen(8000);
 
-})
 
 
-var server = http.createServer(app).listen(80);
+var httpsServer = https.createServer(options, function(req, res){
+	console.log(req.url);
+	proxy.go(req, res);
+}).listen(9000);
