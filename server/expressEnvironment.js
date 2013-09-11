@@ -81,7 +81,7 @@ module.exports = function() {
 		if(bgImage >= bgImages.length) bgImage=0;
 
 		res.render(template, { 
-			socketAdress : config.socketAdress,
+			socketAdress : config.webAdress,
 			title : req.params[1].charAt(0).toUpperCase() + req.params[1].slice(1),
 			show : req.params[1],
 			guid : req.params[0],
@@ -95,7 +95,7 @@ module.exports = function() {
 		if(bgImage >= bgImages.length) bgImage=0;	
 
 		res.render('index', {
-			socketAdress : config.socketAdress,
+			socketAdress : config.webAdress,
 			title : "jnstrument",
 			show : "none",
 			guid : "none",

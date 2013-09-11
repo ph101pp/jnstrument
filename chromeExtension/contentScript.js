@@ -24,6 +24,5 @@
 		else script = "__pca__.disable();";
 		document.body.appendChild(document.createElement('script')).innerHTML="__pca__UpdateScript = function(){ "+script+"; delete __pca__UpdateScript;}; if(typeof(__pca__) === 'object') __pca__UpdateScript();";
 	}
-		document.body.appendChild(document.createElement('script')).innerHTML="alert('hallo')";
 
 })(window, document);

@@ -20,20 +20,20 @@ html
 	body(class="#{show}")
 		div(class="hoverArea")
 			div(class="titleBar")
-				a(class="ir jnstrumentTitle", href="#{guid !== 'none' && show !== 'index' ? 'http://'+socketAdress+'/'+guid+'/index' : '/'}")
+				a(class="ir jnstrumentTitle", href="#{guid !== 'none' && show !== 'index' ? socketAdress+'/'+guid+'/index' : '/'}")
 					h1 jnstrument
 				div(class="ir jnstrumentSubtitle")
 					h2 A look behind the curtains of a web browser
 
 				ul(class="visualsNavigation")
 					li(class="#{guid === 'none' || show === 'neuron' ? 'active' : ''}")
-						a(href="#{guid !== 'none' && show !== 'neuron' ? 'http://'+socketAdress+'/'+guid+'/neuron' : '#'}", class='ir neuronIcon') Neuron
+						a(href="#{guid !== 'none' && show !== 'neuron' ? socketAdress+'/'+guid+'/neuron' : '#'}", class='ir neuronIcon') Neuron
 				
 					li(class="#{guid === 'none' || show === 'lifeline' ? 'active' : ''}")
-						a(href="#{guid !== 'none' && show !== 'lifeline' ? 'http://'+socketAdress+'/'+guid+'/lifeline' : '#'}", class='ir lifelineIcon') Lifeline
+						a(href="#{guid !== 'none' && show !== 'lifeline' ? socketAdress+'/'+guid+'/lifeline' : '#'}", class='ir lifelineIcon') Lifeline
 				
 					li(class="#{guid === 'none' || show === 'radar' ? 'active' : ''}")
-						a(href="#{guid !== 'none' && show !== 'radar' ? 'http://'+socketAdress+'/'+guid+'/radar' : '#'}", class='ir radarIcon') Radar
+						a(href="#{guid !== 'none' && show !== 'radar' ? socketAdress+'/'+guid+'/radar' : '#'}", class='ir radarIcon') Radar
 
 		block content
 
