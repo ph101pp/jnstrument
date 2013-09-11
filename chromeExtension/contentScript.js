@@ -6,8 +6,11 @@
 		updateScript(request.action, request.guid);
 	});
 
+	// Initialisation if already activated
 	chrome.runtime.sendMessage({action:"init"}, function(response) {
-		updateScript(response.action, response.guid);
+		setTimeout(function(){
+			updateScript(response.action, response.guid);
+		},1000);p
 	});
 
 	var updateScript = function (action, guid){

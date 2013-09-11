@@ -18,6 +18,7 @@ jnstrument = new (function (){
 		return tabs[tab.id];
 	}
 /////////////////////////////////////////////////////////////
+//initialisation if already activated
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		if(tabs[sender.tab.id] && tabs[sender.tab.id].status) sendResponse({
 			action : "enable",
@@ -109,7 +110,7 @@ jnstrument = new (function (){
 	}
 /////////////////////////////////////////////////////////////
 	var createGuid = function (){
-	//	return "installation";
+		return "installation";
 		return 'xxxxxxxx-xxxx-4xxx-yxxx-pxxxxcxxxxxa'.replace(/[xy]/g, function(c) {
 	    	var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
 	    	return v.toString(16);
