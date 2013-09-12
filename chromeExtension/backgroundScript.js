@@ -2,16 +2,59 @@ jnstrument = new (function (){
 /////////////////////////////////////////////////////////////
 	var tabs = {};
 	var debugging = false;
-	var installation = function(tab){
-		for(var i=0; i<tabs.length; i++) 
-			if(tabs[i].id !== tab.id)
-				deactivateTab(tabs[i].id);
+
+
+////Exhibition stuff
+
+	chrome.idle.setDetectionInterval(60);
+	chrome.idle.onStateChanged.addListener(function(state){
+		if(state != "idle") return;
+		chrome.tabs.query({currentWindow:true, active:true}, function(result){
+			var tab=result[0];
+			chrome.tabs.update(tab.id, {
+				url:"http://www.google.com"
+			});
+			chrome.windows.update(tab.windowId, {
+				state:"fullscreen"
+			});
+		});	
+		chrome.tabs.query({currentWindow:false}, function(result){
+			var tabs = [];
+			for(var i=0; i<result.length; i++) tabs.push(result[i].id);
+			chrome.tabs.remove(tabs)
+		});	
+		chrome.tabs.query({active:false}, function(result){
+			var tabs = [];
+			for(var i=0; i<result.length; i++) tabs.push(result[i].id);
+			chrome.tabs.remove(tabs)
+		});	
+	});
+
+	var deactivateAllBut = function(tab){
+     		for(id in tabs) 
+			if(id != tab.id)
+				deactivateTab(id);
 	}
+	var activateActiveTab = function(tab){
+		chrome.tabs.query({currentWindow:true, active:true}, function(result){
+			var tab=result[0];
+			if(tabs[tab.id] && tabs[tab.id].status) return;
+
+			jnstrument.activate();
+		});
+
+	}
+
+	chrome.tabs.onActivated.addListener(function(tab){
+		idleSince=new Date().getTime();
+		jnstrument.activate({id:tab.tabId});	
+	});
+////Exhibition stuff	
+
 /////////////////////////////////////////////////////////////
 	this.activate = function(tab) {
-		installation(tab);
-		if(tabs[tab.id] && tabs[tab.id].status) deactivateTab(tab.id);
-		else activateTab(tab.id);
+		deactivateAllBut(tab);
+		activateTab(tab.id);
 	};
 /////////////////////////////////////////////////////////////
 	this.tabStatus = function(tab){
@@ -27,6 +70,7 @@ jnstrument = new (function (){
 	});
 /////////////////////////////////////////////////////////////
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+		idleSince=new Date().getTime();
 		var icon = tabs[tabId] && tabs[tabId].status ? 
 			"active.png":
 			"inactive.png";
@@ -35,6 +79,7 @@ jnstrument = new (function (){
 			tabId:tabId
 		});
 	});
+
 // /////////////////////////////////////////////////////////////
 // 	chrome.debugger.onDetach.addListener(function(debuggee){
 // 		deactivateTab(debuggee.tabId);
@@ -78,7 +123,7 @@ jnstrument = new (function (){
 		});
 
 	}
-
+/////////////////////////////////////////////////////////////
 	var enable= function(tabId){
 		if(tabs[tabId]) tabs[tabId].status = true;
 		else tabs[tabId] = {
@@ -96,7 +141,8 @@ jnstrument = new (function (){
 		tabId = typeof(tabId) == "object" ?
 			tabId.tabId:
 			tabId;
-		chrome.tabs.sendMessage(tabId, {
+		console.log("deactivateTab",tabId);
+		chrome.tabs.sendMessage(parseInt(tabId), {
 			action: "disable"
 		});
 		tabs[tabId].status = false;
@@ -105,7 +151,7 @@ jnstrument = new (function (){
 		// } catch(e){};
 		chrome.browserAction.setIcon({
 			path:"inactive.png",
-			tabId:tabId
+			tabId:parseInt(tabId)
 		});
 	}
 /////////////////////////////////////////////////////////////

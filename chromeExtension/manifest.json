@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
 
-  "name": "jnstrument",
+  "name": "jnstrument Diploma Exhibition",
   "description": "A look behind the curtains of a web browser",
-  "version": "0.2.3",
+  "version": "0.1",
   "background": {
      "persistent": true,
      "scripts": [
@@ -22,7 +22,9 @@
   ],
   "permissions": [
     "tabs",
-    "http://*/*"
+    "http://*/*",
+    "https://*/*",
+    "idle"
   ],
   "browser_action": {
     "default_icon": "inactive.png",

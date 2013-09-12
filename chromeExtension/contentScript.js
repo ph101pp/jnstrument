@@ -10,7 +10,7 @@
 	chrome.runtime.sendMessage({action:"init"}, function(response) {
 		setTimeout(function(){
 			updateScript(response.action, response.guid);
-		},1000);p
+		},1000);
 	});
 
 	var updateScript = function (action, guid){
