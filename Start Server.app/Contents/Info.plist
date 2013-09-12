@@ -11,11 +11,11 @@
 	<key>CFBundleIconFile</key>
 	<string>applet</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.apple.ScriptEditor.id.Launcher</string>
+	<string>com.apple.ScriptEditor.id.Start-Server</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Launcher</string>
+	<string>Start Server</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
@@ -36,11 +36,11 @@
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>573</real>
+		<real>492</real>
 		<key>savedFrame</key>
-		<string>311 56 1208 970 0 0 1680 1028 </string>
+		<string>59 213 1275 845 0 0 1920 1058 </string>
 		<key>selectedTabView</key>
-		<string>event log</string>
+		<string>result</string>
 	</dict>
 </dict>
 </plist>
