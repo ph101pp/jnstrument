@@ -20,4 +20,3 @@ server.listen(process.env.VCAP_APP_PORT || 8000, function () {
 socket.listen(process.env.VCAP_APP_PORT || 9000, function () {
   console.log("Socket waiting for requests at port "+ (process.env.VCAP_APP_PORT || 9000));
 });
-
