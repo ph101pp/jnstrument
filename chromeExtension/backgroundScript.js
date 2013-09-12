@@ -6,7 +6,7 @@ jnstrument = new (function (){
 
 ////Exhibition stuff
 
-	chrome.idle.setDetectionInterval(60);
+	chrome.idle.setDetectionInterval(15);
 	chrome.idle.onStateChanged.addListener(function(state){
 		if(state != "idle") return;
 		chrome.tabs.query({currentWindow:true, active:true}, function(result){
@@ -35,18 +35,18 @@ jnstrument = new (function (){
 			if(id != tab.id)
 				deactivateTab(id);
 	}
-	var activateActiveTab = function(tab){
+	var activateActiveTab = function(){
 		chrome.tabs.query({currentWindow:true, active:true}, function(result){
+			console.log(result);
 			var tab=result[0];
 			if(tabs[tab.id] && tabs[tab.id].status) return;
 
-			jnstrument.activate();
+			jnstrument.activate(tab);
 		});
 
 	}
 
 	chrome.tabs.onActivated.addListener(function(tab){
-		idleSince=new Date().getTime();
 		jnstrument.activate({id:tab.tabId});	
 	});
 ////Exhibition stuff	
@@ -70,7 +70,7 @@ jnstrument = new (function (){
 	});
 /////////////////////////////////////////////////////////////
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-		idleSince=new Date().getTime();
+		activateActiveTab();
 		var icon = tabs[tabId] && tabs[tabId].status ? 
 			"active.png":
 			"inactive.png";

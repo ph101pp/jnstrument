@@ -258,7 +258,7 @@
 		var setupConnection = function(){
 			// connection = require("socket.io-client").connect('http://greenish.jit.su/');
 			// connection = require("socket.io-client").connect('http://greenish.eu01.aws.af.cm/');
-			connection = require("socket.io-client").connect(require("./config.js").socketAdress);
+			connection = require("socket.io-client").connect(require("./config.js").outputAdress);
 			
 			connection.emit("__pca__Connect_Sender",{guid:guid, source: window.location.href}, function(data){
 				console.log("Sending Data to Server with ID: "+data.guid);
