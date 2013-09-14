@@ -6,7 +6,7 @@ jnstrument = new (function (){
 
 ////Exhibition stuff
 
-	chrome.idle.setDetectionInterval(15);
+	chrome.idle.setDetectionInterval(120);
 	chrome.idle.onStateChanged.addListener(function(state){
 		if(state != "idle") return;
 		chrome.tabs.query({currentWindow:true, active:true}, function(result){
