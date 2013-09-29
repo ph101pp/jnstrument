@@ -12,7 +12,7 @@ jnstrument = new (function (){
 		chrome.tabs.query({currentWindow:true, active:true}, function(result){
 			var tab=result[0];
 			chrome.tabs.update(tab.id, {
-				url:"http://www.google.com"
+				url:"http://www.daum.net"
 			});
 			chrome.windows.update(tab.windowId, {
 				state:"fullscreen"
