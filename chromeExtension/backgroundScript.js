@@ -6,29 +6,29 @@ jnstrument = new (function (){
 
 ////Exhibition stuff
 
-	chrome.idle.setDetectionInterval(120);
-	chrome.idle.onStateChanged.addListener(function(state){
-		if(state != "idle") return;
-		chrome.tabs.query({currentWindow:true, active:true}, function(result){
-			var tab=result[0];
-			chrome.tabs.update(tab.id, {
-				url:"http://www.daum.net"
-			});
-			chrome.windows.update(tab.windowId, {
-				state:"fullscreen"
-			});
-		});	
-		chrome.tabs.query({currentWindow:false}, function(result){
-			var tabs = [];
-			for(var i=0; i<result.length; i++) tabs.push(result[i].id);
-			chrome.tabs.remove(tabs)
-		});	
-		chrome.tabs.query({active:false}, function(result){
-			var tabs = [];
-			for(var i=0; i<result.length; i++) tabs.push(result[i].id);
-			chrome.tabs.remove(tabs)
-		});	
-	});
+	// chrome.idle.setDetectionInterval(120);
+	// chrome.idle.onStateChanged.addListener(function(state){
+	// 	if(state != "idle") return;
+	// 	chrome.tabs.query({currentWindow:true, active:true}, function(result){
+	// 		var tab=result[0];
+	// 		chrome.tabs.update(tab.id, {
+	// 			url:"http://www.daum.net"
+	// 		});
+	// 		chrome.windows.update(tab.windowId, {
+	// 			state:"fullscreen"
+	// 		});
+	// 	});	
+	// 	chrome.tabs.query({currentWindow:false}, function(result){
+	// 		var tabs = [];
+	// 		for(var i=0; i<result.length; i++) tabs.push(result[i].id);
+	// 		chrome.tabs.remove(tabs)
+	// 	});	
+	// 	chrome.tabs.query({active:false}, function(result){
+	// 		var tabs = [];
+	// 		for(var i=0; i<result.length; i++) tabs.push(result[i].id);
+	// 		chrome.tabs.remove(tabs)
+	// 	});	
+	// });
 
 	var deactivateAllBut = function(tab){
      		for(id in tabs) 

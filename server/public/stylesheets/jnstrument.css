@@ -161,8 +161,8 @@ a:hover {
   top: 24px;
   width: 200px;
   opacity: 0.2;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
   filter: alpha(opacity=20);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
 }
 .ir.jnstrumentSubtitle {
   position: absolute;
@@ -222,8 +222,8 @@ a:hover {
 }
 .titleBar .ir {
   opacity: 0.25;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)";
   filter: alpha(opacity=25);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)";
 }
 .index .ir,
 .none .ir {
@@ -301,8 +301,8 @@ a:hover {
 }
 li.active a {
   opacity: 0.25 !important;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)" !important;
   filter: alpha(opacity=25) !important;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)" !important;
   cursor: default;
 }
 .visualsNavigation {
