@@ -1,8 +1,10 @@
 var config={
-	socketAdress : "jnstrument.com",
+	// socketAdress : "jnstrument.com",
 //	socketAdress : "192.168.1.13:8000",
 //	socketAdress : "10.162.66.20:8000",
 	// socketAdress : "127.0.0.1:8000",
+
+	socketAdress: "54.200.38.41",
 
 	colors : {
 		background : 0x000015, // 0x000026,//
