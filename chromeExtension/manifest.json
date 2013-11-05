@@ -17,19 +17,22 @@
     {
       "js": ["contentScript.js"],
       "run_at" : "document_end",
-      "matches" : ["http://*/*", "file://*/*"]
+      "matches" : ["http://*/*", "file://*/*", "https://*/*"]
     }
   ],
   "permissions": [
     "tabs",
-    "http://*/*"
+    "http://*/*",
+    "https://*/*"
   ],
   "browser_action": {
     "default_icon": "inactive.png",
     "default_popup": "popup.html",
     "default_title": "jnstrument"
   },
-
+  "web_accessible_resources" : [
+    "pca__ProxyInstrumentES5.js"
+  ],
   "requirements": {
     "3D": {
       "features": ["webgl"]
