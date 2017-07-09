@@ -1,3 +1,5 @@
+// http://astexplorer.net/#/gist/4bdbaedabd939ef702b7036d87b2bba1/e1374b619c559bf2d0c6f84bcfac2483d366bd94
+
 module.exports = jnstrumentVisitor;
 
 ///////////////////////////////////////////////////////////////////////////////
