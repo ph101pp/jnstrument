@@ -4,5 +4,8 @@
   "main": "lib/babel-plugin/index.js",
   "dependencies": {
     "pino": "4.6.0"
+  },
+  "scripts": {
+    "self": "node -e \"var s='../.', d='./node_modules/jnstrument',fs=require('fs'); !fs.existsSync(d) && fs.symlinkSync(s,d,'dir');\""
   }
 }
