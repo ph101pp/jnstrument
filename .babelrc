@@ -1,5 +1,10 @@
 {
   "plugins": [
     "jnstrument"
+  ],
+  "ignore": [
+    "lib/**/*.js",
+    "events.js",
+    "node_modules"
   ]
 }

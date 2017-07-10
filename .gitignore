@@ -6,3 +6,4 @@ npm-debug.log
 es5/
 .nyc_output
 coverage/
+compiled/
