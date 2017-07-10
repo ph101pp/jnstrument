@@ -45,13 +45,16 @@ function jnstrumentVisitor(babel) {
     visitor: {
       Program(path) {
         // create unique event identifier
-        const identifier = path.scope.generateUidIdentifier("jnstrument");
+        const identifier = path.scope.generateUidIdentifier("j");
         
         // create & add jnstrument event module
         const requireStatement = t.variableDeclaration("const", [
           t.variableDeclarator(identifier, t.callExpression(t.identifier("require"), [t.stringLiteral("jnstrument/babel-plugin/event")]))
         ]);
+        
         path.node.body.unshift(requireStatement);
+        path.node.body.unshift(t.expressionStatement(createJnstrumentation("start")));
+        path.node.body.unshift(t.expressionStatement(createJnstrumentation("end")));
 
         // kick off ProgramVisitor to instrument the file
         path.traverse(ProgramVisitor, { eventIdentifier: identifier });
