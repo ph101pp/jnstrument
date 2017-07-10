@@ -1,4 +1,8 @@
 {
-    "name": "jnstrument",
-    "version": "2.0.0"
+  "name": "jnstrument",
+  "version": "2.0.0",
+  "main": "lib/babel-plugin/index.js",
+  "dependencies": {
+    "pino": "4.6.0"
+  }
 }
