@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "node -e \"var s='../.', d='./node_modules/jnstrument',fs=require('fs'); !fs.existsSync(d) && fs.symlinkSync(s,d,'dir');\"",
     "preinstall": "rm -R ./node_modules/jnstrument",
-    "js:build": "rm -R compiled; ./node_modules/.bin/babel test --out-dir compiled --copy-files",
+    "compile": "rm -R compiled; ./node_modules/.bin/babel test --out-dir compiled --copy-files",
     "start": "BABEL_DISABLE_CACHE=1 babel-node test"
   },
   "devDependencies": {

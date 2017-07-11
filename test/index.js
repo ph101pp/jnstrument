@@ -9,9 +9,11 @@ var other = {
   'b': 2
 };
 
-function test(){
-
-return 'hello';  
+function test() {
+  return 'hello';  
 }
- 
+function tests() {
+}
+
+
 console.log(_.merge(object, other));
