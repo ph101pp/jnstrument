@@ -3,22 +3,22 @@
   "version": "2.0.0",
   "main": "lib/babel-plugin/index.js",
   "dependencies": {
-    "minimist": "1.2.0",
+    "commander": "2.11.0",
+    "express": "4.15.3",
     "pino": "4.6.0"
   },
   "bin": {
-    "jnstrument": "./bin/jnstrument.js"
+    "jnstrument": "./lib/bin/index.js"
   },
   "scripts": {
     "postinstall": "node -e \"var s='../.', d='./node_modules/jnstrument',fs=require('fs'); !fs.existsSync(d) && fs.symlinkSync(s,d,'dir');\"",
-    "_preinstall": "fs.existsSync(d) && rm -R ./node_modules/jnstrument",
-    "compile": "rm -R compiled; ./node_modules/.bin/babel test --out-dir compiled --copy-files",
-    "start": "BABEL_DISABLE_CACHE=1 babel-node test",
-    "log": "npm run start | pino-tee info ./log.txt",
-    "jnstrument": "npm run start | node ./bin/jnstrument.js"
+    "preinstall": "([ -d './node_modules/jnstrument' ] && rm -R ./node_modules/jnstrument) || true",
+    "compile": "rm -R compiled; ./node_modules/.bin/babel sourceApp --out-dir compiledApp --copy-files",
+    "start": "BABEL_DISABLE_CACHE=1 babel-node sourceApp",
+    "log": "npm run start | jnstrument -- -f events.log"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
-    "babel-register": "6.24.1",
+    "babel-register": "6.24.1"
   }
 }
