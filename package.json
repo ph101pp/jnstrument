@@ -20,6 +20,5 @@
   "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-register": "6.24.1",
-    "pino-tee": "0.1.2"
   }
 }
