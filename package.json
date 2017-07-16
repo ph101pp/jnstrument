@@ -15,10 +15,18 @@
     "preinstall": "([ -d './node_modules/jnstrument' ] && rm -R ./node_modules/jnstrument) || true",
     "compile": "rm -R compiled; ./node_modules/.bin/babel sourceApp --out-dir compiledApp --copy-files",
     "start": "BABEL_DISABLE_CACHE=1 babel-node sourceApp",
-    "log": "npm run start | jnstrument -- -f events.log"
+    "log": "npm run start | jnstrument log -d events.log"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
-    "babel-register": "6.24.1"
+    "babel-loader": "7.1.1",
+    "babel-register": "6.24.1",
+    "css-loader": "0.28.4",
+    "d3": "4.10.0",
+    "extract-text-webpack-plugin": "3.0.0",
+    "postcss-cssnext": "3.0.2",
+    "postcss-import": "10.0.0",
+    "postcss-loader": "2.0.6",
+    "webpack": "3.3.0"
   }
 }
