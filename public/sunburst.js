@@ -78,17 +78,24 @@ window.__DATA__.forEach(eventRaw => {
 
   if (type !== 'ENTER') return;
 
-  scopes[scopeId] = functionId;
+  // // by scopeId
+  flatTree[scopeId] = flatTree[scopeId] || { name: functionId, children: [], size: 1 };
 
-  // flatTree[scopeId] = flatTree[scopeId] || { name: functionId, children: [] };
-  // flatTree[parentScopeId].children.push(scopeId);
+  const parentId = typeof flatTree[parentScopeId] === 'undefined' ? 'root' : parentScopeId;
+  flatTree[parentId].children.push(scopeId);
 
-  flatTree[functionId] = flatTree[functionId] || { name: functionId, children: [] };
-  flatTree[functionId] = flatTree[functionId] || { name: functionId, children: [] };
+  // // by functionId
+  // scopes[scopeId] = functionId;
+  // flatTree[functionId] = flatTree[functionId] || { name: functionId, children: [], size: 0 };
 
-  const parentId = scopes[parentScopeId] || 'root';
+  // flatTree[functionId].size++
 
-  if (flatTree[parentId].children.indexOf(functionId) < 0) flatTree[parentId].children.push(functionId);
+  // const parentId = scopes[parentScopeId] || 'root';
+
+
+  // if(flatTree[parentId].children.indexOf(functionId) < 0) 
+  //   flatTree[parentId].children.push(functionId);
+
 });
 
 console.log(flatTree);
@@ -97,9 +104,9 @@ const nestedTree = nestTree('root', flatTree);
 function nestTree(nodeId, nodes) {
   const node = nodes[nodeId];
   return {
-    name: node.name,
+    name: `${node.name} - ${node.size}`,
     children: node.children.map(nodeId => nestTree(nodeId, nodes)),
-    size: 1
+    size: node.size
   };
 }
 
