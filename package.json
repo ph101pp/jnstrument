@@ -12,7 +12,7 @@
   },
   "scripts": {
     "postinstall": "node -e \"var s='../.', d='./node_modules/jnstrument',fs=require('fs'); !fs.existsSync(d) && fs.symlinkSync(s,d,'dir');\"",
-    "preinstall": "([ -d './node_modules/jnstrument' ] && rm -R ./node_modules/jnstrument) || true",
+    "preinstall": "rm -R ./node_modules/jnstrument || true",
     "compile": "rm -R compiled; ./node_modules/.bin/babel sourceApp --out-dir compiledApp --copy-files",
     "start": "BABEL_DISABLE_CACHE=1 babel-node sourceApp",
     "log": "npm run start | jnstrument log -d events.log"
@@ -24,6 +24,7 @@
     "css-loader": "0.28.4",
     "d3": "4.10.0",
     "extract-text-webpack-plugin": "3.0.0",
+    "lodash": "4.17.4",
     "postcss-cssnext": "3.0.2",
     "postcss-import": "10.0.0",
     "postcss-loader": "2.0.6",

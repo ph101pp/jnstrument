@@ -8,3 +8,4 @@ es5/
 coverage/
 compiledApp/
 *.log
+public/
