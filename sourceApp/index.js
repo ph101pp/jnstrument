@@ -1,4 +1,4 @@
-const _ = require('./lodash');
+const merge = require('lodash/merge');
 
 var object = {
  "name": "flare",
@@ -762,4 +762,4 @@ var other ={
  ]
 };
 
-console.log(_.merge(object, other));
+console.log(merge(object, other));

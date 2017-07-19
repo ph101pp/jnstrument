@@ -15,7 +15,8 @@
     "preinstall": "rm -R ./node_modules/jnstrument || true",
     "compile": "rm -R compiled; ./node_modules/.bin/babel sourceApp --out-dir compiledApp --copy-files",
     "start": "BABEL_DISABLE_CACHE=1 babel-node sourceApp",
-    "log": "npm run start | jnstrument log -d events.log"
+    "log": "node sourceApp/server | jnstrument log -d events.log",
+    "serve": "jnstrument serve events.log"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
