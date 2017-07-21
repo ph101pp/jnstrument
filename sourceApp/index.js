@@ -1,5 +1,6 @@
 const merge = require('lodash/merge');
 
+
 var object = {
  "name": "flare",
  "children": [
