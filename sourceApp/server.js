@@ -1,8 +1,13 @@
-require('babel-register')({
-  "ignore": /lib|node_modules\/(?!lodash)|events.js/,
+const register = require('babel-register').default;
+
+console.log(register);
+register({
+  "ignore": [
+    /lib|node_modules\/(?!lodash)|events.js/
+  ],
   "cache": false,
   "plugins": [
-    "jnstrument"
+    "module:jnstrument"
   ]
 });
 require('./index');

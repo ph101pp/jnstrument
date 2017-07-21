@@ -3,8 +3,10 @@
   "version": "2.0.0",
   "main": "lib/babel-plugin/index.js",
   "dependencies": {
+    "babel-register": "7.0.0-alpha.15",
     "commander": "2.11.0",
     "express": "4.15.3",
+    "nano-time": "1.0.0",
     "pino": "4.6.0"
   },
   "bin": {
@@ -20,13 +22,12 @@
     "rerun": "npm run log; npm run serve"
   },
   "devDependencies": {
-    "babel-cli": "6.24.1",
+    "babel-cli": "7.0.0-alpha.15",
     "babel-loader": "7.1.1",
-    "babel-register": "6.24.1",
     "css-loader": "0.28.4",
     "d3": "4.10.0",
     "extract-text-webpack-plugin": "3.0.0",
-    "lodash": "4.17.4",
+    "lodash": "^4.17.4",
     "postcss-cssnext": "3.0.2",
     "postcss-import": "10.0.0",
     "postcss-loader": "2.0.6",
