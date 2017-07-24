@@ -5,7 +5,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   entry: {
     sunburst: './lib/client/sunburst',
-    verticalPartition: './lib/client/verticalPartition'
+    verticalPartition: './lib/client/verticalPartition',
+    enterRing: './lib/client/enterRing'
   },
   output: {
     path: path.resolve(__dirname, 'public'),
