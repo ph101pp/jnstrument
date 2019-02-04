@@ -5,6 +5,6 @@
     "events.js"
   ],
   "plugins": [
-    "jnstrument"
+    "module:jnstrument"
   ]
 }

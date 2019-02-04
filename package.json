@@ -18,7 +18,7 @@
     "compile": "rm -R compiled; ./node_modules/.bin/babel sourceApp --out-dir compiledApp --copy-files",
     "start": "BABEL_DISABLE_CACHE=1 babel-node sourceApp",
     "log": "node sourceApp/server | jnstrument log -d events.log",
-    "serve": "jnstrument serve events.log",
+    "serve": "jnstrument serve -s ./events.log",
     "rerun": "npm run log; npm run serve"
   },
   "devDependencies": {
