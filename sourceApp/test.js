@@ -15,6 +15,7 @@ let tips = [
 ];
 
 function printTips() {
+  const hello ="";
   tips.forEach((tip, i) => console.log(`Tip ${i}:` + tip));
   return "hello";
 }
